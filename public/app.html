@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — SocialPulse</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+</head>
+<body>
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <a href="/" class="sidebar-brand">
+                    <span class="logo-icon">⚡</span>
+                    SocialPulse
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-title">Principal</div>
+                <button class="sidebar-link active" data-section="overview" onclick="navigateTo('overview')">
+                    <span class="icon">📊</span>
+                    Dashboard
+                </button>
+                <button class="sidebar-link" data-section="posts" onclick="navigateTo('posts')">
+                    <span class="icon">📝</span>
+                    Mis Posts
+                </button>
+                <button class="sidebar-link" data-section="create" onclick="navigateTo('create')">
+                    <span class="icon">➕</span>
+                    Crear Post
+                </button>
+                <button class="sidebar-link" data-section="calendar" onclick="navigateTo('calendar')">
+                    <span class="icon">📅</span>
+                    Calendario
+                </button>
+
+                <div class="sidebar-section-title">Herramientas</div>
+                <button class="sidebar-link" data-section="ai" onclick="navigateTo('ai')">
+                    <span class="icon">🤖</span>
+                    IA Assistant
+                </button>
+                <button class="sidebar-link" data-section="brand" onclick="navigateTo('brand')">
+                    <span class="icon">🏷️</span>
+                    Mi Marca
+                </button>
+
+                <div class="sidebar-section-title">Cuenta</div>
+                <button class="sidebar-link" data-section="settings" onclick="navigateTo('settings')">
+                    <span class="icon">⚙️</span>
+                    Configuración
+                </button>
+            </nav>
+            <div class="sidebar-footer" style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-lg);">
+                <div class="sidebar-user" onclick="navigateTo('settings')" style="padding: 0; gap: 12px; cursor: pointer; flex: 1;">
+                    <div class="avatar" id="user-avatar" style="background: #e2e8f0; color: #1e293b; width: 36px; height: 36px; font-size: 14px;">M</div>
+                    <div class="sidebar-user-info">
+                        <div class="sidebar-user-name" id="user-name" style="color: #1e293b; font-weight: 700; font-size: 13px;">Usuario</div>
+                        <div class="sidebar-user-plan" id="user-plan" style="color: #10b981; text-transform: lowercase; font-size: 11px;">🟢 activo</div>
+                    </div>
+                </div>
+                <button onclick="logout()" title="Cerrar Sesión" style="border: none; background: rgba(239, 68, 68, 0.1); color: var(--danger); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="main-header">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+                    <h1 id="page-title">Dashboard</h1>
+                </div>
+                <div class="main-header-actions">
+                    <button class="btn btn-primary btn-sm" onclick="navigateTo('create')">
+                        ➕ Nuevo Post
+                    </button>
+                </div>
+            </header>
+            <div class="main-body" id="main-body">
+                <!-- Content loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- Modal container -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal" id="modal-content" onclick="event.stopPropagation()">
+        </div>
+    </div>
+
+    <!-- Onboarding Modal -->
+    <div class="modal-overlay" id="onboarding-overlay" style="background: rgba(15, 23, 42, 0.95);">
+        <div class="modal" style="max-width: 500px; padding: 32px;" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="modal-title" style="font-size: 24px; margin-bottom: 8px;">¡Bienvenido a SocialPulse! 👋</h3>
+            </div>
+            <p style="margin-bottom: 24px; color: var(--text-secondary); line-height: 1.6;">
+                Para que nuestra Inteligencia Artificial pueda generar contenido súper ajustado a tu negocio, por favor completa esta información:
+            </p>
+            <form onsubmit="handleOnboarding(event)">
+                <div class="form-group">
+                    <label class="form-label">¿Cómo usarás SocialPulse?</label>
+                    <select id="ob-account-type" class="form-select" onchange="updateOnboardingLabels(this.value)">
+                        <option value="business">🏢 Como Empresa / Negocio</option>
+                        <option value="personal">🎨 Como Marca Personal / Artista</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="label-ob-type" for="ob-type">Tipo de Negocio / Rubro</label>
+                    <input type="text" id="ob-type" class="form-input" placeholder="Ej: Venta de artículos deportivos" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="label-ob-audience" for="ob-audience">¿A quién le vendes? (Público Objetivo)</label>
+                    <input type="text" id="ob-audience" class="form-input" placeholder="Ej: Deportistas amateurs de 18 a 35 años" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="ob-voice">Tono de tu Marca</label>
+                    <select id="ob-voice" class="form-select" required>
+                        <option value="Amigable y cercano">Amigable y cercano</option>
+                        <option value="Profesional y formal">Profesional y formal</option>
+                        <option value="Humorístico y divertido">Humorístico y divertido</option>
+                        <option value="Educativo e informativo">Educativo e informativo</option>
+                        <option value="Inspirador y motivacional">Inspirador y motivacional</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;" id="ob-btn">Comenzar a usar la app</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/js/api.js"></script>
+    <script src="/js/app.js"></script>
+</body>
+</html>
