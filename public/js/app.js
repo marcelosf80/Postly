@@ -90,7 +90,8 @@ function navigateTo(section) {
         calendar: 'Calendario',
         ai: 'IA Assistant',
         brand: 'Mi Marca',
-        settings: 'Configuración'
+        settings: 'Configuración',
+        admin: '🛡️ Administración'
     };
     document.getElementById('page-title').textContent = titles[section] || 'Dashboard';
 
@@ -102,7 +103,8 @@ function navigateTo(section) {
         calendar: renderCalendar,
         ai: renderAI,
         brand: renderBrand,
-        settings: renderSettings
+        settings: renderSettings,
+        admin: renderAdmin
     };
 
     const renderer = renderers[section];
