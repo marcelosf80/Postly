@@ -184,6 +184,12 @@ router.post('/google', async (req, res) => {
 
         // Generate token
         const token = generateToken(user);
+        
+        // Update avatar if it changed or wasn't set (for existing users)
+        if (payload.picture && user.avatar_url !== payload.picture) {
+            user = users.update(user.id, { avatar_url: payload.picture });
+        }
+
         const { password_hash: _, ...safeUser } = user;
 
         res.json({

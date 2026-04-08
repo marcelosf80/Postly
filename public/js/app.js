@@ -19,28 +19,54 @@ document.addEventListener('DOMContentLoaded', () => {
     navigateTo('overview');
 });
 
-function initUserInfo() {
+async function initUserInfo() {
     if (!currentUser) return;
+    
+    // UI Elements
     const nameEl = document.getElementById('user-name');
     const planEl = document.getElementById('user-plan');
     const avatarEl = document.getElementById('user-avatar');
 
-    if (nameEl) nameEl.textContent = currentUser.name || 'Usuario';
-    if (planEl) planEl.textContent = `Plan ${(currentUser.plan || 'free').charAt(0).toUpperCase() + (currentUser.plan || 'free').slice(1)}`;
-    if (avatarEl) {
-        if (currentUser.avatar_url) {
-            avatarEl.innerHTML = `<img src="${currentUser.avatar_url}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
-            avatarEl.style.background = 'transparent';
-        } else {
-            avatarEl.textContent = (currentUser.name || 'U').charAt(0).toUpperCase();
-            avatarEl.style.background = currentUser.avatar_color || 'var(--gradient-primary)';
-            avatarEl.innerHTML = (currentUser.name || 'U').charAt(0).toUpperCase();
-        }
+    // 1. Render immediate data from Cache
+    renderUserData(currentUser);
+
+    // 2. Fetch fresh data from Server to update Cache
+    try {
+        const data = await API.getProfile();
+        const freshUser = data.user;
+        
+        // Update Cache
+        localStorage.setItem('sp_user', JSON.stringify(freshUser));
+        Object.assign(currentUser, freshUser);
+        
+        // Render again with fresh data
+        renderUserData(freshUser);
+    } catch (err) {
+        console.warn('[APP] Error al sincronizar perfil:', err.message);
     }
 
     if (currentUser.onboarding_completed === false) {
         const overlay = document.getElementById('onboarding-overlay');
         if (overlay) overlay.classList.add('active');
+    }
+}
+
+function renderUserData(user) {
+    const nameEl = document.getElementById('user-name');
+    const planEl = document.getElementById('user-plan');
+    const avatarEl = document.getElementById('user-avatar');
+
+    if (nameEl) nameEl.textContent = user.name || 'Usuario';
+    if (planEl) planEl.textContent = `Plan ${(user.plan || 'free').charAt(0).toUpperCase() + (user.plan || 'free').slice(1)}`;
+    if (avatarEl) {
+        if (user.avatar_url) {
+            avatarEl.innerHTML = `<img src="${user.avatar_url}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+            avatarEl.style.background = 'transparent';
+        } else {
+            avatarEl.textContent = (user.name || 'U').charAt(0).toUpperCase();
+            avatarEl.style.background = user.avatar_color || 'var(--gradient-primary)';
+            avatarEl.innerHTML = (user.name || 'U').charAt(0).toUpperCase();
+        }
     }
 }
 
