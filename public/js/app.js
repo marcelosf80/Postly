@@ -175,12 +175,38 @@ function updateOnboardingLabels(type) {
 function showHelp(topic) {
     const helpData = {
         'ig-page': {
-            title: 'Instagram / Facebook Page ID',
-            text: 'Es el identificador numérico de tu página de Facebook. Puedes encontrarlo en la sección "Información" de tu página de Facebook o en la pestaña "Configuración" > "Nueva experiencia de páginas" > "Páginas vinculadas".'
+            title: 'Encontrar tu Instagram Page ID',
+            text: `
+                <p>Para que la IA publique en Instagram, necesitamos el ID numérico de tu cuenta <strong>Business</strong>:</p>
+                <ol style="margin-top:10px; padding-left:20px;">
+                    <li>Entra a tu FanPage de Facebook vinculada a Instagram.</li>
+                    <li>Ve a <strong>Panel para profesionales</strong> > <strong>Cuentas vinculadas</strong>.</li>
+                    <li>Si no lo ves ahí, la forma más infalible es entrar al <strong><a href="https://developers.facebook.com/tools/explorer/" target="_blank">Meta Explorer</a></strong>, poner <code>me/accounts?fields=instagram_business_account</code> y darle a Submit.</li>
+                </ol>
+            `
+        },
+        'fb-page': {
+            title: 'Encontrar tu Facebook Page ID',
+            text: `
+                <p>El ID de tu página de Facebook es muy fácil de encontrar:</p>
+                <ol style="margin-top:10px; padding-left:20px;">
+                    <li>Entra a tu página de Facebook.</li>
+                    <li>Haz clic en la pestaña <strong>Información</strong>.</li>
+                    <li>Baja hasta el final y verás el <strong>ID de la página</strong> (un número largo).</li>
+                </ol>
+            `
         },
         'meta-token': {
-            title: 'Meta Access Token',
-            text: 'Este token permite a SocialPulse publicar por ti. Debes obtenerlo en Meta for Developers. <b>Recuerda:</b> Usa un token de "Larga Duración" (60 días) para evitar que expire rápido. Tienes la guía detallada en el archivo guia_meta_tokens.md.'
+            title: 'Obtener tu Access Token',
+            text: `
+                <p>Es la "llave" que usa SocialPulse para publicar por ti:</p>
+                <ol style="margin-top:10px; padding-left:20px;">
+                    <li>Entra al <strong><a href="https://developers.facebook.com/tools/explorer/" target="_blank">Meta Graph Explorer</a></strong>.</li>
+                    <li>Selecciona tu App y dale permisos: <code>instagram_basic</code>, <code>instagram_content_publish</code>, <code>pages_show_list</code>.</li>
+                    <li>Haz clic en <strong>Generate Token</strong>.</li>
+                    <li>Copia ese token y pégalo aquí. ¡Recuerda guardarlo!</li>
+                </ol>
+            `
         }
     };
 
@@ -191,7 +217,7 @@ function showHelp(topic) {
             <h3 class="modal-title">❓ ${data.title}</h3>
             <button class="modal-close" onclick="closeModal(event)">✕</button>
         </div>
-        <div style="line-height:1.6; color:var(--text-secondary);">
+        <div style="line-height:1.6; color:var(--text-secondary); font-size:14px;">
             ${data.text}
         </div>
         <button class="btn btn-primary btn-sm" style="width:100%; margin-top:24px;" onclick="closeModal()">Entendido</button>
@@ -1111,31 +1137,34 @@ async function renderSettings() {
             </div>
 
             <div class="settings-section">
-                <h3>📸 Instagram</h3>
-                <p class="text-muted" style="font-size:13px;margin-bottom:16px;">Conectá tu cuenta de Instagram Business para publicar desde SocialPulse.</p>
-                <div class="settings-row">
-                    <div class="form-group">
-                        <label class="form-label">Page ID <span class="help-trigger" onclick="showHelp('ig-page')">?</span></label>
-                        <input type="text" id="set-ig-page" class="form-input" value="${user.ig_page_id || ''}" placeholder="Tu Instagram Page ID">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Access Token <span class="help-trigger" onclick="showHelp('meta-token')">?</span></label>
-                        <input type="password" id="set-ig-token" class="form-input" value="${user.ig_access_token || ''}" placeholder="Token de Meta Graph API">
+                <h3>🔗 Conexiones Sociales</h3>
+                <p class="text-muted" style="font-size:13px;margin-bottom:20px;">Configurá tus IDs y Tokens manualmente para permitir que SocialPulse publique en tus redes.</p>
+                
+                <div style="background:var(--bg-secondary); padding:20px; border-radius:12px; margin-bottom:16px; border:1px solid var(--border);">
+                    <h4 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">📸 Instagram Business</h4>
+                    <div class="settings-row">
+                        <div class="form-group">
+                            <label class="form-label">Instagram Page ID <span class="help-trigger" onclick="showHelp('ig-page')">?</span></label>
+                            <input type="text" id="set-ig-page" class="form-input" value="${user.ig_page_id || ''}" placeholder="Ej: 17841401234567890">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Access Token <span class="help-trigger" onclick="showHelp('meta-token')">?</span></label>
+                            <input type="password" id="set-ig-token" class="form-input" value="${user.ig_access_token || ''}" placeholder="Token de Meta (60 días recomendado)">
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="settings-section">
-                <h3>📘 Facebook</h3>
-                <p class="text-muted" style="font-size:13px;margin-bottom:16px;">Conectá tu página de Facebook para publicaciones cruzadas.</p>
-                <div class="settings-row">
-                    <div class="form-group">
-                        <label class="form-label">Page ID <span class="help-trigger" onclick="showHelp('ig-page')">?</span></label>
-                        <input type="text" id="set-fb-page" class="form-input" value="${user.fb_page_id || ''}" placeholder="Tu Facebook Page ID">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Access Token <span class="help-trigger" onclick="showHelp('meta-token')">?</span></label>
-                        <input type="password" id="set-fb-token" class="form-input" value="${user.fb_access_token || ''}" placeholder="Token de Meta Graph API">
+                <div style="background:var(--bg-secondary); padding:20px; border-radius:12px; border:1px solid var(--border);">
+                    <h4 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">📘 Facebook Page</h4>
+                    <div class="settings-row">
+                        <div class="form-group">
+                            <label class="form-label">Facebook Page ID <span class="help-trigger" onclick="showHelp('fb-page')">?</span></label>
+                            <input type="text" id="set-fb-page" class="form-input" value="${user.fb_page_id || ''}" placeholder="Ej: 102938475612345">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Access Token</label>
+                            <input type="password" id="set-fb-token" class="form-input" value="${user.fb_access_token || ''}" placeholder="Token de Meta">
+                        </div>
                     </div>
                 </div>
             </div>
