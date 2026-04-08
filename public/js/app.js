@@ -28,8 +28,14 @@ function initUserInfo() {
     if (nameEl) nameEl.textContent = currentUser.name || 'Usuario';
     if (planEl) planEl.textContent = `Plan ${(currentUser.plan || 'free').charAt(0).toUpperCase() + (currentUser.plan || 'free').slice(1)}`;
     if (avatarEl) {
-        avatarEl.textContent = (currentUser.name || 'U').charAt(0).toUpperCase();
-        avatarEl.style.background = currentUser.avatar_color || 'var(--gradient-primary)';
+        if (currentUser.avatar_url) {
+            avatarEl.innerHTML = `<img src="${currentUser.avatar_url}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+            avatarEl.style.background = 'transparent';
+        } else {
+            avatarEl.textContent = (currentUser.name || 'U').charAt(0).toUpperCase();
+            avatarEl.style.background = currentUser.avatar_color || 'var(--gradient-primary)';
+            avatarEl.innerHTML = (currentUser.name || 'U').charAt(0).toUpperCase();
+        }
     }
 
     if (currentUser.onboarding_completed === false) {

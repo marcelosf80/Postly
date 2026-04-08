@@ -173,6 +173,7 @@ router.post('/google', async (req, res) => {
                 fb_access_token: '',
                 posts_this_month: 0,
                 avatar_color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`,
+                avatar_url: payload.picture || '',
                 onboarding_completed: false,
                 business_type: '',
                 target_audience: '',
