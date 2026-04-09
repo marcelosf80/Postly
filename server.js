@@ -36,6 +36,7 @@ app.use((req, res, next) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/ai', require('./routes/ai'));
+app.use('/api/billing', require('./routes/billing'));
 
 // === Public Config ===
 app.get('/api/config', (req, res) => {

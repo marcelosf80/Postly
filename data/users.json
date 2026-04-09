@@ -21,8 +21,11 @@
     "brand_voice": "Amigable y cercano",
     "auth_provider": "google",
     "is_admin": true,
+    "posts_remaining": 5,
+    "transactions": [],
     "created_at": "2026-04-07T20:21:23.353Z",
-    "updated_at": "2026-04-07T23:42:00.000Z",
-    "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocL8u9eE9L-JqUoVQ3o7_586JzJjVjV_Z-O4Gz_Z=s96-c"
+    "updated_at": "2026-04-08T20:14:37.209Z",
+    "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocKCKUPM5lKadr7VqPdSRR8e5v6mQ6kiXr6TfrzySEo4lzL84ntJ=s96-c",
+    "mp_access_token": "APP_USR-8829196420406853-040721-8020be3c8ce2e1847a0412f02f1d1c25-3321021797"
   }
 ]

@@ -60,13 +60,19 @@ function renderUserData(user) {
     if (planEl) planEl.textContent = `Plan ${(user.plan || 'free').charAt(0).toUpperCase() + (user.plan || 'free').slice(1)}`;
     if (avatarEl) {
         if (user.avatar_url) {
-            avatarEl.innerHTML = `<img src="${user.avatar_url}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+            avatarEl.innerHTML = `<img src="${user.avatar_url}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" onerror="this.onerror=null; this.parentElement.innerHTML='${(user.name || 'U').charAt(0).toUpperCase()}'; this.parentElement.style.background='${user.avatar_color || 'var(--primary)'}';">`;
             avatarEl.style.background = 'transparent';
         } else {
             avatarEl.textContent = (user.name || 'U').charAt(0).toUpperCase();
             avatarEl.style.background = user.avatar_color || 'var(--gradient-primary)';
             avatarEl.innerHTML = (user.name || 'U').charAt(0).toUpperCase();
         }
+    }
+
+    // Toggle admin link based on User Role
+    const adminLink = document.getElementById('admin-link');
+    if (adminLink) {
+        adminLink.style.display = user.is_admin ? 'flex' : 'none';
     }
 }
 
@@ -91,6 +97,7 @@ function navigateTo(section) {
         ai: 'IA Assistant',
         brand: 'Mi Marca',
         settings: 'Configuración',
+        billing: '💳 Planes y Precios',
         admin: '🛡️ Administración'
     };
     document.getElementById('page-title').textContent = titles[section] || 'Dashboard';
@@ -104,6 +111,7 @@ function navigateTo(section) {
         ai: renderAI,
         brand: renderBrand,
         settings: renderSettings,
+        billing: renderBilling,
         admin: renderAdmin
     };
 
@@ -1321,5 +1329,351 @@ async function saveBrand(e) {
         showToast('Perfil de Marca guardado exitosamente', 'success');
     } catch (error) {
         showToast(error.message, 'error');
+    }
+}
+
+// === ADMIN PANEL ===
+async function renderAdmin() {
+    const body = document.getElementById('main-body');
+    
+    body.innerHTML = `
+        <div style="max-width: 1000px; margin: 0 auto;">
+            <!-- Tabs Navigation -->
+            <div style="display: flex; gap: 16px; border-bottom: 2px solid var(--border); margin-bottom: 24px;">
+                <button id="btn-tab-meta" class="admin-tab-btn active" onclick="switchAdminTab('meta')" style="padding: 12px 24px; background: none; border: none; font-weight: 600; font-size: 16px; color: var(--primary); border-bottom: 2px solid var(--primary); margin-bottom: -2px; cursor: pointer;">
+                    🌐 Configuración Meta
+                </button>
+                <button id="btn-tab-mp" class="admin-tab-btn" onclick="switchAdminTab('mp')" style="padding: 12px 24px; background: none; border: none; font-weight: 600; font-size: 16px; color: var(--text-secondary); cursor: pointer;">
+                    💳 Mercado Pago
+                </button>
+                <button id="btn-tab-users" class="admin-tab-btn" onclick="switchAdminTab('users')" style="padding: 12px 24px; background: none; border: none; font-weight: 600; font-size: 16px; color: var(--text-secondary); cursor: pointer;">
+                    👥 Usuarios
+                </button>
+            </div>
+
+            <!-- Tab 1: META -->
+            <div id="content-tab-meta" class="admin-tab-content" style="display: block;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+                    <!-- Información y Guía -->
+                    <div class="settings-section" style="grid-column: 1 / -1;">
+                        <h3 style="display:flex; align-items:center; gap:8px;">ℹ️ ¿Qué datos se usan aquí?</h3>
+                        <div class="card" style="background:#f0f9ff; border-color:#bae6fd; font-size:14px; color:#0369a1;">
+                            <p style="margin-bottom:8px;">Para que SocialPulse pueda publicar en tus redes, necesita conectarse a la API de Meta usando:</p>
+                            <ul style="margin-left:20px; line-height:1.6;">
+                                <li><strong>Page ID (Facebook e Instagram):</strong> El identificador único de tus páginas comerciales.</li>
+                                <li><strong>Access Token de Usuario (Larga Duración):</strong> Un permiso especial de 60 días generado en el <em>Meta Graph Explorer</em> con permisos como <code>pages_manage_posts</code> y <code>instagram_basic</code>.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- API Status Card -->
+                    <div class="settings-section" style="grid-column: 1 / -1;">
+                        <h3>📊 Estado de Conexión Meta (Global)</h3>
+                        <div id="admin-api-status" class="card" style="padding: 24px; background: #f8fafc;">
+                            Cargando información del sistema...
+                        </div>
+                    </div>
+
+                    <!-- Links Útiles -->
+                    <div class="settings-section">
+                        <h3>🔗 Enlaces Rápidos (Developers)</h3>
+                        <div class="card" style="display:flex; flex-direction:column; gap:12px;">
+                            <a href="https://developers.facebook.com/tools/explorer/" target="_blank" class="btn btn-outline" style="justify-content:flex-start; text-align:left;">
+                                🛠️ Meta Graph Explorer
+                            </a>
+                            <a href="https://developers.facebook.com/tools/debug/accesstoken/" target="_blank" class="btn btn-outline" style="justify-content:flex-start; text-align:left;">
+                                🔍 Access Token Debugger
+                            </a>
+                            <a href="https://developers.facebook.com/apps/" target="_blank" class="btn btn-outline" style="justify-content:flex-start; text-align:left;">
+                                📱 Panel de Mis Apps
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Recordatorios -->
+                    <div class="settings-section">
+                        <h3>📅 Recordatorio de Renovación</h3>
+                        <div class="card" style="background: rgba(234, 179, 8, 0.1); border-color: rgba(234, 179, 8, 0.3);">
+                            <p style="font-size:14px; line-height:1.6; color: #854d0e;">
+                                <strong>Nota Importante:</strong> Los tokens de Meta de "Larga Duración" duran <strong>60 días</strong>. 
+                                Es recomendable renovarlo 1 semana antes de que venza para evitar cortes en el servicio.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 2: MERCADO PAGO -->
+            <div id="content-tab-mp" class="admin-tab-content" style="display: none;">
+                <div class="settings-section">
+                    <h3 style="display:flex; align-items:center; gap:8px;">ℹ️ ¿Qué datos se usan aquí?</h3>
+                    <div class="card" style="background:#f0fdf4; border-color:#bbf7d0; font-size:14px; color:#166534;">
+                        <p style="margin-bottom:8px;">Para que los usuarios puedan comprar planes y el dinero vaya a tu cuenta, se usa:</p>
+                        <ul style="margin-left:20px; line-height:1.6;">
+                            <li><strong>Access Token de Producción:</strong> Una clave privada que arranca con <code>APP_USR-...</code> generada al crear una aplicación "Checkout Pro" en tu panel de desarrollador de Mercado Pago.</li>
+                        </ul>
+                        <p style="margin-top:8px; font-weight:bold;">
+                            <a href="https://dev.mercadopago.com.ar/panel" target="_blank" style="color:#166534; text-decoration:underline;">Ir a obtener mi Access Token en Mercado Pago ↗</a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>🏦 Configuración de Mercado Pago</h3>
+                    <div class="card">
+                        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:16px;">
+                            Ingresa el <strong>Access Token</strong> (Producción o Prueba) de tu cuenta de Mercado Pago Developers. 
+                            Todos los pagos del sistema irán directamente a esta cuenta.
+                        </p>
+                        <form onsubmit="saveDirectPaymentConfig(event)" style="display:flex; gap:12px; max-width:600px;">
+                            <input type="password" id="mp-access-token" class="form-input" style="flex:1;" 
+                                   value="${currentUser.mp_access_token || ''}" 
+                                   placeholder="APP_USR-0000...">
+                            <button type="submit" class="btn btn-primary">Guardar Pasarela</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab 3: USUARIOS -->
+            <div id="content-tab-users" class="admin-tab-content" style="display: none;">
+                <div class="settings-section">
+                    <h3>👥 Usuarios del Sistema</h3>
+                    <div id="admin-users-list" class="card" style="padding: 0; overflow: hidden;">
+                        <table style="width:100%; border-collapse: collapse; font-size:14px;">
+                            <thead style="background:#f8fafc; border-bottom:1px solid var(--border);">
+                                <tr>
+                                    <th style="padding:12px; text-align:left;">Usuario</th>
+                                    <th style="padding:12px; text-align:left;">Email</th>
+                                    <th style="padding:12px; text-align:left;">Plan</th>
+                                    <th style="padding:12px; text-align:left;">Rol</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                <tr><td colspan="4" style="padding:20px; text-align:center;">Cargando usuarios...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    `;
+
+    loadAdminStats();
+    loadAdminUsers();
+}
+
+window.switchAdminTab = function(tabId) {
+    document.querySelectorAll('.admin-tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+        btn.style.color = 'var(--text-secondary)';
+        btn.style.borderBottom = 'none';
+    });
+    document.querySelectorAll('.admin-tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    const activeBtn = document.getElementById('btn-tab-' + tabId);
+    activeBtn.classList.add('active');
+    activeBtn.style.color = 'var(--primary)';
+    activeBtn.style.borderBottom = '2px solid var(--primary)';
+    
+    document.getElementById('content-tab-' + tabId).style.display = 'block';
+}
+
+
+async function loadAdminStats() {
+    const statusDiv = document.getElementById('admin-api-status');
+    try {
+        const user = currentUser; 
+        const igToken = user.ig_access_token || 'No configurado';
+        const fbToken = user.fb_access_token || 'No configurado';
+        
+        statusDiv.innerHTML = `
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 32px;">
+                <div>
+                    <h4 style="color:var(--text-secondary); font-size:12px; text-transform:uppercase; margin-bottom:12px;">Instagram Business</h4>
+                    <div style="margin-bottom:8px;"><strong>ID:</strong> ${user.ig_page_id || 'N/A'}</div>
+                    <div style="margin-bottom:12px; font-size:12px; color:var(--text-secondary); word-break:break-all;"><strong>Token:</strong> ${igToken.substring(0, 15)}...</div>
+                    <div class="badge ${user.ig_access_token ? 'badge-success' : 'badge-danger'}">
+                        ${user.ig_access_token ? '🔌 Conectado' : '❌ Desconectado'}
+                    </div>
+                </div>
+                <div>
+                    <h4 style="color:var(--text-secondary); font-size:12px; text-transform:uppercase; margin-bottom:12px;">Facebook Page</h4>
+                    <div style="margin-bottom:8px;"><strong>ID:</strong> ${user.fb_page_id || 'N/A'}</div>
+                    <div style="margin-bottom:12px; font-size:12px; color:var(--text-secondary); word-break:break-all;"><strong>Token:</strong> ${fbToken.substring(0, 15)}...</div>
+                    <div class="badge ${user.fb_access_token ? 'badge-success' : 'badge-danger'}">
+                        ${user.fb_access_token ? '🔌 Conectado' : '❌ Desconectado'}
+                    </div>
+                </div>
+            </div>
+        `;
+    } catch (e) {
+        statusDiv.innerHTML = `<p style="color:var(--danger);">Error al cargar: ${e.message}</p>`;
+    }
+}
+
+async function loadAdminUsers() {
+    const tableBody = document.getElementById('users-table-body');
+    try {
+        // En esta fase 1, solo simulamos o cargamos desde la API usando getProfile
+        const data = await API.getProfile();
+        const user = data.user;
+
+        tableBody.innerHTML = `
+            <tr style="border-bottom:1px solid var(--border);">
+                <td style="padding:12px;">${user.name}</td>
+                <td style="padding:12px;">${user.email}</td>
+                <td style="padding:12px;"><span class="badge badge-success">${user.plan}</span></td>
+                <td style="padding:12px;">${user.is_admin ? '🛡️ Admin' : '👤 User'}</td>
+            </tr>
+        `;
+    } catch (e) {
+        tableBody.innerHTML = `<tr><td colspan="4" style="padding:20px; text-align:center; color:var(--danger);">Error: ${e.message}</td></tr>`;
+    }
+}
+
+async function saveDirectPaymentConfig(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    const originalText = btn.textContent;
+    btn.innerHTML = `<span class="spinner"></span> Procesando...`;
+    btn.disabled = true;
+
+    try {
+        const tokenVal = document.getElementById('mp-access-token').value;
+        const res = await API.updateProfile({ mp_access_token: tokenVal });
+        
+        // Update user cache
+        localStorage.setItem('sp_user', JSON.stringify(res.user));
+        Object.assign(currentUser, res.user);
+        
+        showToast('🔓 Token de Mercado Pago guardado exitosamente. Pagos activados.', 'success');
+    } catch (err) {
+        showToast(err.message, 'error');
+    } finally {
+        btn.textContent = originalText;
+        btn.disabled = false;
+    }
+}
+
+// === BILLING PANEL ===
+async function renderBilling() {
+    const body = document.getElementById('main-body');
+    
+    // Refresh user data to get accurate balance
+    let user = currentUser;
+    try {
+        const data = await API.getProfile();
+        user = data.user;
+        Object.assign(currentUser, user);
+    } catch {}
+
+    const remaining = user.posts_remaining || 0;
+
+    body.innerHTML = `
+        <div style="max-width: 900px; margin: 0 auto; text-align: center;">
+            <h2 style="margin-bottom: 8px;">💳 Créditos y Planes</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 32px;">Agrega créditos a tu cuenta para continuar publicando.</p>
+            
+            <div style="background: var(--bg-secondary); padding: 16px; border-radius: 12px; display: inline-block; margin-bottom: 40px; border: 1px solid var(--border);">
+                <div style="font-size: 14px; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 4px;">Saldo Actual</div>
+                <div style="font-size: 32px; font-weight: 700; color: ${remaining > 0 ? 'var(--success)' : 'var(--danger)'};">
+                    ${remaining} Publicaciones
+                </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; text-align: left;">
+                
+                <!-- Plan Único -->
+                <div class="card" style="display: flex; flex-direction: column; position: relative;">
+                    <h3 style="font-size: 20px; margin-bottom: 8px;">Plan Único</h3>
+                    <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">Ideal para un uso ocasional.</p>
+                    <div style="font-size: 36px; font-weight: 800; margin-bottom: 24px;">
+                        $2.000 <span style="font-size: 14px; color: var(--text-secondary); font-weight: 400;">/ ARS</span>
+                    </div>
+                    <ul style="list-style: none; padding: 0; margin: 0; margin-bottom: 32px; flex-grow: 1;">
+                        <li style="margin-bottom: 12px;">✅ <strong>1 Publicación</strong> agregada al saldo</li>
+                        <li style="margin-bottom: 12px;">✅ Todas las herramientas IA</li>
+                        <li style="margin-bottom: 12px;">✅ Sin vencimiento</li>
+                    </ul>
+                    <button class="btn btn-outline" style="width: 100%; border-color: var(--primary); color: var(--primary);" onclick="handleCheckout('unica')">
+                        Comprar 1 Post
+                    </button>
+                </div>
+
+                <!-- Plan Semanal -->
+                <div class="card" style="display: flex; flex-direction: column; position: relative; border-color: var(--primary); box-shadow: 0 4px 20px rgba(79, 70, 229, 0.1);">
+                    <div style="position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--primary); color: white; padding: 4px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; text-transform: uppercase;">
+                        Más Popular
+                    </div>
+                    <h3 style="font-size: 20px; margin-bottom: 8px;">Abono Semanal</h3>
+                    <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">Perfecto para mantener constancia.</p>
+                    <div style="font-size: 36px; font-weight: 800; margin-bottom: 24px; color: var(--primary);">
+                        $10.000 <span style="font-size: 14px; color: var(--text-secondary); font-weight: 400;">/ ARS</span>
+                    </div>
+                    <ul style="list-style: none; padding: 0; margin: 0; margin-bottom: 32px; flex-grow: 1;">
+                        <li style="margin-bottom: 12px;">✅ <strong>10 Publicaciones</strong> (50% OFF)</li>
+                        <li style="margin-bottom: 12px;">✅ Todas las herramientas IA</li>
+                        <li style="margin-bottom: 12px;">✅ Sin vencimiento</li>
+                    </ul>
+                    <button class="btn btn-primary" style="width: 100%;" onclick="handleCheckout('semanal')">
+                        Adquirir Paquete
+                    </button>
+                </div>
+
+                <!-- Plan Mensual -->
+                <div class="card" style="display: flex; flex-direction: column; position: relative;">
+                    <h3 style="font-size: 20px; margin-bottom: 8px;">Abono Mensual</h3>
+                    <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">Para agencias o alto volumen.</p>
+                    <div style="font-size: 36px; font-weight: 800; margin-bottom: 24px;">
+                        $50.000 <span style="font-size: 14px; color: var(--text-secondary); font-weight: 400;">/ ARS</span>
+                    </div>
+                    <ul style="list-style: none; padding: 0; margin: 0; margin-bottom: 32px; flex-grow: 1;">
+                        <li style="margin-bottom: 12px;">✅ <strong>60 Publicaciones</strong> (60% OFF)</li>
+                        <li style="margin-bottom: 12px;">✅ Todas las herramientas IA</li>
+                        <li style="margin-bottom: 12px;">✅ Sin vencimiento</li>
+                    </ul>
+                    <button class="btn btn-outline" style="width: 100%;" onclick="handleCheckout('mensual')">
+                        Adquirir Paquete
+                    </button>
+                </div>
+
+            </div>
+            
+            <div style="margin-top: 32px; text-align: center;">
+                 <img src="https://http2.mlstatic.com/frontend-assets/ui-navigation/5.19.1/mercadopago/logo__small@2x.png" alt="Mercado Pago" style="height: 30px; opacity: 0.8;">
+                 <p style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">Pagos seguros, se acredita al instante vía CBU, Tarjeta o Saldo MP.</p>
+            </div>
+        </div>
+    `;
+}
+
+async function handleCheckout(planId) {
+    try {
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.innerHTML = `<span class="spinner"></span> Procesando...`;
+        btn.disabled = true;
+
+        // Se llama al backend para crear la preferencia con el token de auth
+        const res = await API.request('/api/billing/create-preference', {
+            method: 'POST',
+            body: JSON.stringify({ planId })
+        });
+
+        // Redirige al init_point de MercadoPago
+        if (res && res.init_point) {
+            window.location.href = res.init_point;
+        } else {
+            throw new Error('No se pudo iniciar el pago.');
+        }
+
+    } catch (e) {
+        showToast(e.message, 'error');
+        event.target.disabled = false;
+        event.target.textContent = 'Reintentar';
     }
 }

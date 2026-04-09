@@ -188,6 +188,11 @@ router.post('/:id/publish', async (req, res) => {
 
         // Check if user has configured IG credentials
         const user = users.findById(req.user.id);
+        
+        if (user.posts_remaining <= 0 && !user.is_admin) {
+            return res.status(403).json({ error: 'No te quedan publicaciones disponibles. Adquiere un nuevo plan para continuar.' });
+        }
+
         const hasIGCredentials = user && user.ig_page_id && user.ig_access_token;
 
         if (hasIGCredentials && post.image_path) {
@@ -214,6 +219,10 @@ router.post('/:id/publish', async (req, res) => {
                     external_post_id: externalId
                 });
 
+                if (!user.is_admin) {
+                    users.update(user.id, { posts_remaining: user.posts_remaining - 1 });
+                }
+
                 return res.json({ message: '¡Post publicado exitosamente en Instagram!', post: updated });
                 
             } catch (err) {
@@ -230,6 +239,10 @@ router.post('/:id/publish', async (req, res) => {
             status: 'published',
             published_at: new Date().toISOString()
         });
+
+        if (!user.is_admin) {
+            users.update(user.id, { posts_remaining: user.posts_remaining - 1 });
+        }
 
         res.json({ message: 'Post publicado (Simulado). Configura tus tokens en Ajustes para publicar realmente.', post: updated });
     } catch (error) {

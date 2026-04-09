@@ -120,7 +120,7 @@ router.get('/me', authMiddleware, (req, res) => {
 
 // PUT /api/auth/profile — Update profile
 router.put('/profile', authMiddleware, (req, res) => {
-    const { name, company, country, ig_page_id, ig_access_token, fb_page_id, fb_access_token } = req.body;
+    const { name, company, country, ig_page_id, ig_access_token, fb_page_id, fb_access_token, mp_access_token } = req.body;
 
     const updates = {};
     if (name !== undefined) updates.name = name;
@@ -130,6 +130,12 @@ router.put('/profile', authMiddleware, (req, res) => {
     if (ig_access_token !== undefined) updates.ig_access_token = ig_access_token;
     if (fb_page_id !== undefined) updates.fb_page_id = fb_page_id;
     if (fb_access_token !== undefined) updates.fb_access_token = fb_access_token;
+    
+    // Solo admins pueden guardar el token de Mercado Pago
+    const currentUser = users.findById(req.user.id);
+    if (currentUser && currentUser.is_admin && mp_access_token !== undefined) {
+        updates.mp_access_token = mp_access_token;
+    }
 
     const updated = users.update(req.user.id, updates);
     if (!updated) {
@@ -172,6 +178,8 @@ router.post('/google', async (req, res) => {
                 fb_page_id: '',
                 fb_access_token: '',
                 posts_this_month: 0,
+                posts_remaining: 5,
+                transactions: [],
                 avatar_color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`,
                 avatar_url: payload.picture || '',
                 onboarding_completed: false,
