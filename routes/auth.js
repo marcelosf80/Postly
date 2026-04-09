@@ -120,7 +120,15 @@ router.get('/me', authMiddleware, (req, res) => {
 
 // PUT /api/auth/profile — Update profile
 router.put('/profile', authMiddleware, (req, res) => {
-    const { name, company, country, ig_page_id, ig_access_token, fb_page_id, fb_access_token, mp_access_token, mp_public_key } = req.body;
+    const { 
+        name, company, country, 
+        ig_page_id, ig_access_token, fb_page_id, fb_access_token, 
+        mp_access_token, mp_public_key,
+        brand_name, brand_industry, brand_audience, brand_tone, 
+        brand_services, brand_differentiators,
+        brand_dna, brand_keywords, brand_avoid, human_quirks,
+        target_emotion, visual_style, visual_elements
+    } = req.body;
 
     const updates = {};
     if (name !== undefined) updates.name = name;
@@ -131,6 +139,23 @@ router.put('/profile', authMiddleware, (req, res) => {
     if (fb_page_id !== undefined) updates.fb_page_id = fb_page_id;
     if (fb_access_token !== undefined) updates.fb_access_token = fb_access_token;
     
+    // Brand fields
+    if (brand_name !== undefined) updates.brand_name = brand_name;
+    if (brand_industry !== undefined) updates.brand_industry = brand_industry;
+    if (brand_audience !== undefined) updates.brand_audience = brand_audience;
+    if (brand_tone !== undefined) updates.brand_tone = brand_tone;
+    if (brand_services !== undefined) updates.brand_services = brand_services;
+    if (brand_differentiators !== undefined) updates.brand_differentiators = brand_differentiators;
+
+    // Intelligence Center / Brain fields
+    if (brand_dna !== undefined) updates.brand_dna = brand_dna;
+    if (brand_keywords !== undefined) updates.brand_keywords = brand_keywords;
+    if (brand_avoid !== undefined) updates.brand_avoid = brand_avoid;
+    if (human_quirks !== undefined) updates.human_quirks = human_quirks;
+    if (target_emotion !== undefined) updates.target_emotion = target_emotion;
+    if (visual_style !== undefined) updates.visual_style = visual_style;
+    if (visual_elements !== undefined) updates.visual_elements = visual_elements;
+    
     // Solo admins pueden guardar el token de Mercado Pago
     const currentUser = users.findById(req.user.id);
     if (currentUser && currentUser.is_admin) {
@@ -138,7 +163,8 @@ router.put('/profile', authMiddleware, (req, res) => {
         if (mp_public_key !== undefined) updates.mp_public_key = mp_public_key;
     }
 
-    console.log(`[AUTH] Actualizando perfil para usuario ${req.user.id}:`, updates);
+    console.log(`[AUTH] Actualizando perfil de marca para usuario ${req.user.id}`);
+
     const updated = users.update(req.user.id, updates);
     if (!updated) {
         return res.status(404).json({ error: 'Usuario no encontrado.' });
