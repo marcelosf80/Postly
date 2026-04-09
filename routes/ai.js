@@ -34,8 +34,43 @@ router.post('/caption', async (req, res) => {
         );
         res.json({ caption });
     } catch (error) {
+        const userProfile = store.users.findById(req.user.id);
+        const masterPrompt = ai.getMasterPrompt(userProfile, 'post', req.body.description || 'este post');
+        
+        if (error.message.includes('No hay ninguna API key')) {
+            return res.status(200).json({ 
+                error: 'No hay API configurada', 
+                isManual: true,
+                masterPrompt 
+            });
+        }
+        
         console.error('[AI] Error generando caption:', error.message);
-        res.status(500).json({ error: error.message || 'Error al generar el caption.' });
+        res.status(500).json({ error: error.message || 'Error al generar el caption.', masterPrompt });
+    }
+});
+
+// POST /api/ai/visual-prompt — Generate professional image prompt
+router.post('/visual-prompt', async (req, res) => {
+    try {
+        const { concept, provider } = req.body;
+        if (!concept) return res.status(400).json({ error: 'Se requiere un concepto para la imagen.' });
+
+        const userProfile = store.users.findById(req.user.id);
+        const visualPrompt = await ai.generateVisualPrompt(concept, { userProfile, provider });
+        res.json({ visualPrompt });
+    } catch (error) {
+        const userProfile = store.users.findById(req.user.id);
+        const masterPrompt = `[VISUAL BRAIN INSTRUCTIONS]\nCreate a professional image prompt for: "${req.body.concept}"\n\nStyle: ${userProfile.visual_style || 'Realistic'}\nElements: ${userProfile.visual_elements || 'none'}`;
+        
+        if (error.message.includes('No hay ninguna API key')) {
+            return res.status(200).json({ 
+                error: 'No hay API configurada', 
+                isManual: true,
+                masterPrompt 
+            });
+        }
+        res.status(500).json({ error: error.message, masterPrompt });
     }
 });
 
@@ -55,10 +90,20 @@ router.post('/hashtags', async (req, res) => {
         );
         res.json({ hashtags });
     } catch (error) {
-        console.error('[AI] Error generando hashtags:', error.message);
-        res.status(500).json({ error: error.message || 'Error al generar hashtags.' });
+        const userProfile = store.users.findById(req.user.id);
+        const masterPrompt = ai.getMasterPrompt(userProfile, 'hashtags', req.body.description);
+        
+        if (error.message.includes('No hay ninguna API key')) {
+            return res.status(200).json({ 
+                error: 'No hay API configurada', 
+                isManual: true,
+                masterPrompt 
+            });
+        }
+        res.status(500).json({ error: error.message, masterPrompt });
     }
 });
+
 
 // POST /api/ai/ideas — Generate content ideas
 router.post('/ideas', async (req, res) => {

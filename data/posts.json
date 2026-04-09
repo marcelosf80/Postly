@@ -1,61 +1,5 @@
 [
   {
-    "id": "mnpbic0nfvla3nii",
-    "user_id": "mnp2e9spf37k8ut7",
-    "content": "¡Lleva a Pikachu a casa! 🎉💛 Esta adorable figura de vinilo es perfecta para cualquier coleccionista de Pokémon. Con su característico diseño y expresión alegre, es una excelente adición a tu colección. ¡No te pierdas la oportunidad de tener a este querido Pokémon en tus manos! #Pikachu #Pokemon #FiguraDeVinilo #ColeccionistasPokemon",
-    "platform": "instagram",
-    "image_path": "/uploads/1775608589373-ozqttnr4.webp",
-    "status": "draft",
-    "scheduled_at": null,
-    "published_at": null,
-    "external_post_id": null,
-    "hashtags": "",
-    "created_at": "2026-04-08T00:36:29.399Z",
-    "updated_at": "2026-04-08T00:36:29.399Z"
-  },
-  {
-    "id": "mnpbkaj3nmp718o4",
-    "user_id": "mnp2e9spf37k8ut7",
-    "content": "¡Lleva a Pikachu a casa! 🎉💛 Esta adorable figura de vinilo es perfecta para cualquier coleccionista de Pokémon. Con su característico diseño y expresión alegre, es una excelente adición a tu colección. ¡No te pierdas la oportunidad de tener a este querido Pokémon en tus manos! #Pikachu #Pokemon #FiguraDeVinilo #ColeccionistasPokemon",
-    "platform": "instagram",
-    "image_path": "/uploads/1775608680751-fks6ul81.webp",
-    "status": "draft",
-    "scheduled_at": null,
-    "published_at": null,
-    "external_post_id": null,
-    "hashtags": "",
-    "created_at": "2026-04-08T00:38:00.783Z",
-    "updated_at": "2026-04-08T00:38:00.784Z"
-  },
-  {
-    "id": "mnpblsm08lmmcynf",
-    "user_id": "mnp2e9spf37k8ut7",
-    "content": "¡Lleva a Pikachu a casa! 🎉💛 Esta adorable figura de vinilo es perfecta para cualquier coleccionista de Pokémon. Con su característico diseño y expresión alegre, es una excelente adición a tu colección. ¡No te pierdas la oportunidad de tener a este querido Pokémon en tus manos! #Pikachu #Pokemon #FiguraDeVinilo #ColeccionistasPokemon",
-    "platform": "instagram",
-    "image_path": "/uploads/1775608750863-9gl9jzu7.webp",
-    "status": "draft",
-    "scheduled_at": null,
-    "published_at": null,
-    "external_post_id": null,
-    "hashtags": "",
-    "created_at": "2026-04-08T00:39:10.872Z",
-    "updated_at": "2026-04-08T00:39:10.872Z"
-  },
-  {
-    "id": "mnpbmnclpthu8clq",
-    "user_id": "mnp2e9spf37k8ut7",
-    "content": "¡Lleva a Pikachu a casa! 🎉💛 Esta adorable figura de vinilo es perfecta para cualquier coleccionista de Pokémon. Disponible en nuestra tienda. ¡No te pierdas la oportunidad de agregar a este querido personaje a tu colección! #Pikachu #Pokemon #FiguraDeVinilo #ColeccionistasPokemon",
-    "platform": "instagram",
-    "image_path": "/uploads/1775608790702-9s3ubx8j.webp",
-    "status": "draft",
-    "scheduled_at": null,
-    "published_at": null,
-    "external_post_id": null,
-    "hashtags": "",
-    "created_at": "2026-04-08T00:39:50.709Z",
-    "updated_at": "2026-04-08T00:39:50.709Z"
-  },
-  {
     "id": "mnqmdezok92e90f9",
     "user_id": "766f685f-0043-41bb-98bc-b2cf976fa8fb",
     "content": "¡Lleva a Pikachu a casa! 🎉💛 Figura de vinilo de alta calidad, perfecta para coleccionistas. Disponible ahora en nuestra tienda. #Pikachu #Pokemon #FiguraDeVinilo #Coleccionistas #MarceloMaidana",
@@ -84,5 +28,35 @@
     "aspect_ratio": "story",
     "created_at": "2026-04-09T01:53:06.054Z",
     "updated_at": "2026-04-09T01:53:14.846Z"
+  },
+  {
+    "id": "mnrorbz4x86bp2tl",
+    "user_id": "mnowycqq2xierge7",
+    "content": "Test post for debugging publish error. #test #debug",
+    "platform": "instagram",
+    "image_path": "",
+    "status": "draft",
+    "scheduled_at": null,
+    "published_at": null,
+    "external_post_id": null,
+    "hashtags": "",
+    "aspect_ratio": "feed",
+    "created_at": "2026-04-09T16:22:56.608Z",
+    "updated_at": "2026-04-09T16:22:56.608Z"
+  },
+  {
+    "id": "mnrotxmtdxbm8z9x",
+    "user_id": "mnowycqq2xierge7",
+    "content": "¿Estás cansado de invertir tiempo y dinero en marketing digital sin ver resultados concretos para tu pyme? 🤔\r\n\r\nLa verdad es que muchos empresarios como tú se sienten abrumados por la cantidad de opciones y estrategias de marketing digital disponibles, pero no saben por dónde empezar.\r\n\r\n**Aquí te dejo un dato sorprendente**: las pymes que tienen una estrategia de marketing digital clara y enfocada pueden aumentar sus ventas en un 20% en solo 6 meses. 📈\r\n\r\nMi experiencia trabajando con pymes me ha enseñado que el secreto para tener éxito en marketing digital es **entender a tu audiencia y crear contenido que resuene con ellos**. 💬\r\n\r\n¿Quieres saber cómo puedes aplicar esto a tu negocio? Comparte conmigo en los comentarios un desafío que estás enfrentando en tu marketing digital y te daré un consejo práctico para ayudarte a superarlo. 💬 ¿Qué te parece si empezamos a destrabar eso juntos? 🚀",
+    "platform": "instagram",
+    "image_path": "",
+    "status": "draft",
+    "scheduled_at": null,
+    "published_at": null,
+    "external_post_id": null,
+    "hashtags": "",
+    "aspect_ratio": "feed",
+    "created_at": "2026-04-09T16:24:57.989Z",
+    "updated_at": "2026-04-09T16:24:57.989Z"
   }
 ]

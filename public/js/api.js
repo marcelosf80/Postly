@@ -161,5 +161,13 @@ const API = {
             method: 'POST',
             body: JSON.stringify({ text, ...options })
         });
+    },
+
+    async generateVisualPrompt(concept, options = {}) {
+        return this.request('/api/ai/visual-prompt', {
+            method: 'POST',
+            body: JSON.stringify({ concept, ...options })
+        });
     }
 };
+

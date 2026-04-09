@@ -92,6 +92,63 @@ async function testHashtags() {
     }
 }
 
+async function testHumanization() {
+    console.log('\n🧠 Test de Humanización (Control de "IA-Speak")\n');
+    console.log('Regla: NO usar palabras prohibidas ("potenciar", "descubrir")\n');
+    
+    const userProfile = {
+        brand_name: 'Metalúrgica Sol',
+        brand_avoid: 'potenciar, descubrir, revolucionario',
+        human_quirks: 'Hola amigos de las chispas',
+        brand_dna: 'Taller familiar de herrería artística'
+    };
+
+    try {
+        console.log('⏳ Generando caption con restricciones humanas...\n');
+        const caption = await generateCaption('Nuevo portón estilo colonial terminado', {
+            userProfile
+        });
+        
+        console.log('═══════════════════════════════════════════════════════');
+        console.log(`✅ Resultado Humanizado:\n`);
+        console.log(caption);
+        
+        const hasForbidden = ['potenciar', 'descubrir', 'revolucionario'].some(w => caption.toLowerCase().includes(w));
+        if (hasForbidden) {
+            console.log('\n⚠️ ADVERTENCIA: Se detectaron palabras de IA prohibidas.');
+        } else {
+            console.log('\n✨ ÉXITO: El texto no contiene clisés de IA.');
+        }
+        console.log('═══════════════════════════════════════════════════════\n');
+    } catch (error) {
+        console.error('❌ Error:', error.message);
+    }
+}
+
+async function testVisualPrompt() {
+    console.log('\n🎨 Test de Cerebro Visual (Prompt Maestro)\n');
+    const { generateVisualPrompt } = require('./services/ai-providers');
+    
+    const userProfile = {
+        visual_style: 'Cinematic, dark workshop atmosphere, high contrast',
+        visual_elements: 'flying sparks, anvils, orange glow'
+    };
+
+    try {
+        console.log('⏳ Generando prompt para imagen...\n');
+        const prompt = await generateVisualPrompt('Un herrero trabajando en una espada', {
+            userProfile
+        });
+        
+        console.log('═══════════════════════════════════════════════════════');
+        console.log(`✅ Master Image Prompt:\n`);
+        console.log(prompt);
+        console.log('═══════════════════════════════════════════════════════\n');
+    } catch (error) {
+        console.error('❌ Error:', error.message);
+    }
+}
+
 // 4. Ejecutar tests
 async function runTests() {
     // Verificar que al menos un provider está disponible
@@ -109,7 +166,10 @@ async function runTests() {
     }
 
     await testCaption();
+    await testHumanization();
+    await testVisualPrompt();
     await testHashtags();
+
     
     console.log('\n✨ Tests completados exitosamente\n');
     console.log('═══════════════════════════════════════════════════════\n');

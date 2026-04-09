@@ -193,34 +193,51 @@ CONOCIMIENTO ESPECIALIZADO EN REDES SOCIALES:
 - Millennials (25-40): Storytelling, valores, humor inteligente
 - Gen X+ (40+): Profesional, valor práctico, claridad
 
-🚫 EVITAR:
-- Exceso de hashtags genéricos (#love #instagood)
-- Múltiples CTAs en un post
-- Textos >2200 caracteres (corta lectura)
-- Emojis sin contexto
+🚫 REGLAS DE HUMANIZACIÓN (EVITAR "MODO IA"):
+- NUNCA usar frases como: "En el mundo dinámico de...", "Potencia tu...", "Descubre la magia de...", "Sumérgete en...", "Te invitamos a...".
+- EVITAR el exceso de adjetivos innecesarios.
+- EVITAR sonar como un asistente virtual.
+- USAR lenguaje directo, honesto y conversacional. Habla como un experto apasionado en su rubro.
 `;
 
 function getBrandContext(userProfile) {
     if (!userProfile) return '';
     
     const isPersonal = userProfile.account_type === 'personal';
-    const name = userProfile.company || userProfile.name || (isPersonal ? 'Artista' : 'Empresa');
-    const businessType = userProfile.business_type || 'No especificado';
-    const audience = userProfile.target_audience || 'No especificado';
-    const tone = userProfile.brand_voice || 'Profesional';
+    const name = userProfile.brand_name || userProfile.company || userProfile.name || (isPersonal ? 'Artista' : 'Empresa');
+    const businessType = userProfile.brand_industry || userProfile.business_type || 'No especificado';
+    const audience = userProfile.brand_audience || userProfile.target_audience || 'No especificado';
+    const tone = userProfile.brand_tone || userProfile.brand_voice || 'Profesional';
 
-    return `
---- CONTEXTO DE MARCA ---
-Tipo: ${isPersonal ? 'Marca Personal' : 'Empresa'}
+    // Brain fields
+    const dna = userProfile.brand_dna || '';
+    const keywords = userProfile.brand_keywords || '';
+    const avoid = userProfile.brand_avoid || '';
+    const quirks = userProfile.human_quirks || '';
+    const emotion = userProfile.target_emotion || '';
+
+    let context = `
+--- CEREBRO DE MARCA (IDENTIDAD HUMANA) ---
 Nombre: ${name}
 Rubro: ${businessType}
 Audiencia: ${audience}
 Tono: ${tone}
--------------------------
+Esencia (DNA): ${dna}
+Emoción objetivo: ${emotion}
+${keywords ? `Palabras clave permitidas: ${keywords}` : ''}
+${avoid ? `PALABRAS PROHIBIDAS (NO USAR): ${avoid}` : ''}
+${quirks ? `Expresiones propias/muletillas: ${quirks}` : ''}
+------------------------------------------
 ${isPersonal ? 
-    'ESTILO: Primera persona, auténtico, humano (evita sonar corporativo)' : 
-    'ESTILO: Representa la organización profesionalmente'}
+    'ESTILO: Habla en primera persona, sé vulnerable, auténtico y directo. No uses lenguaje corporativo.' : 
+    'ESTILO: Representa la marca como un equipo de personas expertas y apasionadas.'}
 `;
+
+    if (avoid) {
+        context += `\nINSTRUCCIÓN CRÍTICA: Bajo ninguna circunstancia uses estas palabras o conceptos: ${avoid}.`;
+    }
+
+    return context;
 }
 
 // ============================================
@@ -239,21 +256,20 @@ async function generateCaption(description, options = {}) {
     
     const brandContext = getBrandContext(userProfile);
 
-    const systemPrompt = `Eres un experto en marketing de redes sociales con años de experiencia en Meta (Facebook/Instagram).
+    const systemPrompt = `Eres un experto en marketing de redes sociales con un enfoque humano y auténtico.
 ${SOCIAL_MEDIA_EXPERTISE}
 ${brandContext}
 
-TAREA: Genera un caption optimizado para ${platform}.
-TONO: ${tone}
-IDIOMA: ${language}
+TAREA: Genera un caption optimizado para ${platform}. 
+OBJETIVO: Que el lector sienta que lo escribió una persona real vinculada a la marca, no una IA.
 
 INSTRUCCIONES:
-- Usa emojis estratégicamente (no en exceso)
-- Primera línea debe enganchar (hook)
-- Incluye pregunta o CTA al final
-- Máximo 2000 caracteres
-- NO incluyas hashtags (se generan aparte)
-- Responde SOLO con el caption, sin explicaciones ni comillas`;
+- Usa hooks potentes que resuelvan un problema o despierten curiosidad.
+- Usa emojis estratégicamente para enfatizar, no para decorar.
+- Estructura el texto con párrafos cortos para facilitar la lectura.
+- Termina con un CTA (Call to Action) que genere conversación.
+- Responde SOLO con el caption, sin comentarios adicionales.`;
+
 
     const userPrompt = `Genera caption para: ${description}`;
     
@@ -365,6 +381,57 @@ Responde SOLO con el texto mejorado, sin explicaciones.`;
 }
 
 // ============================================
+// CEREBRO VISUAL (Generación de Prompts para Imágenes)
+// ============================================
+
+async function generateVisualPrompt(concept, options = {}) {
+    const { userProfile, provider = null } = options;
+    const brandContext = getBrandContext(userProfile);
+
+    const style = userProfile.visual_style || 'Realista, alta calidad, luz natural';
+    const elements = userProfile.visual_elements || '';
+
+    const systemPrompt = `Eres un experto en "Prompt Engineering" para generadores de imágenes por IA (como Midjourney o DALL-E).
+Tu objetivo es traducir una idea simple en un prompt visual profesional alineado con la identidad de la marca.
+
+${brandContext}
+ESTILO VISUAL REQUERIDO: ${style}
+ELEMENTOS RECURRENTES: ${elements}
+
+INSTRUCCIONES:
+- El prompt debe estar en INGLÉS (es el idioma estándar de estas IAs).
+- Incluye detalles técnicos: iluminación, ángulo de cámara, texturas y atmósfera.
+- Asegúrate de que el prompt refleje la "emoción objetivo" de la marca.
+- NO incluyas texto dentro de la imagen.
+- Responde SOLO con el prompt en inglés, sin explicaciones.`;
+
+    const userPrompt = `Genera un prompt visual profesional para: ${concept}`;
+
+    return callAI(systemPrompt, userPrompt, { provider, temperature: 0.9, maxTokens: 400 });
+}
+
+// ============================================
+// MASTER PROMPT (Modo Manual)
+// ============================================
+
+function getMasterPrompt(userProfile, type = 'post', input = '') {
+    const brandContext = getBrandContext(userProfile);
+    
+    return `[INSTRUCCIONES DE MARCA]
+${brandContext}
+
+[TAREA]
+Genera un ${type} para redes sociales sobre el siguiente tema: "${input}"
+
+[REQUISITOS CRÍTICOS]
+1. Mantén un tono humano y auténtico. Evita sonar como una IA.
+2. Usa hooks que capturen la atención en el primer segundo.
+3. Incluye emojis estratégicos.
+4. Finaliza con un llamado a la acción que fomente la interacción.
+5. Estructura el contenido para una lectura rápida y agradable.`;
+}
+
+// ============================================
 // ANÁLISIS DE IMAGEN (solo providers compatibles)
 // ============================================
 
@@ -413,7 +480,10 @@ module.exports = {
     generateHashtags, 
     generateIdeas, 
     improveText,
+    generateVisualPrompt,
+    getMasterPrompt,
     analyzeImage,
     callAI,
     getProviderStatus
 };
+

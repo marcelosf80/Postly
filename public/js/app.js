@@ -965,35 +965,43 @@ function renderAI() {
     const body = document.getElementById('main-body');
     body.innerHTML = `
         <div style="margin-bottom:var(--space-xl);">
-            <p class="text-secondary">Usá inteligencia artificial para generar contenido profesional para tus redes sociales.</p>
+            <p class="text-secondary">Usá la inteligencia de marca para generar contenido humano y visualmente impactante.</p>
         </div>
 
         <div class="ai-tools-grid">
             <div class="ai-tool-card" onclick="openAITool('caption')">
                 <div class="ai-tool-icon">✍️</div>
                 <h3>Generar Caption</h3>
-                <p>Creá textos atractivos para tus publicaciones con IA. Elegí tono y plataforma.</p>
+                <p>Textos auténticos con el ADN de tu marca para Instagram y FB.</p>
+            </div>
+            <div class="ai-tool-card" onclick="openAITool('visual')">
+                <div class="ai-tool-icon" style="background:rgba(124, 58, 237, 0.1); color:#7C3AED;">🎨</div>
+                <h3>Cerebro Visual</h3>
+                <p>Crea prompts profesionales para generar imágenes (Midjourney/DALL-E).</p>
             </div>
             <div class="ai-tool-card" onclick="openAITool('hashtags')">
                 <div class="ai-tool-icon">#️⃣</div>
-                <h3>Generar Hashtags</h3>
-                <p>Obtené hashtags relevantes y optimizados para maximizar el alcance de tus posts.</p>
+                <h3>SEO Hashtags</h3>
+                <p>Hashtags estratégicos basados en tu nicho y audiencia.</p>
             </div>
             <div class="ai-tool-card" onclick="openAITool('ideas')">
                 <div class="ai-tool-icon">💡</div>
                 <h3>Ideas de Contenido</h3>
-                <p>La IA te sugiere ideas de posts, reels y stories basadas en tu industria.</p>
+                <p>Sugerencias creativas alineadas a tus servicios y rubro.</p>
             </div>
             <div class="ai-tool-card" onclick="openAITool('improve')">
                 <div class="ai-tool-icon">✨</div>
-                <h3>Mejorar Texto</h3>
-                <p>Optimizá un texto existente para mayor engagement y profesionalismo.</p>
+                <h3>Humanizar Texto</h3>
+                <p>Limpia el lenguaje robótico y dale un toque personal a tus textos.</p>
             </div>
         </div>
 
         <div id="ai-workspace" style="display:none;margin-top:var(--space-xl);">
-            <div class="card" style="max-width:700px;">
-                <h3 id="ai-tool-title" style="margin-bottom:var(--space-md);"></h3>
+            <div class="card" style="max-width:700px; border: 1px solid var(--border);">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-md);">
+                    <h3 id="ai-tool-title" style="margin:0;"></h3>
+                    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('ai-workspace').style.display='none'">✕</button>
+                </div>
                 <div id="ai-tool-form"></div>
                 <div id="ai-tool-result" style="display:none;margin-top:var(--space-lg);"></div>
             </div>
@@ -1012,41 +1020,41 @@ function openAITool(tool) {
 
     const tools = {
         caption: {
-            title: '✍️ Generar Caption',
+            title: '✍️ Generar Caption Humano',
             form: `
                 <div class="form-group">
                     <label class="form-label">¿Sobre qué es el post?</label>
-                    <textarea id="ai-input" class="form-textarea" rows="3" placeholder="Ej: Lanzamiento de nueva colección de verano..."></textarea>
+                    <textarea id="ai-input" class="form-textarea" rows="3" placeholder="Ej: Hoy entregamos este letrero neon para una cafetería..."></textarea>
                 </div>
                 <div style="display:flex;gap:var(--space-md);">
-                    <div class="form-group" style="flex:1;">
-                        <label class="form-label">Tono</label>
-                        <select id="ai-tone" class="form-select">
-                            <option value="profesional">Profesional</option>
-                            <option value="casual">Casual</option>
-                            <option value="divertido">Divertido</option>
-                            <option value="inspiracional">Inspiracional</option>
-                            <option value="urgente">Urgente/Oferta</option>
-                        </select>
-                    </div>
                     <div class="form-group" style="flex:1;">
                         <label class="form-label">Plataforma</label>
                         <select id="ai-platform" class="form-select">
                             <option value="Instagram">Instagram</option>
                             <option value="Facebook">Facebook</option>
-                            <option value="Twitter">Twitter</option>
                         </select>
                     </div>
                 </div>
-                <button class="btn btn-accent" onclick="runAITool('caption')">🤖 Generar Caption</button>
+                <button class="btn btn-accent" onclick="runAITool('caption')">🤖 Generar con mi Cerebro de Marca</button>
+            `
+        },
+        visual: {
+            title: '🎨 Generador de Prompts Visuales',
+            form: `
+                <div class="form-group">
+                    <label class="form-label">Idea o concepto de la imagen</label>
+                    <textarea id="ai-input" class="form-textarea" rows="3" placeholder="Ej: Un primer plano de un letrero neon Rosa en una pared de ladrillo gris..."></textarea>
+                </div>
+                <p class="text-secondary" style="font-size:12px; margin-bottom:12px;">Esto generará un prompt técnico en Inglés optimizado para Midjourney, DALL-E o Canva AI siguiendo tu estilo visual.</p>
+                <button class="btn btn-accent" onclick="runAITool('visual')" style="background:var(--accent);">📸 Crear Prompt Maestro</button>
             `
         },
         hashtags: {
-            title: '#️⃣ Generar Hashtags',
+            title: '#️⃣ Generar Hashtags Estratégicos',
             form: `
                 <div class="form-group">
-                    <label class="form-label">Tema o descripción</label>
-                    <textarea id="ai-input" class="form-textarea" rows="3" placeholder="Ej: Fotografía de paisajes naturales..."></textarea>
+                    <label class="form-label">Tema del post</label>
+                    <textarea id="ai-input" class="form-textarea" rows="3" placeholder="Ej: Cartelería 3D para negocios locales..."></textarea>
                 </div>
                 <button class="btn btn-accent" onclick="runAITool('hashtags')">🤖 Generar Hashtags</button>
             `
@@ -1055,20 +1063,20 @@ function openAITool(tool) {
             title: '💡 Ideas de Contenido',
             form: `
                 <div class="form-group">
-                    <label class="form-label">¿Cuál es tu rubro/industria?</label>
-                    <input type="text" id="ai-input" class="form-input" placeholder="Ej: Gastronomía, Moda, Tecnología, Fitness...">
+                    <label class="form-label">Rubro o tema específico</label>
+                    <input type="text" id="ai-input" class="form-input" placeholder="Ej: Ideas para Reels sobre mi taller...">
                 </div>
-                <button class="btn btn-accent" onclick="runAITool('ideas')">🤖 Generar Ideas</button>
+                <button class="btn btn-accent" onclick="runAITool('ideas')">🤖 Ver Sugerencias</button>
             `
         },
         improve: {
-            title: '✨ Mejorar Texto',
+            title: '✨ Humanizar y Mejorar Texto',
             form: `
                 <div class="form-group">
-                    <label class="form-label">Texto a mejorar</label>
-                    <textarea id="ai-input" class="form-textarea" rows="4" placeholder="Pegá el texto que querés mejorar..."></textarea>
+                    <label class="form-label">Tu borrador inicial</label>
+                    <textarea id="ai-input" class="form-textarea" rows="4" placeholder="Escribí de forma natural lo que tenés en mente..."></textarea>
                 </div>
-                <button class="btn btn-accent" onclick="runAITool('improve')">✨ Mejorar</button>
+                <button class="btn btn-accent" onclick="runAITool('improve')">🚀 Darle el Toque Humano</button>
             `
         }
     };
@@ -1086,58 +1094,68 @@ async function runAITool(tool) {
 
     const result = document.getElementById('ai-tool-result');
     result.style.display = 'block';
-    result.innerHTML = '<div class="ai-result"><div style="display:flex;align-items:center;gap:8px;"><span class="spinner"></span> Generando con IA... Puede tomar unos segundos.</div></div>';
+    result.innerHTML = '<div class="ai-result"><div style="display:flex;align-items:center;gap:8px;"><span class="spinner"></span> Consultando a tu Cerebro de Marca...</div></div>';
 
     try {
         let data;
+        let resultHTML = '';
+        
         if (tool === 'caption') {
-            const tone = document.getElementById('ai-tone')?.value;
-            const platform = document.getElementById('ai-platform')?.value;
-            data = await API.generateCaption(input, { tone, platform });
-            result.innerHTML = `
-                <div class="ai-result">
-                    <div style="white-space:pre-wrap;line-height:1.7;">${data.caption}</div>
-                    <div class="ai-result-actions">
-                        <button class="btn btn-primary btn-sm" onclick="copyToClipboard('${encodeURIComponent(data.caption)}')">📋 Copiar</button>
-                        <button class="btn btn-outline btn-sm" onclick="runAITool('caption')">🔄 Regenerar</button>
-                    </div>
-                </div>`;
+            data = await API.generateCaption(input, { platform: document.getElementById('ai-platform')?.value });
+            resultHTML = formatAIResult(data.caption, data);
+        } else if (tool === 'visual') {
+            data = await API.generateVisualPrompt(input);
+            resultHTML = formatAIResult(data.visualPrompt, data, 'image-prompt');
         } else if (tool === 'hashtags') {
             data = await API.generateHashtags(input);
-            result.innerHTML = `
-                <div class="ai-result">
-                    <div style="line-height:2;color:var(--primary-light);">${data.hashtags}</div>
-                    <div class="ai-result-actions">
-                        <button class="btn btn-primary btn-sm" onclick="copyToClipboard('${encodeURIComponent(data.hashtags)}')">📋 Copiar</button>
-                        <button class="btn btn-outline btn-sm" onclick="runAITool('hashtags')">🔄 Regenerar</button>
-                    </div>
-                </div>`;
+            resultHTML = formatAIResult(data.hashtags, data);
         } else if (tool === 'ideas') {
             data = await API.generateIdeas(input);
-            result.innerHTML = `
-                <div class="ai-result">
-                    <div style="white-space:pre-wrap;line-height:1.8;">${data.ideas}</div>
-                    <div class="ai-result-actions">
-                        <button class="btn btn-primary btn-sm" onclick="copyToClipboard('${encodeURIComponent(data.ideas)}')">📋 Copiar</button>
-                        <button class="btn btn-outline btn-sm" onclick="runAITool('ideas')">🔄 Regenerar</button>
-                    </div>
-                </div>`;
+            resultHTML = formatAIResult(data.ideas, data);
         } else if (tool === 'improve') {
             data = await API.improveText(input);
-            result.innerHTML = `
-                <div class="ai-result">
-                    <div style="white-space:pre-wrap;line-height:1.7;">${data.improved}</div>
-                    <div class="ai-result-actions">
-                        <button class="btn btn-primary btn-sm" onclick="copyToClipboard('${encodeURIComponent(data.improved)}')">📋 Copiar</button>
-                        <button class="btn btn-outline btn-sm" onclick="runAITool('improve')">🔄 Regenerar</button>
-                    </div>
-                </div>`;
+            resultHTML = formatAIResult(data.improved, data);
         }
+
+        result.innerHTML = resultHTML;
     } catch (error) {
         result.innerHTML = `<div class="ai-result" style="border-color:var(--danger);">❌ ${error.message}</div>`;
         showToast(error.message, 'error');
     }
 }
+
+function formatAIResult(content, data, type = 'text') {
+    const isManual = data.isManual;
+    const masterPrompt = data.masterPrompt;
+
+    if (isManual) {
+        return `
+            <div class="ai-result" style="border: 2px dashed var(--accent); background: rgba(236, 72, 153, 0.03);">
+                <div style="display:flex; align-items:center; gap:8px; color:var(--accent); font-weight:700; margin-bottom:12px;">
+                    <i data-lucide="info"></i> Modo Manual (Sin API Key)
+                </div>
+                <p style="font-size:13px; margin-bottom:12px;">No tienes una API de IA conectada, pero hemos generado el <strong>Prompt Maestro</strong> con todo tu ADN de marca. Copialo y pegalo en ChatGPT o Claude para obtener el resultado perfecto:</p>
+                
+                <div style="background:var(--bg-secondary); padding:12px; border-radius:8px; font-family:monospace; font-size:12px; white-space:pre-wrap; border:1px solid var(--border); max-height:200px; overflow-y:auto; margin-bottom:12px;">${masterPrompt}</div>
+                
+                <div class="ai-result-actions">
+                    <button class="btn btn-accent btn-sm" onclick="copyToClipboard('${encodeURIComponent(masterPrompt)}')">📋 Copiar Prompt Maestro</button>
+                    <a href="https://chat.openai.com" target="_blank" class="btn btn-outline btn-sm">Ir a ChatGPT</a>
+                </div>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="ai-result">
+            <div style="white-space:pre-wrap;line-height:1.7;">${content}</div>
+            <div class="ai-result-actions">
+                <button class="btn btn-primary btn-sm" onclick="copyToClipboard('${encodeURIComponent(content)}')">📋 Copiar ${type === 'image-prompt' ? 'Prompt' : 'Resultado'}</button>
+                <button class="btn btn-outline btn-sm" onclick="runAITool('${lastToolActive || 'caption'}')">🔄 Regenerar</button>
+            </div>
+        </div>`;
+}
+
 
 function copyToClipboard(encodedText) {
     const text = decodeURIComponent(encodedText);
@@ -1369,78 +1387,134 @@ async function renderBrand() {
     } catch { /* use cached */ }
 
     body.innerHTML = `
-        <div style="max-width:700px;">
+        <div style="max-width:800px;">
             <div style="margin-bottom:var(--space-xl);">
-                <p class="text-secondary">Completá esta información para que la Inteligencia Artificial de Postly conozca tu negocio y genere contenido más personalizado, preciso y alineado con tu marca.</p>
+                <p class="text-secondary">Configurá el <strong>Cerebro de tu Marca</strong>. Mientras más detalles humanos y específicos agregues, la IA podrá generar contenido que suene exactamente como tú y atraiga a tu cliente ideal.</p>
             </div>
 
-            <div class="settings-section">
-                <h3>🏷️ Identidad de Marca</h3>
-                <form onsubmit="saveBrand(event)">
+            <form onsubmit="saveBrand(event)">
+                <!-- Identidad Humana -->
+                <div class="settings-section">
+                    <h3 style="display:flex; align-items:center; gap:8px;"><i data-lucide="brain" style="color:var(--primary);"></i> Identidad Humana y Estrategia</h3>
+                    
                     <div class="settings-row">
                         <div class="form-group">
-                            <label class="form-label">Nombre de la Marca/Negocio</label>
-                            <input type="text" id="brand-name" class="form-input" value="${user.brand_name || ''}" placeholder="Ej: MR Letreros" required>
+                            <label class="form-label">Nombre de Marca</label>
+                            <input type="text" id="brand-name" class="form-input" value="${user.brand_name || ''}" placeholder="Ej: MR Letreros">
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Rubro o Industria</label>
-                            <input type="text" id="brand-industry" class="form-input" value="${user.brand_industry || ''}" placeholder="Ej: Fabricación de letreros 3D, Diseño gráfico" required>
+                            <label class="form-label">Rubro/Industria</label>
+                            <input type="text" id="brand-industry" class="form-input" value="${user.brand_industry || ''}" placeholder="Ej: Cartelería 3D y Neon">
                         </div>
                     </div>
-                    
+
                     <div class="form-group">
-                        <label class="form-label">¿A quién le vendés? (Público Objetivo)</label>
-                        <textarea id="brand-audience" class="form-textarea" rows="2" placeholder="Ej: Negocios locales, restaurantes, empresas de eventos que buscan destacar su marca.">${user.brand_audience || ''}</textarea>
+                        <label class="form-label">ADN de la Marca (Misión y Valores)</label>
+                        <textarea id="brand-dna" class="form-textarea" rows="2" placeholder="¿Qué te apasiona de lo que haces? ¿Cuál es tu historia breve?">${user.brand_dna || ''}</textarea>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Tono de Voz de la Marca</label>
-                        <select id="brand-tone" class="form-select">
-                            <option value="Profesional y Confiable" ${user.brand_tone === 'Profesional y Confiable' ? 'selected' : ''}>Profesional y Confiable</option>
-                            <option value="Cercano y Amigable" ${user.brand_tone === 'Cercano y Amigable' ? 'selected' : ''}>Cercano y Amigable</option>
-                            <option value="Creativo y Original" ${user.brand_tone === 'Creativo y Original' ? 'selected' : ''}>Creativo y Original</option>
-                            <option value="Enérgico y Llamativo" ${user.brand_tone === 'Enérgico y Llamativo' ? 'selected' : ''}>Enérgico y Llamativo</option>
-                            <option value="Lujoso y Exclusivo" ${user.brand_tone === 'Lujoso y Exclusivo' ? 'selected' : ''}>Lujoso y Exclusivo</option>
+                        <label class="form-label">La "Chispa Humana" (Muletillas o frases propias)</label>
+                        <textarea id="human-quirks" class="form-textarea" rows="2" placeholder="Ej: 'Hola gente linda', 'Manos a la obra', 'Che, miren este laburo'">${user.human_quirks || ''}</textarea>
+                        <small class="text-muted">Palabras o expresiones que usas siempre para sonar más natural.</small>
+                    </div>
+
+                    <div class="settings-row">
+                        <div class="form-group">
+                            <label class="form-label">Palabras que SIEMPRE usar</label>
+                            <input type="text" id="brand-keywords" class="form-input" value="${user.brand_keywords || ''}" placeholder="Ej: Calidad, artesanal, detalle">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Palabras PROHIBIDAS (IA-speak)</label>
+                            <input type="text" id="brand-avoid" class="form-input" value="${user.brand_avoid || ''}" placeholder="Ej: Potenciar, descubrir, revolucionario">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Emoción a transmitir</label>
+                        <select id="target-emotion" class="form-select">
+                            <option value="Confianza y Seguridad" ${user.target_emotion === 'Confianza y Seguridad' ? 'selected' : ''}>🛡️ Confianza y Seguridad</option>
+                            <option value="Inspiración y Creatividad" ${user.target_emotion === 'Inspiración y Creatividad' ? 'selected' : ''}>✨ Inspiración y Creatividad</option>
+                            <option value="Cercanía y Amistad" ${user.target_emotion === 'Cercanía y Amistad' ? 'selected' : ''}>🤝 Cercanía y Amistad</option>
+                            <option value="Exclusividad y Lujo" ${user.target_emotion === 'Exclusividad y Lujo' ? 'selected' : ''}>💎 Exclusividad y Lujo</option>
+                            <option value="DiverSIón y Energía" ${user.target_emotion === 'DiverSIón y Energía' ? 'selected' : ''}>⚡ Diversión y Energía</option>
                         </select>
                     </div>
+                </div>
 
+                <!-- Cerebro Visual -->
+                <div class="settings-section">
+                    <h3 style="display:flex; align-items:center; gap:8px;"><i data-lucide="palette" style="color:var(--accent);"></i> Cerebro Visual (Guía para Imágenes)</h3>
+                    
                     <div class="form-group">
-                        <label class="form-label">Productos o Servicios Principales</label>
-                        <textarea id="brand-services" class="form-textarea" rows="3" placeholder="Ej: Letreros corpóreos en polyfan, carteles luminosos, neon LED, letras 3D para paredes.">${user.brand_services || ''}</textarea>
+                        <label class="form-label">Estilo Visual Dominante</label>
+                        <textarea id="visual-style" class="form-textarea" rows="2" placeholder="Ej: Minimalista, luz natural, fondo desenfocado, colores cálidos.">${user.visual_style || ''}</textarea>
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label">Diferenciador (¿Por qué elegirte?)</label>
-                        <textarea id="brand-differentiators" class="form-textarea" rows="2" placeholder="Ej: Materiales de primera calidad, instalación rápida, diseños 100% personalizados, garantía de 1 año.">${user.brand_differentiators || ''}</textarea>
+                        <label class="form-label">Elementos que NO deben faltar</label>
+                        <textarea id="visual-elements" class="form-textarea" rows="2" placeholder="Ej: Herramientas de taller, manos trabajando, logo al fondo.">${user.visual_elements || ''}</textarea>
                     </div>
+                </div>
 
-                    <button type="submit" class="btn btn-primary" style="margin-top:var(--space-md);">💾 Guardar Perfil de Marca</button>
-                </form>
-            </div>
+                <!-- Configuración de Marketing (Original) -->
+                <div class="settings-section">
+                    <h3>📢 Estrategia de Público</h3>
+                    <div class="form-group">
+                        <label class="form-label">¿A quién le vendés? (Público Objetivo)</label>
+                        <textarea id="brand-audience" class="form-textarea" rows="2">${user.brand_audience || ''}</textarea>
+                    </div>
+                    <div class="settings-row">
+                        <div class="form-group">
+                            <label class="form-label">Tono de Voz</label>
+                            <select id="brand-tone" class="form-select">
+                                <option value="Profesional" ${user.brand_tone === 'Profesional' ? 'selected' : ''}>Profesional</option>
+                                <option value="Amigable" ${user.brand_tone === 'Amigable' ? 'selected' : ''}>Amigable</option>
+                                <option value="Humorístico" ${user.brand_tone === 'Humorístico' ? 'selected' : ''}>Humorístico</option>
+                                <option value="Inspirador" ${user.brand_tone === 'Inspirador' ? 'selected' : ''}>Inspirador</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="position: sticky; bottom: 20px; z-index: 10;">
+                    <button type="submit" class="btn btn-primary" style="width:100%; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">💾 Guardar Todo el Cerebro de Marca</button>
+                </div>
+            </form>
         </div>
     `;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
 async function saveBrand(e) {
-    e.preventDefault();
+    if (e) e.preventDefault();
     try {
-        const data = await API.updateProfile({
+        const payload = {
             brand_name: document.getElementById('brand-name').value,
             brand_industry: document.getElementById('brand-industry').value,
+            brand_dna: document.getElementById('brand-dna').value,
+            human_quirks: document.getElementById('human-quirks').value,
+            brand_keywords: document.getElementById('brand-keywords').value,
+            brand_avoid: document.getElementById('brand-avoid').value,
+            target_emotion: document.getElementById('target-emotion').value,
+            visual_style: document.getElementById('visual-style').value,
+            visual_elements: document.getElementById('visual-elements').value,
             brand_audience: document.getElementById('brand-audience').value,
-            brand_tone: document.getElementById('brand-tone').value,
-            brand_services: document.getElementById('brand-services').value,
-            brand_differentiators: document.getElementById('brand-differentiators').value
-        });
+            brand_tone: document.getElementById('brand-tone').value
+        };
+
+        const data = await API.updateProfile(payload);
 
         // Update cached user
         localStorage.setItem('sp_user', JSON.stringify(data.user));
-        initUserInfo();
-        showToast('Perfil de Marca guardado exitosamente', 'success');
+        Object.assign(currentUser, data.user);
+        
+        showToast('¡Cerebro de Marca actualizado!', 'success');
     } catch (error) {
         showToast(error.message, 'error');
     }
 }
+
 
 // === ADMIN PANEL ===
 async function renderAdmin() {
