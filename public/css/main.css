@@ -1,5 +1,5 @@
 /* ============================================
-   SocialPulse — Design System
+   Postly — Design System
    Premium Dark Theme SaaS
    ============================================ */
 
@@ -683,9 +683,10 @@ tr:hover td {
 }
 
 .navbar.scrolled {
-    background: rgba(6, 6, 15, 0.9);
+    background: rgba(255, 255, 255, 0.90);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
 }
 
 .navbar .container {
@@ -1181,18 +1182,71 @@ tr:hover td {
     justify-content: center;
     position: relative;
     padding: var(--space-xl);
+    overflow: hidden;
+}
+
+/* === Split Network Backgrounds === */
+.split-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    z-index: 0;
+}
+
+.split-side {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.split-facebook {
+    background: linear-gradient(135deg, rgba(24, 119, 242, 0.03) 0%, rgba(24, 119, 242, 0.1) 100%);
+}
+.split-facebook .split-hero-icon {
+    color: rgba(24, 119, 242, 0.1);
+    width: 600px;
+    height: 600px;
+    position: absolute;
+    transform: rotate(-15deg);
+    margin-left: -100px;
+}
+
+.split-instagram {
+    background: linear-gradient(135deg, rgba(240, 148, 51, 0.05) 0%, rgba(220, 39, 67, 0.08) 50%, rgba(188, 24, 136, 0.1) 100%);
+}
+.split-instagram .split-hero-icon {
+    color: rgba(220, 39, 67, 0.08); /* Instagram sort of pink-red */
+    width: 600px;
+    height: 600px;
+    position: absolute;
+    transform: rotate(15deg);
+    margin-right: -100px;
 }
 
 .auth-container {
     width: 100%;
     max-width: 440px;
+    z-index: 10;
 }
 
 .auth-card {
     background: var(--bg-surface);
-    border: 1px solid var(--border);
     border-radius: var(--radius-xl);
     padding: var(--space-xl);
+    
+    /* 50/50 Split Border */
+    border: 3px solid transparent;
+    background-image: linear-gradient(white, white), 
+                      linear-gradient(90deg, #1877F2 0%, #1877F2 50%, #dc2743 50%, #f09433 100%);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
 }
 
 .auth-header {

@@ -41,15 +41,21 @@ class InstagramAPI {
     /**
      * Primero: Crear el contenedor de Media en Instagram
      */
-    async createMediaContainer(imageUrl, caption) {
+    async createMediaContainer(imageUrl, caption, mediaType = 'IMAGE') {
         try {
-            const response = await axios.post(`${this.graphUrl}/${this.pageId}/media`, null, {
-                params: {
-                    image_url: imageUrl,
-                    caption: caption,
-                    access_token: this.accessToken
-                }
-            });
+            const params = {
+                image_url: imageUrl,
+                access_token: this.accessToken
+            };
+
+            // Stories doesn't support caption in the same way as Feed
+            if (mediaType === 'STORIES') {
+                params.media_type = 'STORIES';
+            } else {
+                if (caption) params.caption = caption;
+            }
+
+            const response = await axios.post(`${this.graphUrl}/${this.pageId}/media`, null, { params });
             return response.data.id; // Retorna el creation_id
         } catch (error) {
             const detail = error.response ? JSON.stringify(error.response.data) : error.message;
@@ -59,7 +65,7 @@ class InstagramAPI {
     }
 
     /**
-     * Segundo: Publicar el contenedor en el Feed
+     * Segundo: Publicar el contenedor en el Feed o Story
      */
     async publishMedia(creationId) {
         try {
@@ -80,12 +86,12 @@ class InstagramAPI {
     /**
      * Flujo completo de publicación
      */
-    async processAndPublish(filePath, caption) {
-        console.log('[INSTAGRAM] 1. Subiendo imagen a servidor público interino...');
+    async processAndPublish(filePath, caption, mediaType = 'IMAGE') {
+        console.log(`[INSTAGRAM] 1. Subiendo imagen (${mediaType}) a servidor público interino...`);
         const publicUrl = await this.uploadLocalImage(filePath);
         
-        console.log('[INSTAGRAM] 2. Creando contenedor en Meta Graph con URL:', publicUrl);
-        const creationId = await this.createMediaContainer(publicUrl, caption);
+        console.log(`[INSTAGRAM] 2. Creando contenedor ${mediaType} en Meta Graph con URL:`, publicUrl);
+        const creationId = await this.createMediaContainer(publicUrl, caption, mediaType);
         
         console.log('[INSTAGRAM] 3. Publicando en Instagram...');
         const postId = await this.publishMedia(creationId);

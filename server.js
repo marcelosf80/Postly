@@ -40,9 +40,13 @@ app.use('/api/billing', require('./routes/billing'));
 
 // === Public Config ===
 app.get('/api/config', (req, res) => {
+    const { users } = require('./data/store');
+    const adminUser = users.findOne({ is_admin: true });
+    
     res.json({
         google_client_id: process.env.GOOGLE_CLIENT_ID,
-        facebook_app_id: process.env.FACEBOOK_APP_ID
+        facebook_app_id: process.env.FACEBOOK_APP_ID,
+        mp_public_key: (adminUser && adminUser.mp_public_key) || process.env.MP_PUBLIC_KEY
     });
 });
 

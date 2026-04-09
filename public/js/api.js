@@ -1,4 +1,4 @@
-// public/js/api.js — Centralized API Client for SocialPulse
+// public/js/api.js — Centralized API Client for Postly
 
 const API = {
     base: '',

@@ -3,26 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Iniciar sesión o crear cuenta en SocialPulse">
-    <title>Login — SocialPulse</title>
+    <meta name="description" content="Iniciar sesión o crear cuenta en Postly">
+    <title>Login — Postly</title>
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    <link rel="icon" href="/assets/img/logo.png">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="/js/api.js?v=1.4"></script>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
 </head>
 <body>
-    <!-- Background orbs -->
-    <div class="hero-bg" style="position:fixed; z-index:0;">
-        <div class="orb orb-1" style="opacity:0.15;"></div>
-        <div class="orb orb-2" style="opacity:0.15;"></div>
+    <!-- Split Networks Background -->
+    <div class="split-bg">
+        <div class="split-side split-facebook">
+            <i data-lucide="facebook" class="split-hero-icon"></i>
+        </div>
+        <div class="split-side split-instagram">
+            <i data-lucide="instagram" class="split-hero-icon"></i>
+        </div>
     </div>
+
 
     <div class="auth-page">
         <div class="auth-container">
             <!-- Logo -->
             <div style="text-align:center; margin-bottom: 32px;">
-                <a href="/" style="display:inline-flex; align-items:center; gap:8px; font-family:var(--font-display); font-size:26px; font-weight:800; color:var(--text-primary); text-decoration:none;">
-                    <span class="logo-icon" style="width:40px;height:40px;font-size:20px;">⚡</span>
-                    SocialPulse
+                <a href="/" style="display:inline-flex; align-items:center; gap:16px; font-family:var(--font-display); font-size:36px; font-weight:800; color:var(--text-primary); text-decoration:none;">
+                    <img src="/assets/img/logo.png" alt="Logo" style="width:64px; height:64px; border-radius:12px; box-shadow: 0 8px 24px rgba(0,0,0,0.15);">
+                    Postly
                 </a>
             </div>
 
@@ -52,7 +59,15 @@
                     O continuar con
                     <div style="flex: 1; height: 1px; background: var(--border);"></div>
                 </div>
-                <div style="display: flex; justify-content: center; margin-bottom: 24px;"><div id="googlebtn-login"></div></div>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                    <div id="googlebtn-login" style="display: flex; justify-content: center;"></div>
+                    
+                    <button type="button" class="btn" onclick="handleFacebookLogin()" style="background: #1877F2; color: white; width: 100%; border: none; font-weight: 600; font-size: 14px; height: 40px; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); transition: background 0.2s;">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        Continuar con Meta
+                    </button>
+                    
+                </div>
 
                 <div class="auth-switch">
                     ¿No tenés cuenta? <a href="#" onclick="showRegister(event)">Crear cuenta gratis</a>
@@ -109,7 +124,14 @@
                     O continuar con
                     <div style="flex: 1; height: 1px; background: var(--border);"></div>
                 </div>
-                <div style="display: flex; justify-content: center; margin-bottom: 24px;"><div id="googlebtn-register"></div></div>
+                <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px;">
+                    <div id="googlebtn-register" style="display: flex; justify-content: center;"></div>
+                    
+                    <button type="button" class="btn" onclick="handleFacebookLogin()" style="background: #1877F2; color: white; width: 100%; border: none; font-weight: 600; font-size: 14px; height: 40px; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 4px; box-shadow: 0 1px 2px rgba(0,0,0,0.1); transition: background 0.2s;">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        Continuar con Meta
+                    </button>
+                </div>
 
                 <div class="auth-switch">
                     ¿Ya tenés cuenta? <a href="#" onclick="showLogin(event)">Iniciar sesión</a>
@@ -127,13 +149,33 @@
         const API_BASE = '';
 
         window.onload = async function () {
-            // Fetch public config from server (only Google Client ID used now)
-            let config = { google_client_id: '' };
+            // Fetch public config from server (Google & Facebook)
+            let config = { google_client_id: '', facebook_app_id: '' };
             try {
                 const configRes = await fetch('/api/config');
                 config = await configRes.json();
             } catch (e) {
                 console.error('Error cargando configuración:', e);
+            }
+
+            // Facebook SDK Init
+            if (config.facebook_app_id) {
+                window.fbAsyncInit = function() {
+                    FB.init({
+                        appId      : config.facebook_app_id,
+                        cookie     : true,
+                        xfbml      : true,
+                        version    : 'v21.0'
+                    });
+                };
+
+                (function(d, s, id){
+                    var js, fjs = d.getElementsByTagName(s)[0];
+                    if (d.getElementById(id)) {return;}
+                    js = d.createElement(s); js.id = id;
+                    js.src = "https://connect.facebook.net/es_LA/sdk.js";
+                    fjs.parentNode.insertBefore(js, fjs);
+                }(document, 'script', 'facebook-jssdk'));
             }
 
             // Google Init
@@ -155,21 +197,64 @@
             }
         };
 
-        async function handleGoogleLogin(response) {
-            setLoading('login-btn', true); // generic simple loading state
+        function handleGoogleLogin(response) {
+            setLoading('login-btn', true);
+            // Move async logic inside a promise or self-executing async block
+            (async () => {
+                try {
+                    const res = await fetch(`${API_BASE}/api/auth/google`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ credential: response.credential })
+                    });
+
+                    const data = await res.json();
+                    if (!res.ok) throw new Error(data.error || 'Error en login con Google');
+
+                    localStorage.setItem('sp_token', data.token);
+                    localStorage.setItem('sp_user', JSON.stringify(data.user));
+                    window.location.href = '/app';
+                } catch (error) {
+                    showMessage(error.message);
+                    setLoading('login-btn', false);
+                }
+            })();
+        }
+
+        function handleFacebookLogin() {
+            setLoading('login-btn', true);
             try {
-                const res = await fetch(`${API_BASE}/api/auth/google`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ credential: response.credential })
+                FB.login(function(response) {
+                    if (response.authResponse) {
+                        const accessToken = response.authResponse.accessToken;
+                        
+                        // Execute async fetch
+                        (async () => {
+                            try {
+                                const res = await fetch(`${API_BASE}/api/auth/facebook`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ accessToken })
+                                });
+
+                                const data = await res.json();
+                                if (!res.ok) throw new Error(data.error || 'Error en login con Meta');
+
+                                localStorage.setItem('sp_token', data.token);
+                                localStorage.setItem('sp_user', JSON.stringify(data.user));
+                                window.location.href = '/app';
+                            } catch (error) {
+                                showMessage(error.message);
+                                setLoading('login-btn', false);
+                            }
+                        })();
+                    } else {
+                        setLoading('login-btn', false);
+                    }
+                }, {
+                    scope: 'email,public_profile,pages_manage_posts,pages_read_engagement,instagram_basic,instagram_content_publish,business_management,pages_show_list',
+                    return_scopes: true
                 });
-
-                const data = await res.json();
-                if (!res.ok) throw new Error(data.error || 'Error en login con Google');
-
-                localStorage.setItem('sp_token', data.token);
-                localStorage.setItem('sp_user', JSON.stringify(data.user));
-                window.location.href = '/app';
             } catch (error) {
                 showMessage(error.message);
                 setLoading('login-btn', false);

@@ -6,6 +6,7 @@ const fs = require('fs');
 const { posts, users } = require('../data/store');
 const { authMiddleware } = require('../middleware/auth');
 const InstagramAPI = require('../instagram_api');
+const FacebookAPI = require('../facebook_api');
 
 const router = express.Router();
 
@@ -105,6 +106,7 @@ router.get('/:id', (req, res) => {
 
 // POST /api/posts — Create post
 router.post('/', upload.single('image'), (req, res) => {
+    console.log('[POSTS] Creando post. Body:', req.body);
     try {
         const { content, platform, status, scheduled_at } = req.body;
 
@@ -121,7 +123,8 @@ router.post('/', upload.single('image'), (req, res) => {
             scheduled_at: scheduled_at || null,
             published_at: null,
             external_post_id: null,
-            hashtags: req.body.hashtags || ''
+            hashtags: req.body.hashtags || '',
+            aspect_ratio: req.body.aspect_ratio || 'feed'
         });
 
         res.status(201).json({ message: 'Post creado.', post });
@@ -149,6 +152,7 @@ router.put('/:id', upload.single('image'), (req, res) => {
         if (req.body.status !== undefined) updates.status = req.body.status;
         if (req.body.scheduled_at !== undefined) updates.scheduled_at = req.body.scheduled_at;
         if (req.body.hashtags !== undefined) updates.hashtags = req.body.hashtags;
+        if (req.body.aspect_ratio !== undefined) updates.aspect_ratio = req.body.aspect_ratio;
         if (req.file) updates.image_path = `/uploads/${req.file.filename}`;
 
         const updated = posts.update(req.params.id, updates);
@@ -167,9 +171,19 @@ router.delete('/:id', (req, res) => {
             return res.status(404).json({ error: 'Post no encontrado.' });
         }
 
+        // Delete physical image file if exists
+        if (existing.image_path) {
+            const absolutePath = path.join(__dirname, '..', existing.image_path.startsWith('/') ? existing.image_path.substring(1) : existing.image_path);
+            if (fs.existsSync(absolutePath)) {
+                fs.unlinkSync(absolutePath);
+                console.log(`[STORAGE] Imagen eliminada: ${absolutePath}`);
+            }
+        }
+
         posts.delete(req.params.id);
         res.json({ message: 'Post eliminado.' });
     } catch (error) {
+        console.error('[STORAGE] Error al eliminar post:', error);
         res.status(500).json({ error: 'Error al eliminar el post.' });
     }
 });
@@ -194,15 +208,15 @@ router.post('/:id/publish', async (req, res) => {
         }
 
         const hasIGCredentials = user && user.ig_page_id && user.ig_access_token;
+        const hasFBCredentials = user && user.fb_page_id && user.fb_access_token;
 
-        if (hasIGCredentials && post.image_path) {
+        if (post.platform === 'instagram' && hasIGCredentials && post.image_path) {
             console.log(`[PUBLISH] Intentando publicar post ${post.id} en Instagram real...`);
             
             try {
                 const api = new InstagramAPI(user.ig_page_id, user.ig_access_token);
                 
                 // Get absolute local path to image
-                // post.image_path is like '/uploads/filename.jpg'
                 const relativePath = post.image_path.startsWith('/') ? post.image_path.substring(1) : post.image_path;
                 const absImagePath = path.join(__dirname, '..', relativePath);
                 
@@ -211,7 +225,8 @@ router.post('/:id/publish', async (req, res) => {
                 }
 
                 // Execute real publishing flow
-                const externalId = await api.processAndPublish(absImagePath, post.content + (post.hashtags ? '\n\n' + post.hashtags : ''));
+                const mediaType = post.aspect_ratio === 'story' ? 'STORIES' : 'IMAGE';
+                const externalId = await api.processAndPublish(absImagePath, post.content + (post.hashtags ? '\n\n' + post.hashtags : ''), mediaType);
                 
                 const updated = posts.update(req.params.id, {
                     status: 'published',
@@ -226,11 +241,46 @@ router.post('/:id/publish', async (req, res) => {
                 return res.json({ message: '¡Post publicado exitosamente en Instagram!', post: updated });
                 
             } catch (err) {
-                console.error('[PUBLISH] Falló la publicación real:', err.message);
-                return res.status(500).json({ 
-                    error: `Meta API Error: ${err.message}`,
-                    details: 'Asegúrate de que tu Page ID y Token sean correctos y tengan permisos de publicación.'
+                console.error('[PUBLISH] Falló la publicación real en Instagram:', err.message);
+                return res.status(500).json({ error: `Meta API Error (Instagram): ${err.message}` });
+            }
+        } 
+        else if (post.platform === 'facebook' && hasFBCredentials) {
+            console.log(`[PUBLISH] Intentando publicar post ${post.id} en Facebook real...`);
+            
+            try {
+                const igHelper = new InstagramAPI(user.ig_page_id, user.ig_access_token); // Use uploader helper
+                const fbApi = new FacebookAPI(user.fb_page_id, user.fb_access_token);
+                
+                const fullMessage = post.content + (post.hashtags ? '\n\n' + post.hashtags : '');
+                let externalId = '';
+
+                if (post.image_path) {
+                    const relativePath = post.image_path.startsWith('/') ? post.image_path.substring(1) : post.image_path;
+                    const absImagePath = path.join(__dirname, '..', relativePath);
+                    
+                    // Upload to temp host first (Facebook also prefers public URLs for simple POST requests)
+                    const publicUrl = await igHelper.uploadLocalImage(absImagePath);
+                    externalId = await fbApi.publishPhoto(publicUrl, fullMessage);
+                } else {
+                    externalId = await fbApi.publishText(fullMessage);
+                }
+
+                const updated = posts.update(req.params.id, {
+                    status: 'published',
+                    published_at: new Date().toISOString(),
+                    external_post_id: externalId
                 });
+
+                if (!user.is_admin) {
+                    users.update(user.id, { posts_remaining: user.posts_remaining - 1 });
+                }
+
+                return res.json({ message: '¡Post publicado exitosamente en Facebook!', post: updated });
+
+            } catch (err) {
+                console.error('[PUBLISH] Falló la publicación real en Facebook:', err.message);
+                return res.status(500).json({ error: `Meta API Error (Facebook): ${err.message}` });
             }
         }
 

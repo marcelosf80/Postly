@@ -54,5 +54,35 @@
     "hashtags": "",
     "created_at": "2026-04-08T00:39:50.709Z",
     "updated_at": "2026-04-08T00:39:50.709Z"
+  },
+  {
+    "id": "mnqmdezok92e90f9",
+    "user_id": "766f685f-0043-41bb-98bc-b2cf976fa8fb",
+    "content": "¡Lleva a Pikachu a casa! 🎉💛 Figura de vinilo de alta calidad, perfecta para coleccionistas. Disponible ahora en nuestra tienda. #Pikachu #Pokemon #FiguraDeVinilo #Coleccionistas #MarceloMaidana",
+    "platform": "facebook",
+    "image_path": "/uploads/1775687301900-ezwd1kwq.webp",
+    "status": "published",
+    "scheduled_at": null,
+    "published_at": "2026-04-08T22:28:27.191Z",
+    "external_post_id": "1518329820295019",
+    "hashtags": "",
+    "aspect_ratio": "vertical",
+    "created_at": "2026-04-08T22:28:21.924Z",
+    "updated_at": "2026-04-08T22:28:27.192Z"
+  },
+  {
+    "id": "mnqtophi74l3bxso",
+    "user_id": "766f685f-0043-41bb-98bc-b2cf976fa8fb",
+    "content": "¡Lleva a Pikachu a casa! 🎉💛 ¡Descubre nuestra increíble colección de figuras de Pokémon! ¡Disponible ahora en Marcelo Maidana! #Pikachu #Pokemon #Coleccionistas #FigurasDeVinilo",
+    "platform": "instagram",
+    "image_path": "/uploads/1775699586002-zyik8fif.webp",
+    "status": "published",
+    "scheduled_at": null,
+    "published_at": "2026-04-09T01:53:14.845Z",
+    "external_post_id": "18112976434699164",
+    "hashtags": "",
+    "aspect_ratio": "story",
+    "created_at": "2026-04-09T01:53:06.054Z",
+    "updated_at": "2026-04-09T01:53:14.846Z"
   }
 ]

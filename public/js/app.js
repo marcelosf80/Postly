@@ -17,6 +17,9 @@ let currentImageBase64 = null;
 document.addEventListener('DOMContentLoaded', () => {
     initUserInfo();
     navigateTo('overview');
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 });
 
 async function initUserInfo() {
@@ -117,6 +120,11 @@ function navigateTo(section) {
 
     const renderer = renderers[section];
     if (renderer) renderer();
+
+    // Refresh icons
+    if (typeof lucide !== 'undefined') {
+        setTimeout(() => lucide.createIcons(), 50);
+    }
 }
 
 function toggleSidebar() {
@@ -133,9 +141,11 @@ function showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    const icons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
-    toast.innerHTML = `<span>${icons[type] || ''}</span> ${message}`;
+    const icons = { success: 'check-circle', error: 'x-circle', warning: 'alert-triangle', info: 'info' };
+    const iconName = icons[type] || 'info';
+    toast.innerHTML = `<i data-lucide="${iconName}" style="width:18px;height:18px;"></i> ${message}`;
     container.appendChild(toast);
+    if (typeof lucide !== 'undefined') lucide.createIcons();
     setTimeout(() => {
         toast.classList.add('toast-exit');
         setTimeout(() => toast.remove(), 300);
@@ -241,7 +251,7 @@ function showHelp(topic) {
         'meta-token': {
             title: 'Obtener tu Access Token',
             text: `
-                <p>Es la "llave" que usa SocialPulse para publicar por ti:</p>
+                <p>Es la "llave" que usa Postly para publicar por ti:</p>
                 <ol style="margin-top:10px; padding-left:20px;">
                     <li>Entra al <strong><a href="https://developers.facebook.com/tools/explorer/" target="_blank">Meta Graph Explorer</a></strong>.</li>
                     <li>Selecciona tu App y dale permisos: <code>instagram_basic</code>, <code>instagram_content_publish</code>, <code>pages_show_list</code>.</li>
@@ -256,7 +266,7 @@ function showHelp(topic) {
     
     openModal(`
         <div class="modal-header">
-            <h3 class="modal-title">❓ ${data.title}</h3>
+            <h3 class="modal-title" style="display:flex; align-items:center; gap:8px;"><i data-lucide="help-circle" style="width:20px; height:20px; color:var(--primary);"></i> ${data.title}</h3>
             <button class="modal-close" onclick="closeModal(event)">✕</button>
         </div>
         <div style="line-height:1.6; color:var(--text-secondary); font-size:14px;">
@@ -285,8 +295,12 @@ function statusBadge(status) {
 }
 
 function platformIcon(platform) {
-    const map = { instagram: '📸', facebook: '📘', twitter: '🐦' };
-    return map[platform] || '📱';
+    const map = { 
+        instagram: '<i data-lucide="instagram" style="width:14px;height:14px;vertical-align:middle;"></i>', 
+        facebook: '<i data-lucide="facebook" style="width:14px;height:14px;vertical-align:middle;"></i>', 
+        twitter: '<i data-lucide="twitter" style="width:14px;height:14px;vertical-align:middle;"></i>' 
+    };
+    return map[platform] || '<i data-lucide="smartphone" style="width:14px;height:14px;vertical-align:middle;"></i>';
 }
 
 // ============================================
@@ -298,10 +312,10 @@ async function renderOverview() {
     const body = document.getElementById('main-body');
     body.innerHTML = `
         <div class="stats-grid">
-            <div class="stat-card"><div><div class="stat-value skeleton" style="width:60px;height:32px;"></div><div class="stat-label">Total Posts</div></div><div class="stat-icon" style="background:rgba(102,126,234,0.12)">📝</div></div>
-            <div class="stat-card"><div><div class="stat-value skeleton" style="width:60px;height:32px;"></div><div class="stat-label">Este Mes</div></div><div class="stat-icon" style="background:rgba(0,212,255,0.12)">📅</div></div>
-            <div class="stat-card"><div><div class="stat-value skeleton" style="width:60px;height:32px;"></div><div class="stat-label">Publicados</div></div><div class="stat-icon" style="background:rgba(16,185,129,0.12)">✅</div></div>
-            <div class="stat-card"><div><div class="stat-value skeleton" style="width:60px;height:32px;"></div><div class="stat-label">Programados</div></div><div class="stat-icon" style="background:rgba(245,158,11,0.12)">⏰</div></div>
+            <div class="stat-card"><div><div class="stat-value skeleton" style="width:60px;height:32px;"></div><div class="stat-label">Total Posts</div></div><div class="stat-icon" style="background:rgba(102,126,234,0.12)"><i data-lucide="file-text"></i></div></div>
+            <div class="stat-card"><div><div class="stat-value skeleton" style="width:60px;height:32px;"></div><div class="stat-label">Este Mes</div></div><div class="stat-icon" style="background:rgba(0,212,255,0.12)"><i data-lucide="calendar"></i></div></div>
+            <div class="stat-card"><div><div class="stat-value skeleton" style="width:60px;height:32px;"></div><div class="stat-label">Publicados</div></div><div class="stat-icon" style="background:rgba(16,185,129,0.12)"><i data-lucide="check-circle"></i></div></div>
+            <div class="stat-card"><div><div class="stat-value skeleton" style="width:60px;height:32px;"></div><div class="stat-label">Programados</div></div><div class="stat-icon" style="background:rgba(245,158,11,0.12)"><i data-lucide="clock"></i></div></div>
         </div>
         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:var(--space-lg);">
             <div>
@@ -313,19 +327,19 @@ async function renderOverview() {
                 <div style="display:grid;gap:var(--space-sm);">
                     <button class="card card-glow" style="text-align:left;cursor:pointer;border:1px solid var(--border);background:var(--bg-card);" onclick="navigateTo('create')">
                         <div style="display:flex;align-items:center;gap:12px;">
-                            <span style="font-size:24px;">➕</span>
+                            <span style="font-size:24px; color:var(--primary);"><i data-lucide="plus-square"></i></span>
                             <div><strong>Crear Post</strong><br><small class="text-muted">Publicar o programar contenido</small></div>
                         </div>
                     </button>
                     <button class="card card-glow" style="text-align:left;cursor:pointer;border:1px solid var(--border);background:var(--bg-card);" onclick="navigateTo('ai')">
                         <div style="display:flex;align-items:center;gap:12px;">
-                            <span style="font-size:24px;">🤖</span>
+                            <span style="font-size:24px; color:var(--accent);"><i data-lucide="sparkles"></i></span>
                             <div><strong>Generar con IA</strong><br><small class="text-muted">Captions, hashtags e ideas</small></div>
                         </div>
                     </button>
                     <button class="card card-glow" style="text-align:left;cursor:pointer;border:1px solid var(--border);background:var(--bg-card);" onclick="navigateTo('settings')">
                         <div style="display:flex;align-items:center;gap:12px;">
-                            <span style="font-size:24px;">🔗</span>
+                            <span style="font-size:24px; color:var(--purple);"><i data-lucide="link"></i></span>
                             <div><strong>Conectar Redes</strong><br><small class="text-muted">Instagram, Facebook</small></div>
                         </div>
                     </button>
@@ -411,7 +425,7 @@ async function loadPosts(statusFilter = null) {
         if (data.posts.length === 0) {
             list.innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-state-icon">📭</div>
+                    <div class="empty-state-icon"><i data-lucide="inbox"></i></div>
                     <div class="empty-state-title">No hay posts${statusFilter ? ' con este filtro' : ''}</div>
                     <div class="empty-state-text">Creá tu primer post para empezar a publicar</div>
                     <button class="btn btn-primary" onclick="navigateTo('create')">Crear Post</button>
@@ -516,6 +530,12 @@ function editPost(id) {
             document.getElementById('post-content').value = post.content || '';
             document.getElementById('post-platform').value = post.platform || 'instagram';
             document.getElementById('post-hashtags').value = post.hashtags || '';
+            const aspectSelect = document.getElementById('post-aspect-ratio');
+            if (aspectSelect) {
+                aspectSelect.value = post.aspect_ratio || 'feed';
+                // Trigger mockup update
+                changeMockupAspectRatio({ target: { value: aspectSelect.value } });
+            }
             // Store edit mode
             document.getElementById('create-post-form').dataset.editId = id;
             document.querySelector('#main-body h2').textContent = 'Editar Post';
@@ -587,20 +607,21 @@ function renderCreatePost() {
                     </div>
 
                     <input type="hidden" id="post-hashtags" value="">
+                    
+                    <div id="ai-inline-result" style="display:none;" class="ai-result">
+                        <div id="ai-inline-text"></div>
+                        <div class="ai-result-actions">
+                            <button type="button" class="btn btn-primary btn-sm" onclick="useAIResult()">✓ Usar este texto</button>
+                            <button type="button" class="btn btn-outline btn-sm" onclick="aiGenerateWithHint(lastAIType)">🔄 Otra sugerencia</button>
+                            <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('ai-inline-result').style.display='none'">✕ Descartar</button>
+                        </div>
+                    </div>
 
                     <div style="display:flex;gap:var(--space-md);margin-top:var(--space-xl);">
                         <button type="button" class="btn btn-primary" style="flex:1;" onclick="handleCreateAndPublish()">Publicar Inmediato</button>
                         <button type="button" class="btn btn-outline" style="flex:1;">🕒 Programar</button>
                     </div>
                 </form>
-
-                <div id="ai-inline-result" style="display:none;" class="ai-result">
-                    <div id="ai-inline-text"></div>
-                    <div class="ai-result-actions">
-                        <button class="btn btn-primary btn-sm" onclick="useAIResult()">✓ Usar este texto</button>
-                        <button class="btn btn-ghost btn-sm" onclick="document.getElementById('ai-inline-result').style.display='none'">✕ Descartar</button>
-                    </div>
-                </div>
             </div>
 
             <!-- Right Column: Mockup -->
@@ -711,7 +732,10 @@ function updateMockupCaption(event) {
     }
 }
 
+let lastAIType = 'caption';
+
 async function aiGenerateWithHint(type) {
+    lastAIType = type;
     const hint = document.getElementById('post-pista').value;
     const resultDiv = document.getElementById('ai-inline-result');
     const resultText = document.getElementById('ai-inline-text');
@@ -825,6 +849,7 @@ async function handleCreatePost(e) {
     formData.append('content', document.getElementById('post-content').value);
     formData.append('platform', document.getElementById('post-platform').value);
     formData.append('hashtags', document.getElementById('post-hashtags').value);
+    formData.append('aspect_ratio', document.getElementById('post-aspect-ratio').value);
     formData.append('status', 'draft');
 
     if (imageInput.files[0]) {
@@ -851,6 +876,7 @@ async function handleCreateAndPublish() {
     formData.append('content', document.getElementById('post-content').value);
     formData.append('platform', document.getElementById('post-platform').value);
     formData.append('hashtags', document.getElementById('post-hashtags').value);
+    formData.append('aspect_ratio', document.getElementById('post-aspect-ratio').value);
     formData.append('status', 'draft');
 
     if (imageInput.files[0]) {
@@ -1179,51 +1205,92 @@ async function renderSettings() {
             </div>
 
             <div class="settings-section">
-                <h3>🔗 Conexiones Sociales</h3>
-                <p class="text-muted" style="font-size:13px;margin-bottom:20px;">Configurá tus IDs y Tokens manualmente para permitir que SocialPulse publique en tus redes.</p>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                    <h3>🔗 Conexiones Sociales</h3>
+                </div>
                 
-                <div style="background:var(--bg-secondary); padding:20px; border-radius:12px; margin-bottom:16px; border:1px solid var(--border);">
-                    <h4 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">📸 Instagram Business</h4>
-                    <div class="settings-row">
-                        <div class="form-group">
-                            <label class="form-label">Instagram Page ID <span class="help-trigger" onclick="showHelp('ig-page')">?</span></label>
-                            <input type="text" id="set-ig-page" class="form-input" value="${user.ig_page_id || ''}" placeholder="Ej: 17841401234567890">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Access Token <span class="help-trigger" onclick="showHelp('meta-token')">?</span></label>
-                            <input type="password" id="set-ig-token" class="form-input" value="${user.ig_access_token || ''}" placeholder="Token de Meta (60 días recomendado)">
-                        </div>
-                    </div>
+                <div id="meta-connection-status" style="margin-bottom:20px;">
+                    <!-- Cargado dinámicamente por checkConnectionStatus() -->
+                    <div class="skeleton" style="height:80px; border-radius:8px;"></div>
                 </div>
 
-                <div style="background:var(--bg-secondary); padding:20px; border-radius:12px; border:1px solid var(--border);">
-                    <h4 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">📘 Facebook Page</h4>
-                    <div class="settings-row">
-                        <div class="form-group">
-                            <label class="form-label">Facebook Page ID <span class="help-trigger" onclick="showHelp('fb-page')">?</span></label>
-                            <input type="text" id="set-fb-page" class="form-input" value="${user.fb_page_id || ''}" placeholder="Ej: 102938475612345">
+                <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+                    <button type="button" id="btn-connect-facebook" class="btn btn-primary" onclick="connectWithFacebook()" style="flex:1; background:#0866FF; border:none; display:flex; align-items:center; justify-content:center; gap:10px;">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        Conectar con Meta (Instagram & FB)
+                    </button>
+                </div>
+
+                <button type="button" class="btn btn-ghost btn-sm" onclick="document.getElementById('advanced-social-config').style.display = document.getElementById('advanced-social-config').style.display === 'none' ? 'block' : 'none'" style="margin-bottom:12px; padding:0; font-size:12px; color:var(--text-muted);">
+                    ⚙️ Configuración manual avanzada
+                </button>
+
+                <div id="advanced-social-config" style="display:none;">
+                    <div style="background:var(--bg-secondary); padding:20px; border-radius:12px; margin-bottom:16px; border:1px solid var(--border);">
+                        <h4 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">📸 Instagram Business</h4>
+                        <div class="settings-row">
+                            <div class="form-group">
+                                <label class="form-label">Instagram Page ID <span class="help-trigger" onclick="showHelp('ig-page')">?</span></label>
+                                <input type="text" id="set-ig-page" class="form-input" value="${user.ig_page_id || ''}" placeholder="Ej: 17841401234567890">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Access Token <span class="help-trigger" onclick="showHelp('meta-token')">?</span></label>
+                                <input type="password" id="set-ig-token" class="form-input" value="${user.ig_access_token || ''}" placeholder="Token de Meta">
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label class="form-label">Access Token</label>
-                            <input type="password" id="set-fb-token" class="form-input" value="${user.fb_access_token || ''}" placeholder="Token de Meta">
+                    </div>
+
+                    <div style="background:var(--bg-secondary); padding:20px; border-radius:12px; border:1px solid var(--border);">
+                        <h4 style="margin-bottom:12px; display:flex; align-items:center; gap:8px;">📘 Facebook Page</h4>
+                        <div class="settings-row">
+                            <div class="form-group">
+                                <label class="form-label">Facebook Page ID <span class="help-trigger" onclick="showHelp('fb-page')">?</span></label>
+                                <input type="text" id="set-fb-page" class="form-input" value="${user.fb_page_id || ''}" placeholder="Ej: 102938475612345">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Access Token</label>
+                                <input type="password" id="set-fb-token" class="form-input" value="${user.fb_access_token || ''}" placeholder="Token de Meta">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div class="settings-section">
-                <h3>💳 Suscripción</h3>
-                <div class="card" style="display:flex;align-items:center;justify-content:space-between;">
-                    <div>
-                        <div style="font-weight:700;font-size:16px;">Plan ${(user.plan || 'free').charAt(0).toUpperCase() + (user.plan || 'free').slice(1)}</div>
-                        <div class="text-muted" style="font-size:13px;">Estado: ${user.subscription_status || 'trial'}</div>
-                        ${user.trial_ends_at ? `<div class="text-muted" style="font-size:12px;">Trial hasta: ${formatDate(user.trial_ends_at)}</div>` : ''}
+                <h3>💳 Abonos y Créditos</h3>
+                <div class="card" style="margin-bottom: 20px;">
+                    <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 4px;">Saldo disponible</div>
+                    <div style="font-size: 28px; font-weight: 800; color: var(--primary);">${user.posts_remaining || 0} <span style="font-size: 16px; font-weight: 600; color: var(--text-primary);">Posts</span></div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                    <div style="padding: 16px; text-align: center; border: 1px solid var(--border); background: var(--bg-surface); border-radius: var(--radius-md);">
+                        <div style="font-weight: 700; margin-bottom: 8px;">Post Individual</div>
+                        <div style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">$2.000</div>
+                        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">+1 Post</div>
+                        <button id="btn-buy-unica" class="btn btn-outline btn-sm" style="width:100%" onclick="buyPlan('unica')">Comprar</button>
                     </div>
-                    <button class="btn btn-accent btn-sm" onclick="showToast('Mejora de plan próximamente (Fase 4)', 'info')">⬆️ Mejorar Plan</button>
+                    <div style="padding: 16px; text-align: center; border: 2px solid var(--primary); background: rgba(102, 126, 234, 0.05); border-radius: var(--radius-md);">
+                        <div style="font-weight: 700; margin-bottom: 8px; color: var(--primary);">Abono Semanal</div>
+                        <div style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">$10.000</div>
+                        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">+10 Posts</div>
+                        <button id="btn-buy-semanal" class="btn btn-primary btn-sm" style="width:100%" onclick="buyPlan('semanal')">Comprar</button>
+                    </div>
+                    <div style="padding: 16px; text-align: center; border: 1px solid var(--border); background: var(--bg-surface); border-radius: var(--radius-md);">
+                        <div style="font-weight: 700; margin-bottom: 8px;">Abono Mensual</div>
+                        <div style="font-size: 20px; font-weight: 800; color: var(--text-primary); margin-bottom: 8px;">$50.000</div>
+                        <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 16px;">+60 Posts</div>
+                        <button id="btn-buy-mensual" class="btn btn-outline btn-sm" style="width:100%" onclick="buyPlan('mensual')">Comprar</button>
+                    </div>
                 </div>
             </div>
         </div>
     `;
+
+    // Initialize connection status if SDK is loaded
+    if (typeof checkConnectionStatus === 'function') {
+        checkConnectionStatus();
+    }
 }
 
 async function saveSettings(e) {
@@ -1248,6 +1315,49 @@ async function saveSettings(e) {
     }
 }
 
+async function buyPlan(planId) {
+    try {
+        const btn = document.getElementById('btn-buy-' + planId);
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<div class="spinner"></div>';
+        btn.disabled = true;
+
+        // 1. Get Public Config to initialize SDK
+        const configRes = await fetch('/api/config');
+        const config = await configRes.json();
+        
+        if (!config.mp_public_key) {
+            throw new Error('La pasarela de pago no está configurada por el administrador.');
+        }
+
+        // 2. Initialize MP SDK
+        if (typeof MercadoPago === 'undefined') {
+            throw new Error('El sistema de seguridad de Mercado Pago aún se está cargando. Por favor, espera 2 segundos o refresca la página.');
+        }
+        const mp = new MercadoPago(config.mp_public_key, { locale: 'es-AR' });
+
+        // 3. Create Preference on Backend
+        const response = await API.createCheckoutPreference(planId);
+        
+        // 4. Open Official Modal
+        mp.checkout({
+            preference: { id: response.id },
+            autoOpen: true
+        });
+        
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+        
+        showToast('Ventana de pago segura iniciada.', 'success');
+    } catch (e) {
+        showToast(e.message || 'Error al iniciar pago.', 'error');
+        const btn = document.getElementById('btn-buy-' + planId);
+        if(btn) {
+            btn.innerHTML = 'Comprar';
+            btn.disabled = false;
+        }
+    }
+}
 // === BRAND PROFILE ===
 async function renderBrand() {
     const body = document.getElementById('main-body');
@@ -1261,7 +1371,7 @@ async function renderBrand() {
     body.innerHTML = `
         <div style="max-width:700px;">
             <div style="margin-bottom:var(--space-xl);">
-                <p class="text-secondary">Completá esta información para que la Inteligencia Artificial de SocialPulse conozca tu negocio y genere contenido más personalizado, preciso y alineado con tu marca.</p>
+                <p class="text-secondary">Completá esta información para que la Inteligencia Artificial de Postly conozca tu negocio y genere contenido más personalizado, preciso y alineado con tu marca.</p>
             </div>
 
             <div class="settings-section">
@@ -1358,7 +1468,7 @@ async function renderAdmin() {
                     <div class="settings-section" style="grid-column: 1 / -1;">
                         <h3 style="display:flex; align-items:center; gap:8px;">ℹ️ ¿Qué datos se usan aquí?</h3>
                         <div class="card" style="background:#f0f9ff; border-color:#bae6fd; font-size:14px; color:#0369a1;">
-                            <p style="margin-bottom:8px;">Para que SocialPulse pueda publicar en tus redes, necesita conectarse a la API de Meta usando:</p>
+                            <p style="margin-bottom:8px;">Para que Postly pueda publicar en tus redes, necesita conectarse a la API de Meta usando:</p>
                             <ul style="margin-left:20px; line-height:1.6;">
                                 <li><strong>Page ID (Facebook e Instagram):</strong> El identificador único de tus páginas comerciales.</li>
                                 <li><strong>Access Token de Usuario (Larga Duración):</strong> Un permiso especial de 60 días generado en el <em>Meta Graph Explorer</em> con permisos como <code>pages_manage_posts</code> y <code>instagram_basic</code>.</li>
@@ -1406,30 +1516,65 @@ async function renderAdmin() {
             <!-- Tab 2: MERCADO PAGO -->
             <div id="content-tab-mp" class="admin-tab-content" style="display: none;">
                 <div class="settings-section">
-                    <h3 style="display:flex; align-items:center; gap:8px;">ℹ️ ¿Qué datos se usan aquí?</h3>
-                    <div class="card" style="background:#f0fdf4; border-color:#bbf7d0; font-size:14px; color:#166534;">
-                        <p style="margin-bottom:8px;">Para que los usuarios puedan comprar planes y el dinero vaya a tu cuenta, se usa:</p>
+                    <h3 style="display:flex; align-items:center; gap:8px;">ℹ️ ¿Cómo evitar el error de "Modo Prueba"?</h3>
+                    <div class="card" style="background:#fff7ed; border-color:#fed7aa; font-size:14px; color:#9a3412;">
+                        <p style="margin-bottom:8px;"><strong>Importante:</strong> Para que los pagos funcionen con tarjetas reales, ambas claves deben ser de <strong>Producción</strong> (las que empiezan con <code>APP_USR</code> y <code>APP_USR</code>).</p>
                         <ul style="margin-left:20px; line-height:1.6;">
-                            <li><strong>Access Token de Producción:</strong> Una clave privada que arranca con <code>APP_USR-...</code> generada al crear una aplicación "Checkout Pro" en tu panel de desarrollador de Mercado Pago.</li>
+                            <li>Si usas claves <code>TEST-</code>, solo funcionará con cuentas de prueba de Mercado Pago.</li>
+                            <li>Si usas claves <code>APP_USR-</code>, funcionará con dinero real.</li>
                         </ul>
-                        <p style="margin-top:8px; font-weight:bold;">
-                            <a href="https://dev.mercadopago.com.ar/panel" target="_blank" style="color:#166534; text-decoration:underline;">Ir a obtener mi Access Token en Mercado Pago ↗</a>
+                        <p style="margin-top:12px; font-weight:bold;">
+                            <a href="https://www.mercadopago.com.ar/developers/panel/app" target="_blank" style="color:#9a3412; text-decoration:underline;">Ir a mi Panel de Aplicaciones ↗</a>
                         </p>
                     </div>
                 </div>
 
                 <div class="settings-section">
-                    <h3>🏦 Configuración de Mercado Pago</h3>
+                    <h3 style="display:flex; align-items:center; gap:8px;">🚀 Pasos Críticos para Activar Pagos</h3>
+                    <div class="card" style="background:#f0f9ff; border-color:#bae6fd; font-size:13px; color:#0369a1;">
+                        <ol style="margin-left:20px; display:flex; flex-direction:column; gap:8px;">
+                            <li><strong>Homologación de la App:</strong> En el segundo pantallazo que pasaste, dale a <strong>"Comenzar"</strong> en "Configurar ambiente de desarrollo". Mercado Pago te pedirá completar tus datos fiscales. **Sin esto, Mercado Pago bloquea el botón "Pagar"** para evitar fraudes.</li>
+                            <li><strong>Localhost (Importante):</strong> Como estás en <code>localhost:3000</code>, Mercado Pago no puede "avisarle" a tu PC que el pago fue exitoso. Para que se sumen los posts automáticamente, deberás subir la web a un servidor real o usar <strong>Ngrok</strong> para darle una URL pública.</li>
+                            <li><strong>Configurar Webhooks (IPN):</strong> Una vez que tengas una URL pública, ve a "Webhooks" en el panel de Mercado Pago y coloca esta dirección:
+                                <code style="display:block; background:#fff; padding:8px; border-radius:4px; margin-top:4px; border:1px solid #bae6fd;">
+                                    ${window.location.origin}/api/billing/webhook
+                                </code>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3>🏦 Configuración de Pasarela (Checkout Integrado)</h3>
                     <div class="card">
-                        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:16px;">
-                            Ingresa el <strong>Access Token</strong> (Producción o Prueba) de tu cuenta de Mercado Pago Developers. 
-                            Todos los pagos del sistema irán directamente a esta cuenta.
-                        </p>
-                        <form onsubmit="saveDirectPaymentConfig(event)" style="display:flex; gap:12px; max-width:600px;">
-                            <input type="password" id="mp-access-token" class="form-input" style="flex:1;" 
-                                   value="${currentUser.mp_access_token || ''}" 
-                                   placeholder="APP_USR-0000...">
-                            <button type="submit" class="btn btn-primary">Guardar Pasarela</button>
+                        <div style="margin-bottom: 20px;">
+                            <label class="form-label" style="margin-bottom:8px;">Modo Detectado:</label>
+                            ${(currentUser.mp_access_token || '').startsWith('TEST-') 
+                                ? '<span class="badge badge-warning">🧪 MODO PRUEBAS (SANDBOX)</span>' 
+                                : (currentUser.mp_access_token || '').startsWith('APP_USR-') 
+                                    ? '<span class="badge badge-success">💰 MODO PRODUCCIÓN (REAL)</span>' 
+                                    : '<span class="badge badge-danger">⚠️ NO CONFIGURADO</span>'}
+                        </div>
+
+                        <form onsubmit="saveDirectPaymentConfig(event)">
+                            <div class="form-group" style="margin-bottom:16px;">
+                                <label class="form-label">Public Key <span class="help-trigger" onclick="showHelp('mp-public')">?</span></label>
+                                <input type="text" id="mp-public-key" class="form-input" 
+                                       value="${currentUser.mp_public_key || ''}" 
+                                       placeholder="APP_USR-0000... o TEST-0000...">
+                                <small style="color:var(--text-muted); font-size:11px;">Necesaria para abrir la ventana de pago sin salir del sitio.</small>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom:20px;">
+                                <label class="form-label">Access Token <span class="help-trigger" onclick="showHelp('mp-token')">?</span></label>
+                                <input type="password" id="mp-access-token" class="form-input" 
+                                       value="${currentUser.mp_access_token || ''}" 
+                                       placeholder="APP_USR-... o TEST-...">
+                                <small style="color:var(--text-muted); font-size:11px;">Mantenlo privado. Se usa para crear las órdenes de pago de forma segura.</small>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary" style="width:100%;">Guardar Todo y Activar Pop-up</button>
                         </form>
                     </div>
                 </div>
@@ -1543,14 +1688,23 @@ async function saveDirectPaymentConfig(e) {
     btn.disabled = true;
 
     try {
-        const tokenVal = document.getElementById('mp-access-token').value;
-        const res = await API.updateProfile({ mp_access_token: tokenVal });
+        const publicVal = document.getElementById('mp-public-key').value;
+        const accessVal = document.getElementById('mp-access-token').value;
+        const res = await API.updateProfile({ 
+            mp_public_key: publicVal,
+            mp_access_token: accessVal 
+        });
         
-        // Update user cache
+        // Update user cache and global state
         localStorage.setItem('sp_user', JSON.stringify(res.user));
+        
+        // Mutate the global object and also re-assign to be absolutely sure
         Object.assign(currentUser, res.user);
         
-        showToast('🔓 Token de Mercado Pago guardado exitosamente. Pagos activados.', 'success');
+        showToast('🔓 Credenciales de Mercado Pago guardadas. El Pop-up ahora está activo.', 'success');
+        
+        // Re-render completely with fresh data
+        renderAdmin(); 
     } catch (err) {
         showToast(err.message, 'error');
     } finally {

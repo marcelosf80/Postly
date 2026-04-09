@@ -3,60 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard — SocialPulse</title>
+    <title>Dashboard — Postly</title>
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+    <link rel="icon" href="/assets/img/logo.png">
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     <div class="dashboard">
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <a href="/" class="sidebar-brand">
-                    <span class="logo-icon">⚡</span>
-                    SocialPulse
+            <div class="sidebar-header" style="padding-top: var(--space-xl); padding-bottom: var(--space-xl);">
+                <a href="/" class="sidebar-brand" style="font-size: 22px; gap: 12px; margin: 0 auto; text-decoration: none;">
+                    <img src="/assets/img/logo.png" alt="Logo" style="width:44px; height:44px; border-radius:8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); object-fit:contain;">
+                    Postly
                 </a>
             </div>
             <nav class="sidebar-nav">
                 <div class="sidebar-section-title">Principal</div>
                 <button class="sidebar-link active" data-section="overview" onclick="navigateTo('overview')">
-                    <span class="icon">📊</span>
+                    <i data-lucide="layout-dashboard" class="icon"></i>
                     Dashboard
                 </button>
                 <button class="sidebar-link" data-section="posts" onclick="navigateTo('posts')">
-                    <span class="icon">📝</span>
+                    <i data-lucide="file-text" class="icon"></i>
                     Mis Posts
                 </button>
                 <button class="sidebar-link" data-section="create" onclick="navigateTo('create')">
-                    <span class="icon">➕</span>
+                    <i data-lucide="plus-circle" class="icon"></i>
                     Crear Post
                 </button>
                 <button class="sidebar-link" data-section="calendar" onclick="navigateTo('calendar')">
-                    <span class="icon">📅</span>
+                    <i data-lucide="calendar" class="icon"></i>
                     Calendario
                 </button>
 
                 <div class="sidebar-section-title">Herramientas</div>
                 <button class="sidebar-link" data-section="ai" onclick="navigateTo('ai')">
-                    <span class="icon">🤖</span>
+                    <i data-lucide="sparkles" class="icon"></i>
                     IA Assistant
                 </button>
                 <button class="sidebar-link" data-section="brand" onclick="navigateTo('brand')">
-                    <span class="icon">🏷️</span>
+                    <i data-lucide="tag" class="icon"></i>
                     Mi Marca
                 </button>
 
                 <div class="sidebar-section-title">Cuenta</div>
                 <button class="sidebar-link" data-section="billing" onclick="navigateTo('billing')" style="color: var(--primary);">
-                    <span class="icon">💳</span>
+                    <i data-lucide="credit-card" class="icon"></i>
                     Planes y Precios
                 </button>
                 <button class="sidebar-link" data-section="settings" onclick="navigateTo('settings')">
-                    <span class="icon">⚙️</span>
+                    <i data-lucide="settings" class="icon"></i>
                     Configuración
                 </button>
                 <button class="sidebar-link" id="admin-link" data-section="admin" onclick="navigateTo('admin')" style="display:none; border-left: 4px solid var(--accent);">
-                    <span class="icon">🛡️</span>
+                    <i data-lucide="shield" class="icon"></i>
                     Administración
                 </button>
             </nav>
@@ -105,14 +106,14 @@
     <div class="modal-overlay" id="onboarding-overlay" style="background: rgba(15, 23, 42, 0.95);">
         <div class="modal" style="max-width: 500px; padding: 32px;" onclick="event.stopPropagation()">
             <div class="modal-header">
-                <h3 class="modal-title" style="font-size: 24px; margin-bottom: 8px;">¡Bienvenido a SocialPulse! 👋</h3>
+                <h3 class="modal-title" style="font-size: 24px; margin-bottom: 8px;">¡Bienvenido a Postly! 👋</h3>
             </div>
             <p style="margin-bottom: 24px; color: var(--text-secondary); line-height: 1.6;">
                 Para que nuestra Inteligencia Artificial pueda generar contenido súper ajustado a tu negocio, por favor completa esta información:
             </p>
             <form onsubmit="handleOnboarding(event)">
                 <div class="form-group">
-                    <label class="form-label">¿Cómo usarás SocialPulse?</label>
+                    <label class="form-label">¿Cómo usarás Postly?</label>
                     <select id="ob-account-type" class="form-select" onchange="updateOnboardingLabels(this.value)">
                         <option value="business">🏢 Como Empresa / Negocio</option>
                         <option value="personal">🎨 Como Marca Personal / Artista</option>
@@ -141,7 +142,9 @@
         </div>
     </div>
 
-    <script src="/js/api.js"></script>
-    <script src="/js/app.js"></script>
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <script src="/js/api.js?v=1.5"></script>
+    <script src="/js/facebook-oauth.js?v=1.5"></script>
+    <script src="/js/app.js?v=1.5"></script>
 </body>
 </html>

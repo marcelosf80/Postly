@@ -120,7 +120,7 @@ router.get('/me', authMiddleware, (req, res) => {
 
 // PUT /api/auth/profile — Update profile
 router.put('/profile', authMiddleware, (req, res) => {
-    const { name, company, country, ig_page_id, ig_access_token, fb_page_id, fb_access_token, mp_access_token } = req.body;
+    const { name, company, country, ig_page_id, ig_access_token, fb_page_id, fb_access_token, mp_access_token, mp_public_key } = req.body;
 
     const updates = {};
     if (name !== undefined) updates.name = name;
@@ -133,10 +133,12 @@ router.put('/profile', authMiddleware, (req, res) => {
     
     // Solo admins pueden guardar el token de Mercado Pago
     const currentUser = users.findById(req.user.id);
-    if (currentUser && currentUser.is_admin && mp_access_token !== undefined) {
-        updates.mp_access_token = mp_access_token;
+    if (currentUser && currentUser.is_admin) {
+        if (mp_access_token !== undefined) updates.mp_access_token = mp_access_token;
+        if (mp_public_key !== undefined) updates.mp_public_key = mp_public_key;
     }
 
+    console.log(`[AUTH] Actualizando perfil para usuario ${req.user.id}:`, updates);
     const updated = users.update(req.user.id, updates);
     if (!updated) {
         return res.status(404).json({ error: 'Usuario no encontrado.' });
@@ -246,10 +248,11 @@ router.post('/facebook', async (req, res) => {
         const exchangeRes = await axios.get(exchangeUrl);
         const longToken = exchangeRes.data.access_token;
 
-        // 2. Fetch User Info (Email)
-        const meUrl = `https://graph.facebook.com/v19.0/me?fields=id,name,email&access_token=${longToken}`;
+        // 2. Fetch User Info (Email and Picture)
+        const meUrl = `https://graph.facebook.com/v19.0/me?fields=id,name,email,picture.type(large)&access_token=${longToken}`;
         const meRes = await axios.get(meUrl);
-        const { email, name: fbName } = meRes.data;
+        const { email, name: fbName, picture } = meRes.data;
+        const fbAvatarUrl = picture && picture.data ? picture.data.url : '';
 
         if (!email) {
             return res.status(400).json({ error: 'No pudimos obtener tu email de Facebook. Asegúrate de dar los permisos necesarios.' });
@@ -270,23 +273,34 @@ router.post('/facebook', async (req, res) => {
             for (const page of pages) {
                 // Check if page has an Instagram Business Account
                 const igUrl = `https://graph.facebook.com/v19.0/${page.id}?fields=instagram_business_account&access_token=${page.access_token}`;
-                const igRes = await axios.get(igUrl);
-                
-                if (igRes.data.instagram_business_account) {
-                    ig_page_id = igRes.data.instagram_business_account.id;
-                    ig_access_token = page.access_token; // Page token works for IG posting
-                    console.log(`[AUTH] ✅ Instagram encontrado: ${ig_page_id} vinculado a la página: ${page.name}`);
-                    break;
+                try {
+                    const igRes = await axios.get(igUrl);
+                    if (igRes.data.instagram_business_account) {
+                        ig_page_id = igRes.data.instagram_business_account.id;
+                        ig_access_token = page.access_token;
+                        console.log(`[AUTH] ✅ Instagram encontrado: ${ig_page_id} vinculado a la página: ${page.name}`);
+                        break;
+                    }
+                } catch (e) {
+                    console.warn(`[AUTH] No se pudo consultar IG en la página ${page.name}`);
                 }
             }
         }
 
         // 4. Update or Create User
         let user = users.findOne({ email: email.toLowerCase() });
+        const fb_page_id = pages && pages[0] ? pages[0].id : '';
+        const fb_access_token = pages && pages[0] ? pages[0].access_token : '';
+
+        console.log(`[AUTH] Descubrimiento Meta p/ ${email}: IG=${ig_page_id}, FB=${fb_page_id}, Avatar=${fbAvatarUrl ? 'SI' : 'NO'}`);
+
         const updates = {
             ig_page_id: ig_page_id || (user ? user.ig_page_id : ''),
             ig_access_token: ig_access_token || (user ? user.ig_access_token : ''),
+            fb_page_id: fb_page_id || (user ? user.fb_page_id : ''),
+            fb_access_token: fb_access_token || (user ? user.fb_access_token : ''),
             name: user ? user.name : fbName,
+            avatar_url: fbAvatarUrl || (user ? user.avatar_url : ''),
             auth_provider: 'facebook'
         };
 
@@ -301,13 +315,13 @@ router.post('/facebook', async (req, res) => {
                 subscription_status: 'trial',
                 trial_ends_at: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString(),
                 ...updates,
-                fb_page_id: pages && pages[0] ? pages[0].id : '',
-                fb_access_token: pages && pages[0] ? pages[0].access_token : '',
                 onboarding_completed: false,
                 posts_this_month: 0,
                 avatar_color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`
             });
+            console.log(`[AUTH] Nuevo usuario creado vía Meta: ${email}`);
         } else {
+            console.log(`[AUTH] Actualizando usuario existente vía Meta: ${email}`);
             user = users.update(user.id, updates);
         }
 

@@ -70,7 +70,7 @@ async function connectWithFacebook() {
                 resetConnectButton();
             }
         }, {
-            scope: 'pages_manage_posts,pages_read_engagement,instagram_basic,instagram_content_publish,business_management',
+            scope: 'email,public_profile,pages_manage_posts,pages_read_engagement,instagram_basic,instagram_content_publish,business_management,pages_show_list',
             return_scopes: true
         });
     } catch (error) {
@@ -128,16 +128,28 @@ async function exchangeTokenAndSaveUser(shortToken) {
                             <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 24px;">
                                 ⏰ Tu token es válido por <strong>60 días</strong>. Te notificaremos cuando debas renovarlo.
                             </p>
-                            <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove(); loadSettings();">
+                            <button class="btn btn-primary" onclick="this.closest('.modal-overlay').remove(); navigateTo('settings');">
                                 Continuar
                             </button>
                         </div>
                     </div>
                 `;
+                // Update global state and persistent storage
+                localStorage.setItem('sp_user', JSON.stringify(data.user));
+                window.currentUser = data.user;
+                if (typeof initUserInfo === 'function') initUserInfo();
+                if (typeof checkConnectionStatus === 'function') checkConnectionStatus();
+
                 document.body.appendChild(modal);
             } else {
+                // Update even if no modal is shown
+                localStorage.setItem('sp_user', JSON.stringify(data.user));
+                window.currentUser = data.user;
+                if (typeof initUserInfo === 'function') initUserInfo();
+                if (typeof checkConnectionStatus === 'function') checkConnectionStatus();
+
                 showToast('Conectado con Facebook. Configura manualmente tu Instagram Business ID en Ajustes.', 'warning');
-                setTimeout(() => loadSettings(), 1000);
+                setTimeout(() => navigateTo('settings'), 1000);
             }
         } else {
             throw new Error(data.error || 'Error en el servidor');
@@ -154,7 +166,10 @@ async function exchangeTokenAndSaveUser(shortToken) {
 function resetConnectButton() {
     const btn = document.getElementById('btn-connect-facebook');
     if (btn) {
-        btn.innerHTML = '<span style="display:inline-flex;align-items:center;gap:8px;">📘 Conectar con Facebook</span>';
+        btn.innerHTML = `<span style="display:inline-flex;align-items:center;gap:8px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            Conectar con Meta (Instagram & FB)
+        </span>`;
         btn.disabled = false;
     }
 }
@@ -166,7 +181,7 @@ async function disconnectFacebook() {
     }
 
     try {
-        const token = localStorage.getItem('token');
+        const token = API.getToken();
         const response = await fetch('/api/auth/profile', {
             method: 'PUT',
             headers: {
@@ -183,7 +198,7 @@ async function disconnectFacebook() {
 
         if (response.ok) {
             showToast('Cuenta de Meta desconectada', 'success');
-            loadSettings();
+            navigateTo('settings');
         } else {
             throw new Error('Error al desconectar');
         }
@@ -195,18 +210,24 @@ async function disconnectFacebook() {
 // Verificar estado de conexión
 function checkConnectionStatus() {
     const user = window.currentUser;
-    const isConnected = user && user.ig_page_id && user.ig_access_token;
+    const hasIG = user && user.ig_page_id && user.ig_access_token;
+    const hasFB = user && user.fb_page_id && user.fb_access_token;
+    const isConnected = hasIG || hasFB;
     
     const statusContainer = document.getElementById('meta-connection-status');
     if (statusContainer) {
         if (isConnected) {
+            let details = '';
+            if (hasIG) details += `<div><i data-lucide="instagram" style="width:12px;height:12px;vertical-align:middle;"></i> <strong>Instagram:</strong> ${user.ig_page_id}</div>`;
+            if (hasFB) details += `<div><i data-lucide="facebook" style="width:12px;height:12px;vertical-align:middle;"></i> <strong>Facebook Page:</strong> ${user.fb_page_id}</div>`;
+
             statusContainer.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 12px; padding: 16px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: 8px;">
-                    <span style="font-size: 24px;">✅</span>
+                    <span style="font-size: 24px;"><i data-lucide="check-circle" style="color:var(--success);"></i></span>
                     <div style="flex: 1;">
-                        <div style="font-weight: 600; color: var(--success);">Instagram Conectado</div>
+                        <div style="font-weight: 600; color: var(--success);">Meta Conectado</div>
                         <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-                            ID: ${user.ig_page_id}
+                            ${details}
                         </div>
                     </div>
                     <button class="btn btn-outline btn-sm" onclick="disconnectFacebook()" style="border-color: var(--danger); color: var(--danger);">
@@ -214,19 +235,33 @@ function checkConnectionStatus() {
                     </button>
                 </div>
             `;
+        } else if (user && user.auth_provider === 'facebook') {
+            statusContainer.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 12px; padding: 16px; background: rgba(102, 126, 234, 0.1); border: 1px solid var(--primary); border-radius: 8px;">
+                    <span style="font-size: 24px;"><i data-lucide="user-check" style="color:var(--primary);"></i></span>
+                    <div style="flex: 1;">
+                        <div style="font-weight: 600; color: var(--primary-light);">Autenticado con Meta</div>
+                        <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
+                            No encontramos páginas de Facebook o cuentas de Instagram vinculadas a tu perfil. 
+                            Asegúrate de tener una <strong>Fan Page</strong> creada.
+                        </div>
+                    </div>
+                </div>
+            `;
         } else {
             statusContainer.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 12px; padding: 16px; background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.3); border-radius: 8px;">
-                    <span style="font-size: 24px;">⚠️</span>
+                    <span style="font-size: 24px;"><i data-lucide="alert-triangle" style="color:var(--warning);"></i></span>
                     <div style="flex: 1;">
                         <div style="font-weight: 600; color: var(--warning);">No conectado</div>
                         <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">
-                            Conectá tu cuenta para publicar automáticamente
+                            Conectá tu cuenta para publicar automáticamente en FB e Instagram
                         </div>
                     </div>
                 </div>
             `;
         }
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     }
 }
 
