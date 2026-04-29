@@ -35,13 +35,13 @@ Tu sistema **SocialPulse** ahora tiene conexión OAuth automática con Meta que 
 
 Tu `.env` ya tiene:
 ```env
-FACEBOOK_APP_ID=1493782988779942
-FACEBOOK_APP_SECRET=9ded6acee6a119bfffcc764a509cff2a
+FACEBOOK_APP_ID=2217261002140935
+FACEBOOK_APP_SECRET=575e54a2337b8865606bdda1bfa4a399
 ```
 
 ### 2. Configurar Dominios en Meta Developer
 
-1. Ve a: https://developers.facebook.com/apps/1493782988779942/settings/basic/
+1. Ve a: https://developers.facebook.com/apps/2217261002140935/settings/basic/
 
 2. **App Domains:**
    ```
@@ -84,6 +84,23 @@ Tu app necesita estos permisos:
 - ✅ `business_management`
 
 **IMPORTANTE:** En modo desarrollo, estos permisos están disponibles automáticamente. Para producción necesitás App Review.
+
+---
+
+## 📱 Configuración Android (Key Hash)
+
+Para que el login funcione en Android, debes registrar el **Hash de clave** en el Panel de Meta.
+
+### 1. Hash de tu Aplicación
+El hash actual para este proyecto es:
+`nxLrNlzVdB6J98JKqic9/QR9FCU=`
+
+### 2. Dónde agregarlo
+1. Ve a: **Configuración de la app > Básica**
+2. Desliza hasta la sección **Android**.
+3. En el campo **Hashes de clave**, pega el valor de arriba.
+4. Asegúrate de que el **Nombre del paquete** sea `com.socialpulse.marketing`.
+5. Guarda los cambios.
 
 ---
 

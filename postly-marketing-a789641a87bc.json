@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "postly-marketing",
+  "private_key_id": "a789641a87bc3bc755c955939f459cb3c0966dcc",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDxNfnGCnm1L3PA\nKbuTOkhubdQkrvo/BU5DL0BGHJGE5UqVxJ9hgblnbscWUc6j0stAkNBlwmCnmqLg\nyvsb15cS5N8fXlNhDY/0XQZ58gJVmRea4ORL/sCvPvm2/zBILxdoju25bvGy0kFZ\nX0F759lgexXEWQ7NxQSVNq7ywMJpjxM9vWjxQxJq4550tNvnbGpZZlDJdKJfMB/b\nxugFIgOQ+CnG9Trtgf4N6CXnOalM2Z7RcV92wBl1WN7mvc+w8UtpOA9FvQsVJt+4\nUkeediAcDgV/nZCaW6LkOGIbZ+tGmJBWV9tbcYceU3uume4sPDsxYcYXPuqSfD9p\n7ExyDt73AgMBAAECggEAD1x+SqlyH3glKVC/EbI9g02FRszJ7RIxGMA9RKR0c//c\n5HWAJ50zqdhOiietlEChZxGR5APL/1XZbPLK/naYDWumoKseKOkh3iW/0CukZb/O\ngV40dnkuhjqUJp5RJy0F6Ee/RfbrIkCXntHH1tSTbbyI91crRS7N4D7PnMVqhtRR\nH/JBdujVbbXv0tIzQApU/dxosx284HoBZMsyaolOKz5pKrqQ+RqTV3o5nIM/JjBM\np10VJW+MjaWZndvFumIcoAAR66GR74nuqeZGf/7h1C1tzDDolAGIvegoqJFjJq1+\ng4vlue55wli8HGJOlw1ZZ5ALSPg4nf9NGtHsyfZ+qQKBgQD8r5v3IiteFZRY8IBq\n4cqW3NTnWudn4skEZKGuOqdsrdqDznr7Td/Ol2kOcQ+XmUudo947aqXM4ad1ldAJ\nhmqWgFYEttOTnpPxFO8FlXS31TRcR3+ZERWnigGDYAzv26oveyiVpZABqrXy0YUw\nY8GS0Yy2pcKtPXoR8RZVpG0jXQKBgQD0X9a7PVZzq9Awg114txsGpnT/t0+1On5C\nfO+qbAQ/YxHtn8KAVXbFvDOphV05dkBnDxYF5idikH58TW3e+kOKziNpLblidXUh\nZQhAE4L2NPHJ1TgR2uKxWl0RmNHkC1lb0vXySEJpaT1UiS/0woh96gRxNqxKsKve\nyiqxw+HaYwKBgQCO+GmdzhaNmFYkcIeocfLnozFPae7Op9GnC60zYHqEkmW1+Ck7\ncZd1U9QcWLpCw3i2TBactb30C6VtcYORMB205A5Hgo550trQKFEJbsPok9iZcdbv\na2w+LGaox7rqJ/bGAMA408GEP+vM5OGgPIE1Kh2c5nMdBFDCQA+sC2m4/QKBgG7i\nIcQaA+U+e5vXr4z7wJaW5xW07sTzwqCWogT5OEAuys7Ao/epT9hPGj38Vp2hK33X\n2Y1ZrltJ5yqt04HOmuEbwfOSnMCxPTGm70Rr1guzYFbNmcB4Sk5hC0PVzL8l6ykA\nIzsJUKEV8I8wJINx1Y8UpWldfnXxjjrsDs1UbWGzAoGBALXw4rZKhcMXIMAaFS25\nCjlyhd+Gu9vZqZvcX/A1KT6JBrVasEj9AhLRBeaBsWnDzZBYyuHBvwpIsWIrbJdn\nea2ZHlYFLoqRI9Ll4sRpYraXTjW8s7V9ANwExbgi5JxH4BFfH783bnsQJHev8nLf\nVRvHDdjUsUOyCKHGXFmcglPc\n-----END PRIVATE KEY-----\n",
+  "client_email": "postly@postly-marketing.iam.gserviceaccount.com",
+  "client_id": "117106266265698657539",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/postly%40postly-marketing.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Control Center | Premium Launcher</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Fira+Code&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo-area">
+                <h1>Server Hub</h1>
+                <p>Gestioná tus servidores de forma centralizada al estilo XAMPP.</p>
+            </div>
+            <div class="stats-bar">
+                <div class="stat-item">
+                    <span class="status-dot" style="background:var(--success)"></span>
+                    <span>Launcher Online</span>
+                </div>
+            </div>
+        </header>
+
+        <main class="grid" id="services-grid">
+            <!-- Services will be injected here -->
+        </main>
+    </div>
+
+    <!-- Floating Console -->
+    <div class="console" id="service-console">
+        <div class="console-header">
+            <span id="console-title">Logs: Service Name</span>
+            <button onclick="closeConsole()" style="padding: 2px 8px; font-size: 12px; flex: none;">✕</button>
+        </div>
+        <div class="console-body" id="console-output"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>

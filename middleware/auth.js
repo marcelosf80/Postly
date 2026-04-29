@@ -46,4 +46,20 @@ function optionalAuth(req, res, next) {
     next();
 }
 
-module.exports = { authMiddleware, optionalAuth, generateToken, JWT_SECRET };
+function adminMiddleware(req, res, next) {
+    if (!req.user || !req.user.id) {
+        return res.status(401).json({ error: 'Acceso no autorizado.' });
+    }
+
+    const { users } = require('../data/store');
+    const user = users.findById(req.user.id);
+
+    if (!user || !user.is_admin) {
+        return res.status(403).json({ error: 'Acceso restringido. Solo administradores.' });
+    }
+
+    next();
+}
+
+module.exports = { authMiddleware, optionalAuth, generateToken, adminMiddleware, JWT_SECRET };
+

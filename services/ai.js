@@ -94,8 +94,8 @@ async function generateCaption(description, options = {}) {
     const systemPrompt = `Eres un experto en marketing digital y copywriting para redes sociales.${brandContext}
 Genera captions atractivos y efectivos para ${platform}.
 Tono: ${tone}. Idioma: ${language}.
-Incluye emojis relevantes.
-Responde SOLAMENTE con el caption, sin explicaciones ni comillas.`;
+Incluye emojis relevantes y una lista de hashtags estratégicos al final.
+Responde SOLAMENTE con el post completo (caption + hashtags), sin explicaciones ni comillas.`;
 
     const userPrompt = `Genera un caption para ${platform} sobre: ${description}`;
     return callAI(systemPrompt, userPrompt, { imageBase64 });

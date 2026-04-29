@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — Postly</title>
+    <link rel="stylesheet" href="./css/main.css">
+    <link rel="stylesheet" href="./css/mobile.css">
+    <link rel="stylesheet" href="./css/photo-filters.css">
+    <link rel="icon" href="./assets/img/logo.png">
+</head>
+<body class="mobile-mode">
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <button type="button" class="sidebar-close-btn" onclick="toggleSidebar()">✕</button>
+            <div class="sidebar-header" style="padding-top: var(--space-xl); padding-bottom: var(--space-xl);">
+                <a href="./" class="sidebar-brand" style="font-size: 22px; gap: 12px; margin: 0 auto; text-decoration: none;">
+                    <img src="./assets/img/logo.png" alt="Logo" style="width:44px; height:44px; border-radius:8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); object-fit:contain;">
+                    Postly
+                </a>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="sidebar-section-title">Principal</div>
+                <button class="sidebar-link active" data-section="overview" onclick="navigateTo('overview')">
+                    <i data-lucide="layout-dashboard" class="icon"></i>
+                    Dashboard
+                </button>
+                <button class="sidebar-link" data-section="posts" onclick="navigateTo('posts')">
+                    <i data-lucide="file-text" class="icon"></i>
+                    Mis Posts
+                </button>
+                <button class="sidebar-link" data-section="create" onclick="navigateTo('create')">
+                    <i data-lucide="plus-circle" class="icon"></i>
+                    Crear Post
+                </button>
+                <button class="sidebar-link" data-section="calendar" onclick="navigateTo('calendar')">
+                    <i data-lucide="calendar" class="icon"></i>
+                    Calendario
+                </button>
+
+                <div class="sidebar-section-title">Herramientas</div>
+                <button class="sidebar-link" data-section="ai" onclick="navigateTo('ai')">
+                    <i data-lucide="sparkles" class="icon"></i>
+                    IA Assistant
+                </button>
+                <button class="sidebar-link" data-section="brand" onclick="navigateTo('brand')">
+                    <i data-lucide="tag" class="icon"></i>
+                    Mi Marca
+                </button>
+
+                <div class="sidebar-section-title">Cuenta</div>
+                <button class="sidebar-link" data-section="billing" onclick="navigateTo('billing')" style="color: var(--primary);">
+                    <i data-lucide="credit-card" class="icon"></i>
+                    Planes y Precios
+                </button>
+                <button class="sidebar-link" data-section="settings" onclick="navigateTo('settings')">
+                    <i data-lucide="settings" class="icon"></i>
+                    Configuración
+                </button>
+                <button class="sidebar-link" id="admin-link" data-section="admin" onclick="navigateTo('admin')" style="display:none; border-left: 4px solid var(--accent);">
+                    <i data-lucide="shield" class="icon"></i>
+                    Administración
+                </button>
+            </nav>
+            <div class="sidebar-footer" style="display: flex; flex-direction: column; padding: var(--space-lg); border-top: 1px solid var(--border);">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 8px;">
+                    <div class="sidebar-user" onclick="navigateTo('settings')" style="padding: 0; gap: 12px; cursor: pointer; flex: 1;">
+                        <div class="avatar" id="user-avatar" style="background: #e2e8f0; color: #1e293b; width: 36px; height: 36px; font-size: 14px;">M</div>
+                        <div class="sidebar-user-info">
+                            <div class="sidebar-user-name" id="user-name" style="color: #1e293b; font-weight: 700; font-size: 13px;">Usuario</div>
+                            <div class="sidebar-user-plan" id="user-plan" style="color: #10b981; text-transform: lowercase; font-size: 11px;">🟢 activo</div>
+                        </div>
+                    </div>
+                    <button onclick="logout()" title="Cerrar Sesión" style="border: none; background: rgba(239, 68, 68, 0.1); color: var(--danger); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    </button>
+                </div>
+                <div style="text-align: center; font-size: 10px; color: var(--text-muted); opacity: 0.7;" id="app-version-label">v1.0.3</div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <header class="mobile-header">
+                <button onclick="toggleSidebar()" style="background:none; border:none; color:var(--text-primary); cursor:pointer; padding: 8px;">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                </button>
+                <div class="mobile-header-title" id="page-title" style="display:flex; align-items:center; gap:8px;">
+                    <img src="./assets/img/logo.png" style="width:28px; height:28px; border-radius:6px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                    <span style="font-family:var(--font-display); font-weight:800; font-size:20px;">Postly</span>
+                </div>
+                <div class="avatar avatar-sm" id="mobile-user-avatar" onclick="navigateTo('settings')" style="background:var(--gradient-primary); color:white; cursor:pointer; overflow:hidden;">U</div>
+            </header>
+            <div class="main-body" id="main-body">
+                <!-- Content loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <!-- AI Assistant Modal -->
+    <div id="ai-modal" class="ai-modal-overlay" style="display:none;" onclick="this.style.display='none'">
+        <div class="ai-modal" onclick="event.stopPropagation()" style="margin:20vh 20px;">
+            <div class="ai-modal-header" style="display:flex; justify-content:space-between; align-items:center; padding:16px; border-bottom:1px solid var(--border);">
+                <h3 id="ai-title" style="margin:0; font-size:18px; font-weight:700;">IA Assistant</h3>
+                <button onclick="document.getElementById('ai-modal').style.display='none'" style="background:none; border:none; font-size:20px; cursor:pointer;">✕</button>
+            </div>
+            <div class="ai-modal-body" style="padding:16px;">
+                <div id="ai-form-container">
+                    <textarea id="ai-input" class="form-textarea" rows="3" placeholder="¿Sobre qué trata tu post?" style="width:100%; border-radius:12px; padding:12px;"></textarea>
+                    <button class="btn btn-primary" style="width:100%; margin-top:16px; border-radius:12px;" onclick="generateAI()">Generar ✨</button>
+                </div>
+                <div id="ai-result" style="margin-top:20px; display:none;">
+                    <div class="ai-result-box" id="ai-result-text" style="background:#f8fafc; padding:12px; border-radius:12px; font-size:14px; white-space:pre-wrap; border:1px solid #e2e8f0;"></div>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-top:12px;">
+                        <button class="btn btn-primary btn-sm" style="border-radius:12px;" onclick="useAIText()">Usar Texto</button>
+                        <button class="btn btn-outline btn-sm" style="border-radius:12px;" onclick="generateAI()">Sugerir otro</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal container -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+        <div class="modal" id="modal-content" onclick="event.stopPropagation()">
+        </div>
+    </div>
+
+    <!-- Onboarding Modal -->
+    <div class="modal-overlay" id="onboarding-overlay" style="background: rgba(15, 23, 42, 0.95);">
+        <div class="modal" style="max-width: 500px; padding: 32px;" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="modal-title" style="font-size: 24px; margin-bottom: 8px;">¡Bienvenido a Postly! 👋</h3>
+            </div>
+            <p style="margin-bottom: 24px; color: var(--text-secondary); line-height: 1.6;">
+                Para que nuestra Inteligencia Artificial pueda generar contenido súper ajustado a tu negocio, por favor completa esta información:
+            </p>
+            <form onsubmit="handleOnboarding(event)">
+                <div class="form-group">
+                    <label class="form-label">¿Cómo usarás Postly?</label>
+                    <select id="ob-account-type" class="form-select" onchange="updateOnboardingLabels(this.value)">
+                        <option value="business">🏢 Como Empresa / Negocio</option>
+                        <option value="personal">🎨 Como Marca Personal / Artista</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="label-ob-type" for="ob-type">Tipo de Negocio / Rubro</label>
+                    <input type="text" id="ob-type" class="form-input" placeholder="Ej: Venta de artículos deportivos" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" id="label-ob-audience" for="ob-audience">¿A quién le vendes? (Público Objetivo)</label>
+                    <input type="text" id="ob-audience" class="form-input" placeholder="Ej: Deportistas amateurs de 18 a 35 años" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="ob-voice">Tono de tu Marca</label>
+                    <select id="ob-voice" class="form-select" required>
+                        <option value="Amigable y cercano">Amigable y cercano</option>
+                        <option value="Profesional y formal">Profesional y formal</option>
+                        <option value="Humorístico y divertido">Humorístico y divertido</option>
+                        <option value="Educativo e informativo">Educativo e informativo</option>
+                        <option value="Inspirador y motivacional">Inspirador y motivacional</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 16px;" id="ob-btn">Comenzar a usar la app</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation Bar (Mobile Only) -->
+    <nav class="bottom-nav" id="bottom-nav">
+        <button class="bottom-nav-item active" data-section="overview" onclick="navigateTo('overview')">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Inicio</span>
+        </button>
+        <button class="bottom-nav-item" data-section="posts" onclick="navigateTo('posts')">
+            <i data-lucide="file-text"></i>
+            <span>Posts</span>
+        </button>
+        <div class="bottom-nav-fab-container">
+            <button class="bottom-nav-fab" data-section="create" onclick="navigateTo('create')">
+                <i data-lucide="plus"></i>
+            </button>
+        </div>
+        <button class="bottom-nav-item" data-section="ai" onclick="navigateTo('ai')">
+            <i data-lucide="sparkles"></i>
+            <span>IA</span>
+        </button>
+        <button class="bottom-nav-item" onclick="toggleSidebar()">
+            <i data-lucide="menu"></i>
+            <span>Menú</span>
+        </button>
+    </nav>
+
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+    <script src="https://sdk.mercadopago.com/js/v2"></script>
+    <script src="./js/config.js"></script>
+    <script src="./js/local-store.js"></script>
+    <script src="./js/photo-filters.js?v=1.0"></script>
+    <script src="./js/api.js?v=2.1"></script>
+    <script src="./js/facebook-oauth.js?v=2.1"></script>
+    <script src="./js/app.js?v=2.1"></script>
+</body>
+</html>

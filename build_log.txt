@@ -1,0 +1,803 @@
+Starting a Gradle Daemon, 2 busy and 1 stopped Daemons could not be reused, use --status for details
+
+> Configure project :app
+WARNING: Using flatDir should be avoided because it doesn't support any meta-data formats.
+
+> Configure project :capacitor-cordova-android-plugins
+WARNING: Using flatDir should be avoided because it doesn't support any meta-data formats.
+
+> Task :clean
+> Task :app:clean
+> Task :capacitor-android:clean
+> Task :capacitor-community-facebook-login:clean
+> Task :capacitor-cordova-android-plugins:clean UP-TO-DATE
+
+[Incubating] Problems report is available at: file:///C:/Marketing/android/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.4.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 7m 13s
+5 actionable tasks: 4 executed, 1 up-to-date
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.4.1/userguide/configuration_cache_enabling.html
+Initialized native services in: C:\Users\marce\.gradle\native
+Initialized jansi services in: C:\Users\marce\.gradle\native
+Removing 0 daemon stop events from registry
+Previous Daemon (5452) stopped at Mon Apr 27 20:26:47 ART 2026 by user or operating system
+Starting a Gradle Daemon, 6 busy and 1 stopped Daemons could not be reused, use --status for details
+Received JVM installation metadata from 'C:\Program Files\Android\Android Studio\jbr': {JAVA_HOME=C:\Program Files\Android\Android Studio\jbr, JAVA_VERSION=21.0.10, JAVA_VENDOR=JetBrains s.r.o., RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=21.0.10+-14961533-b1163.108, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=21.0.10+-14961533-b1163.108, VM_VENDOR=JetBrains s.r.o., OS_ARCH=amd64}
+Starting process 'Gradle build daemon'. Working directory: C:\Users\marce\.gradle\daemon\9.4.1 Command: C:\Program Files\Android\Android Studio\jbr\bin\java.exe --add-opens=java.base/java.lang=ALL-UNNAMED --add-opens=java.base/java.lang.invoke=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED --add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED --add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.prefs/java.util.prefs=ALL-UNNAMED --add-opens=java.base/java.nio.charset=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED --add-opens=java.base/java.util.concurrent=ALL-UNNAMED --add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED --add-opens=java.xml/javax.xml.namespace=ALL-UNNAMED --add-opens=java.base/java.time=ALL-UNNAMED -Xmx1536m -Dfile.encoding=UTF-8 -Duser.country=ES -Duser.language=es -Duser.variant -cp C:\Users\marce\.gradle\wrapper\dists\gradle-9.4.1-all\eckclv9s5vi9exbmnyvpg2a3h\gradle-9.4.1\lib\gradle-daemon-main-9.4.1.jar -javaagent:C:\Users\marce\.gradle\wrapper\dists\gradle-9.4.1-all\eckclv9s5vi9exbmnyvpg2a3h\gradle-9.4.1\lib\agents\gradle-instrumentation-agent-9.4.1.jar org.gradle.launcher.daemon.bootstrap.GradleDaemon 9.4.1
+Successfully started process 'Gradle build daemon'
+An attempt to start the daemon took 1 mins 57.643 secs.
+The client will now receive all logging from the daemon (pid: 13112). The daemon log file: C:\Users\marce\.gradle\daemon\9.4.1\daemon-13112.out.log
+Starting build in new daemon [memory: 1.5 GiB]
+Using 2 worker leases.
+Operational build model parameters: {cachingModelBuilding=false, configurationCache=false, configurationCacheDisabledReason=null, configurationCacheParallelLoad=false, configurationCacheParallelStore=false, configureOnDemand=false, invalidateCoupledProjects=false, isolatedProjects=false, modelAsProjectDependency=false, modelBuilding=false, parallelModelBuilding=false, parallelProjectConfiguration=false, parallelProjectExecution=false, resilientModelBuilding=false}
+Received JVM installation metadata from 'C:\Program Files\Android\Android Studio\jbr': {JAVA_HOME=C:\Program Files\Android\Android Studio\jbr, JAVA_VERSION=21.0.10, JAVA_VENDOR=JetBrains s.r.o., RUNTIME_NAME=OpenJDK Runtime Environment, RUNTIME_VERSION=21.0.10+-14961533-b1163.108, VM_NAME=OpenJDK 64-Bit Server VM, VM_VERSION=21.0.10+-14961533-b1163.108, VM_VENDOR=JetBrains s.r.o., OS_ARCH=amd64}
+Watching the file system is configured to be enabled if available
+Now considering [C:\Marketing\android] as hierarchies to watch
+File system watching is active
+Starting Build
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Settings evaluated using settings file 'C:\Marketing\android\settings.gradle'.
+Projects loaded. Root project using build file 'C:\Marketing\android\build.gradle'.
+Included projects: [root project 'android', project ':app', project ':capacitor-android', project ':capacitor-community-facebook-login', project ':capacitor-cordova-android-plugins']
+
+> Configure project :
+Evaluating root project 'android' using build file 'C:\Marketing\android\build.gradle'.
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+
+> Configure project :
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+
+> Configure project :app
+Evaluating project ':app' using build file 'C:\Marketing\android\app\build.gradle'.
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Using default execution profile
+Using Kotlin Gradle Plugin gradle85 variant
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+google-services.json not found, google-services plugin not applied.
+WARNING: Using flatDir should be avoided because it doesn't support any meta-data formats.
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+Detected Android Gradle Plugin compose compiler configuration
+
+> Configure project :capacitor-android
+Evaluating project ':capacitor-android' using build file 'C:\Marketing\node_modules\@capacitor\android\capacitor\build.gradle'.
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+Using default execution profile
+
+> Configure project :capacitor-community-facebook-login
+Evaluating project ':capacitor-community-facebook-login' using build file 'C:\Marketing\node_modules\@capacitor-community\facebook-login\android\build.gradle'.
+Using default execution profile
+
+> Configure project :capacitor-cordova-android-plugins
+Evaluating project ':capacitor-cordova-android-plugins' using build file 'C:\Marketing\android\capacitor-cordova-android-plugins\build.gradle'.
+Using default execution profile
+WARNING: Using flatDir should be avoided because it doesn't support any meta-data formats.
+All projects evaluated.
+Task name matched 'assembleDebug'
+Selected primary task 'assembleDebug' from project :
+Starting process 'command 'C:\Program Files\Java\jdk-26.0.1\bin\java.exe''. Working directory: C:\Users\marce\.gradle\.tmp\tmp-jvm15079490434065055570probe Command: C:\Program Files\Java\jdk-26.0.1\bin\java.exe -Xmx32m -Xms32m -cp . JavaProbe
+Successfully started process 'command 'C:\Program Files\Java\jdk-26.0.1\bin\java.exe''
+Received JVM installation metadata from 'C:\Program Files\Java\jdk-26.0.1': {JAVA_HOME=C:\Program Files\Java\jdk-26.0.1, JAVA_VERSION=26.0.1, JAVA_VENDOR=Oracle Corporation, RUNTIME_NAME=Java(TM) SE Runtime Environment, RUNTIME_VERSION=26.0.1+8-34, VM_NAME=Java HotSpot(TM) 64-Bit Server VM, VM_VERSION=26.0.1+8-34, VM_VENDOR=Oracle Corporation, OS_ARCH=amd64}
+file or directory 'C:\Marketing\node_modules\@capacitor\android\capacitor\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor\android\capacitor\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor\android\capacitor\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor\android\capacitor\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor-community\facebook-login\android\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor-community\facebook-login\android\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor-community\facebook-login\android\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor-community\facebook-login\android\libs', not found
+file or directory 'C:\Marketing\android\capacitor-cordova-android-plugins\src\main\libs', not found
+file or directory 'C:\Marketing\android\capacitor-cordova-android-plugins\src\main\libs', not found
+file or directory 'C:\Marketing\android\capacitor-cordova-android-plugins\src\main\libs', not found
+file or directory 'C:\Marketing\android\capacitor-cordova-android-plugins\src\main\libs', not found
+Tasks to be executed: [task ':app:preBuild', task ':app:preDebugBuild', task ':app:mergeDebugNativeDebugMetadata', task ':app:checkKotlinGradlePluginConfigurationErrors', task ':capacitor-android:preBuild', task ':capacitor-android:preDebugBuild', task ':capacitor-android:writeDebugAarMetadata', task ':capacitor-community-facebook-login:preBuild', task ':capacitor-community-facebook-login:preDebugBuild', task ':capacitor-community-facebook-login:writeDebugAarMetadata', task ':capacitor-cordova-android-plugins:preBuild', task ':capacitor-cordova-android-plugins:preDebugBuild', task ':capacitor-cordova-android-plugins:writeDebugAarMetadata', task ':app:checkDebugAarMetadata', task ':app:generateDebugResValues', task ':capacitor-android:generateDebugResValues', task ':capacitor-android:generateDebugResources', task ':capacitor-android:packageDebugResources', task ':capacitor-community-facebook-login:generateDebugResValues', task ':capacitor-community-facebook-login:generateDebugResources', task ':capacitor-community-facebook-login:packageDebugResources', task ':capacitor-cordova-android-plugins:generateDebugResValues', task ':capacitor-cordova-android-plugins:generateDebugResources', task ':capacitor-cordova-android-plugins:packageDebugResources', task ':app:mapDebugSourceSetPaths', task ':app:generateDebugResources', task ':app:mergeDebugResources', task ':app:packageDebugResources', task ':app:parseDebugLocalResources', task ':app:createDebugCompatibleScreenManifests', task ':app:extractDeepLinksDebug', task ':capacitor-android:extractDeepLinksDebug', task ':capacitor-android:processDebugManifest', task ':capacitor-community-facebook-login:extractDeepLinksDebug', task ':capacitor-community-facebook-login:processDebugManifest', task ':capacitor-cordova-android-plugins:extractDeepLinksDebug', task ':capacitor-cordova-android-plugins:processDebugManifest', task ':app:processDebugMainManifest', task ':app:processDebugManifest', task ':app:processDebugManifestForPackage', task ':capacitor-android:compileDebugLibraryResources', task ':capacitor-android:parseDebugLocalResources', task ':capacitor-android:generateDebugRFile', task ':capacitor-community-facebook-login:compileDebugLibraryResources', task ':capacitor-community-facebook-login:parseDebugLocalResources', task ':capacitor-community-facebook-login:generateDebugRFile', task ':capacitor-cordova-android-plugins:compileDebugLibraryResources', task ':capacitor-cordova-android-plugins:parseDebugLocalResources', task ':capacitor-cordova-android-plugins:generateDebugRFile', task ':app:processDebugResources', task ':capacitor-android:javaPreCompileDebug', task ':capacitor-android:compileDebugJavaWithJavac', task ':capacitor-android:bundleLibCompileToJarDebug', task ':capacitor-community-facebook-login:javaPreCompileDebug', task ':capacitor-community-facebook-login:compileDebugJavaWithJavac', task ':capacitor-community-facebook-login:bundleLibCompileToJarDebug', task ':capacitor-cordova-android-plugins:javaPreCompileDebug', task ':capacitor-cordova-android-plugins:compileDebugJavaWithJavac', task ':capacitor-cordova-android-plugins:bundleLibCompileToJarDebug', task ':app:compileDebugKotlin', task ':app:javaPreCompileDebug', task ':app:compileDebugJavaWithJavac', task ':app:mergeDebugShaders', task ':app:compileDebugShaders', task ':app:generateDebugAssets', task ':capacitor-android:mergeDebugShaders', task ':capacitor-android:compileDebugShaders', task ':capacitor-android:generateDebugAssets', task ':capacitor-android:packageDebugAssets', task ':capacitor-community-facebook-login:mergeDebugShaders', task ':capacitor-community-facebook-login:compileDebugShaders', task ':capacitor-community-facebook-login:generateDebugAssets', task ':capacitor-community-facebook-login:packageDebugAssets', task ':capacitor-cordova-android-plugins:mergeDebugShaders', task ':capacitor-cordova-android-plugins:compileDebugShaders', task ':capacitor-cordova-android-plugins:generateDebugAssets', task ':capacitor-cordova-android-plugins:packageDebugAssets', task ':app:mergeDebugAssets', task ':app:compressDebugAssets', task ':capacitor-community-facebook-login:bundleLibRuntimeToJarDebug', task ':capacitor-android:bundleLibRuntimeToJarDebug', task ':capacitor-cordova-android-plugins:bundleLibRuntimeToJarDebug', task ':app:desugarDebugFileDependencies', task ':app:dexBuilderDebug', task ':app:mergeDebugGlobalSynthetics', task ':app:processDebugJavaRes', task ':capacitor-android:processDebugJavaRes', task ':capacitor-community-facebook-login:processDebugJavaRes', task ':capacitor-cordova-android-plugins:processDebugJavaRes', task ':app:mergeDebugJavaResource', task ':app:checkDebugDuplicateClasses', task ':app:mergeExtDexDebug', task ':capacitor-community-facebook-login:bundleLibRuntimeToDirDebug', task ':capacitor-android:bundleLibRuntimeToDirDebug', task ':capacitor-cordova-android-plugins:bundleLibRuntimeToDirDebug', task ':app:mergeLibDexDebug', task ':app:mergeProjectDexDebug', task ':app:mergeDebugJniLibFolders', task ':capacitor-android:mergeDebugJniLibFolders', task ':capacitor-android:mergeDebugNativeLibs', task ':capacitor-android:copyDebugJniLibsProjectOnly', task ':capacitor-community-facebook-login:mergeDebugJniLibFolders', task ':capacitor-community-facebook-login:mergeDebugNativeLibs', task ':capacitor-community-facebook-login:copyDebugJniLibsProjectOnly', task ':capacitor-cordova-android-plugins:mergeDebugJniLibFolders', task ':capacitor-cordova-android-plugins:mergeDebugNativeLibs', task ':capacitor-cordova-android-plugins:copyDebugJniLibsProjectOnly', task ':app:mergeDebugNativeLibs', task ':app:stripDebugDebugSymbols', task ':app:validateSigningDebug', task ':app:writeDebugAppMetadata', task ':app:writeDebugSigningConfigVersions', task ':app:packageDebug', task ':app:createDebugApkListingFileRedirect', task ':app:assembleDebug', task ':capacitor-android:stripDebugDebugSymbols', task ':capacitor-android:copyDebugJniLibsProjectAndLocalJars', task ':capacitor-android:extractDebugAnnotations', task ':capacitor-android:extractDeepLinksForAarDebug', task ':capacitor-android:mergeDebugGeneratedProguardFiles', task ':capacitor-android:mergeDebugConsumerProguardFiles', task ':capacitor-android:prepareDebugArtProfile', task ':capacitor-android:prepareLintJarForPublish', task ':capacitor-android:mergeDebugJavaResource', task ':capacitor-android:syncDebugLibJars', task ':capacitor-android:bundleDebugAar', task ':capacitor-android:assembleDebug', task ':capacitor-community-facebook-login:stripDebugDebugSymbols', task ':capacitor-community-facebook-login:copyDebugJniLibsProjectAndLocalJars', task ':capacitor-community-facebook-login:extractDebugAnnotations', task ':capacitor-community-facebook-login:extractDeepLinksForAarDebug', task ':capacitor-community-facebook-login:mergeDebugGeneratedProguardFiles', task ':capacitor-community-facebook-login:mergeDebugConsumerProguardFiles', task ':capacitor-community-facebook-login:prepareDebugArtProfile', task ':capacitor-community-facebook-login:prepareLintJarForPublish', task ':capacitor-community-facebook-login:mergeDebugJavaResource', task ':capacitor-community-facebook-login:syncDebugLibJars', task ':capacitor-community-facebook-login:bundleDebugAar', task ':capacitor-community-facebook-login:assembleDebug', task ':capacitor-cordova-android-plugins:stripDebugDebugSymbols', task ':capacitor-cordova-android-plugins:copyDebugJniLibsProjectAndLocalJars', task ':capacitor-cordova-android-plugins:extractDebugAnnotations', task ':capacitor-cordova-android-plugins:extractDeepLinksForAarDebug', task ':capacitor-cordova-android-plugins:mergeDebugGeneratedProguardFiles', task ':capacitor-cordova-android-plugins:mergeDebugConsumerProguardFiles', task ':capacitor-cordova-android-plugins:prepareDebugArtProfile', task ':capacitor-cordova-android-plugins:prepareLintJarForPublish', task ':capacitor-cordova-android-plugins:mergeDebugJavaResource', task ':capacitor-cordova-android-plugins:syncDebugLibJars', task ':capacitor-cordova-android-plugins:bundleDebugAar', task ':capacitor-cordova-android-plugins:assembleDebug']
+Tasks that were excluded: []
+work action Parameters of IdentityTransform (Thread[#62,included builds,5,main]) started.
+work action Parameters of DexingNoClasspathTransform (Thread[#62,included builds,5,main]) started.
+work action Parameters of DexingOutputSplitTransform (Thread[#62,included builds,5,main]) started.
+work action Parameters of ClassesDirToClassesTransform (Thread[#63,Execution worker,5,main]) started.
+work action Parameters of DexingOutputSplitTransform (Thread[#63,Execution worker,5,main]) started.
+Resolve mutations for :app:preBuild (Thread[#63,Execution worker,5,main]) started.
+:app:preBuild (Thread[#63,Execution worker,5,main]) started.
+
+> Task :app:preBuild UP-TO-DATE
+Skipping task ':app:preBuild' as it has no actions.
+Resolve mutations for :app:preDebugBuild (Thread[#63,Execution worker,5,main]) started.
+:app:preDebugBuild (Thread[#63,Execution worker,5,main]) started.
+
+> Task :app:preDebugBuild UP-TO-DATE
+Skipping task ':app:preDebugBuild' as it has no actions.
+Resolve mutations for :app:mergeDebugNativeDebugMetadata (Thread[#62,included builds,5,main]) started.
+:app:mergeDebugNativeDebugMetadata (Thread[#62,included builds,5,main]) started.
+
+> Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
+Invalidating in-memory cache of C:\Marketing\android\.gradle\buildOutputCleanup\outputFiles.bin
+Skipping task ':app:mergeDebugNativeDebugMetadata' as it has no source files and no previous output files.
+Resolve mutations for :app:checkKotlinGradlePluginConfigurationErrors (Thread[#62,included builds,5,main]) started.
+:app:checkKotlinGradlePluginConfigurationErrors (Thread[#62,included builds,5,main]) started.
+
+> Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
+Skipping task ':app:checkKotlinGradlePluginConfigurationErrors' as task onlyIf 'errorDiagnostics are present' is false.
+Resolve mutations for :capacitor-android:preBuild (Thread[#63,Execution worker,5,main]) started.
+:capacitor-android:preBuild (Thread[#63,Execution worker,5,main]) started.
+
+> Task :capacitor-android:preBuild UP-TO-DATE
+Skipping task ':capacitor-android:preBuild' as it has no actions.
+Resolve mutations for :capacitor-android:preDebugBuild (Thread[#62,included builds,5,main]) started.
+:capacitor-android:preDebugBuild (Thread[#62,included builds,5,main]) started.
+
+> Task :capacitor-android:preDebugBuild UP-TO-DATE
+Skipping task ':capacitor-android:preDebugBuild' as it has no actions.
+Resolve mutations for :capacitor-android:writeDebugAarMetadata (Thread[#62,included builds,5,main]) started.
+:capacitor-android:writeDebugAarMetadata (Thread[#62,included builds,5,main]) started.
+
+> Task :capacitor-android:writeDebugAarMetadata UP-TO-DATE
+Invalidating in-memory cache of C:\Marketing\android\.gradle\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Marketing\android\.gradle\9.4.1\fileHashes\resourceHashesCache.bin
+Caching disabled for task ':capacitor-android:writeDebugAarMetadata' because:
+  Build cache is disabled
+  Caching has been disabled for the task
+Skipping task ':capacitor-android:writeDebugAarMetadata' as it is up-to-date.
+work action resolve aar-metadata.properties (project :capacitor-android) (Thread[#62,included builds,5,main]) started.
+Resolve mutations for :capacitor-community-facebook-login:preBuild (Thread[#63,Execution worker,5,main]) started.
+:capacitor-community-facebook-login:preBuild (Thread[#63,Execution worker,5,main]) started.
+
+> Task :capacitor-community-facebook-login:preBuild UP-TO-DATE
+Skipping task ':capacitor-community-facebook-login:preBuild' as it has no actions.
+Resolve mutations for :capacitor-community-facebook-login:preDebugBuild (Thread[#63,Execution worker,5,main]) started.
+:capacitor-community-facebook-login:preDebugBuild (Thread[#63,Execution worker,5,main]) started.
+
+> Task :capacitor-community-facebook-login:preDebugBuild UP-TO-DATE
+Skipping task ':capacitor-community-facebook-login:preDebugBuild' as it has no actions.
+Resolve mutations for :capacitor-community-facebook-login:writeDebugAarMetadata (Thread[#63,Execution worker,5,main]) started.
+:capacitor-community-facebook-login:writeDebugAarMetadata (Thread[#63,Execution worker,5,main]) started.
+
+> Task :capacitor-community-facebook-login:writeDebugAarMetadata UP-TO-DATE
+Caching disabled for task ':capacitor-community-facebook-login:writeDebugAarMetadata' because:
+  Build cache is disabled
+  Caching has been disabled for the task
+Skipping task ':capacitor-community-facebook-login:writeDebugAarMetadata' as it is up-to-date.
+work action resolve aar-metadata.properties (project :capacitor-community-facebook-login) (Thread[#62,included builds,5,main]) started.
+Resolve mutations for :capacitor-cordova-android-plugins:preBuild (Thread[#62,included builds,5,main]) started.
+:capacitor-cordova-android-plugins:preBuild (Thread[#62,included builds,5,main]) started.
+
+> Task :capacitor-cordova-android-plugins:preBuild UP-TO-DATE
+Skipping task ':capacitor-cordova-android-plugins:preBuild' as it has no actions.
+Resolve mutations for :capacitor-cordova-android-plugins:preDebugBuild (Thread[#62,included builds,5,main]) started.
+:capacitor-cordova-android-plugins:preDebugBuild (Thread[#62,included builds,5,main]) started.
+
+> Task :capacitor-cordova-android-plugins:preDebugBuild UP-TO-DATE
+Skipping task ':capacitor-cordova-android-plugins:preDebugBuild' as it has no actions.
+Resolve mutations for :capacitor-cordova-android-plugins:writeDebugAarMetadata (Thread[#62,included builds,5,main]) started.
+:capacitor-cordova-android-plugins:writeDebugAarMetadata (Thread[#62,included builds,5,main]) started.
+Resolve mutations for :app:generateDebugResValues (Thread[#63,Execution worker,5,main]) started.
+:app:generateDebugResValues (Thread[#63,Execution worker,5,main]) started.
+
+> Task :app:generateDebugResValues UP-TO-DATE
+Caching disabled for task ':app:generateDebugResValues' because:
+  Build cache is disabled
+Skipping task ':app:generateDebugResValues' as it is up-to-date.
+Resolve mutations for :capacitor-android:generateDebugResValues (Thread[#63,Execution worker,5,main]) started.
+:capacitor-android:generateDebugResValues (Thread[#63,Execution worker,5,main]) started.
+
+> Task :capacitor-android:generateDebugResValues UP-TO-DATE
+Caching disabled for task ':capacitor-android:generateDebugResValues' because:
+  Build cache is disabled
+Skipping task ':capacitor-android:generateDebugResValues' as it is up-to-date.
+Resolve mutations for :capacitor-android:generateDebugResources (Thread[#63,Execution worker,5,main]) started.
+:capacitor-android:generateDebugResources (Thread[#63,Execution worker,5,main]) started.
+
+> Task :capacitor-cordova-android-plugins:writeDebugAarMetadata
+Caching disabled for task ':capacitor-cordova-android-plugins:writeDebugAarMetadata' because:
+  Build cache is disabled
+  Caching has been disabled for the task
+Task ':capacitor-cordova-android-plugins:writeDebugAarMetadata' is not up-to-date because:
+  Output property 'output' file C:\Marketing\android\capacitor-cordova-android-plugins\build\intermediates\aar_metadata\debug\writeDebugAarMetadata\aar-metadata.properties has been removed.
+
+> Task :capacitor-android:generateDebugResources UP-TO-DATE
+Caching disabled for task ':capacitor-android:generateDebugResources' because:
+  Build cache is disabled
+Skipping task ':capacitor-android:generateDebugResources' as it is up-to-date.
+work action resolve aar-metadata.properties (project :capacitor-cordova-android-plugins) (Thread[#62,included builds,5,main]) started.
+Resolve mutations for :app:checkDebugAarMetadata (Thread[#62,included builds,5,main]) started.
+:app:checkDebugAarMetadata (Thread[#62,included builds,5,main]) started.
+
+> Task :app:checkDebugAarMetadata
+file or directory 'C:\Marketing\android\app\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor-community\facebook-login\android\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor\android\capacitor\libs', not found
+file or directory 'C:\Marketing\android\capacitor-cordova-android-plugins\src\main\libs', not found
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\fileHashes\resourceHashesCache.bin
+file or directory 'C:\Marketing\android\app\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor-community\facebook-login\android\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor\android\capacitor\libs', not found
+file or directory 'C:\Marketing\android\capacitor-cordova-android-plugins\src\main\libs', not found
+Caching disabled for task ':app:checkDebugAarMetadata' because:
+  Build cache is disabled
+  Caching has been disabled for the task
+Skipping task ':app:checkDebugAarMetadata' as it is up-to-date.
+Invalidating in-memory cache of C:\Marketing\android\.gradle\buildOutputCleanup\outputFiles.bin
+
+> Task :app:checkDebugAarMetadata UP-TO-DATE
+Resolve mutations for :capacitor-android:packageDebugResources (Thread[#62,included builds,5,main]) started.
+:capacitor-android:packageDebugResources (Thread[#62,included builds,5,main]) started.
+
+> Task :capacitor-android:packageDebugResources UP-TO-DATE
+Invalidating in-memory cache of C:\Marketing\android\.gradle\9.4.1\executionHistory\executionHistory.bin
+Invalidating in-memory cache of C:\Marketing\android\.gradle\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Marketing\android\.gradle\9.4.1\fileHashes\resourceHashesCache.bin
+Caching disabled for task ':capacitor-android:packageDebugResources' because:
+  Build cache is disabled
+Skipping task ':capacitor-android:packageDebugResources' as it is up-to-date.
+work action resolve packageDebugResources (project :capacitor-android) (Thread[#62,included builds,5,main]) started.
+Resolve mutations for :capacitor-community-facebook-login:generateDebugResValues (Thread[#62,included builds,5,main]) started.
+:capacitor-community-facebook-login:generateDebugResValues (Thread[#62,included builds,5,main]) started.
+
+> Task :capacitor-community-facebook-login:generateDebugResValues UP-TO-DATE
+Caching disabled for task ':capacitor-community-facebook-login:generateDebugResValues' because:
+  Build cache is disabled
+Skipping task ':capacitor-community-facebook-login:generateDebugResValues' as it is up-to-date.
+Resolve mutations for :capacitor-community-facebook-login:generateDebugResources (Thread[#62,included builds,5,main]) started.
+:capacitor-community-facebook-login:generateDebugResources (Thread[#62,included builds,5,main]) started.
+
+> Task :capacitor-community-facebook-login:generateDebugResources UP-TO-DATE
+Caching disabled for task ':capacitor-community-facebook-login:generateDebugResources' because:
+  Build cache is disabled
+Skipping task ':capacitor-community-facebook-login:generateDebugResources' as it is up-to-date.
+Resolve mutations for :capacitor-community-facebook-login:packageDebugResources (Thread[#62,included builds,5,main]) started.
+:capacitor-community-facebook-login:packageDebugResources (Thread[#62,included builds,5,main]) started.
+
+> Task :capacitor-community-facebook-login:packageDebugResources UP-TO-DATE
+Caching disabled for task ':capacitor-community-facebook-login:packageDebugResources' because:
+  Build cache is disabled
+Skipping task ':capacitor-community-facebook-login:packageDebugResources' as it is up-to-date.
+work action resolve packageDebugResources (project :capacitor-community-facebook-login) (Thread[#62,included builds,5,main]) started.
+Resolve mutations for :capacitor-cordova-android-plugins:generateDebugResValues (Thread[#62,included builds,5,main]) started.
+:capacitor-cordova-android-plugins:generateDebugResValues (Thread[#62,included builds,5,main]) started.
+
+> Task :capacitor-cordova-android-plugins:generateDebugResValues
+Caching disabled for task ':capacitor-cordova-android-plugins:generateDebugResValues' because:
+  Build cache is disabled
+Task ':capacitor-cordova-android-plugins:generateDebugResValues' is not up-to-date because:
+  Output property 'outputDirectory' file C:\Marketing\android\capacitor-cordova-android-plugins\build\generated\res\resValues\debug has been removed.
+Resolve mutations for :capacitor-cordova-android-plugins:generateDebugResources (Thread[#63,Execution worker,5,main]) started.
+:capacitor-cordova-android-plugins:generateDebugResources (Thread[#63,Execution worker,5,main]) started.
+
+> Task :capacitor-cordova-android-plugins:generateDebugResources
+Caching disabled for task ':capacitor-cordova-android-plugins:generateDebugResources' because:
+  Build cache is disabled
+Task ':capacitor-cordova-android-plugins:generateDebugResources' is not up-to-date because:
+  Output property 'validationReportFile' file C:\Marketing\android\capacitor-cordova-android-plugins\build\intermediates\nested_resources_validation_report\debug\generateDebugResources\nestedResourcesValidationReport.txt has been removed.
+Resolve mutations for :capacitor-cordova-android-plugins:packageDebugResources (Thread[#63,Execution worker,5,main]) started.
+:capacitor-cordova-android-plugins:packageDebugResources (Thread[#63,Execution worker,5,main]) started.
+
+> Task :capacitor-cordova-android-plugins:packageDebugResources
+Caching disabled for task ':capacitor-cordova-android-plugins:packageDebugResources' because:
+  Build cache is disabled
+Task ':capacitor-cordova-android-plugins:packageDebugResources' is not up-to-date because:
+  Output property 'dataBindingLayoutInfoOutFolder' file C:\Marketing\android\capacitor-cordova-android-plugins\build\intermediates\data_binding_layout_info_type_package\debug\packageDebugResources\out has been removed.
+  Output property 'generatedPngsOutputDir' file C:\Marketing\android\capacitor-cordova-android-plugins\build\generated\res\pngs\debug has been removed.
+  Output property 'incrementalFolder' file C:\Marketing\android\capacitor-cordova-android-plugins\build\intermediates\incremental\debug\packageDebugResources has been removed.
+  and more...
+The input changes require a full rebuild for incremental task ':capacitor-cordova-android-plugins:packageDebugResources'.
+[MergeResources] Inputs are non-incremental full task action.
+work action resolve packageDebugResources (project :capacitor-cordova-android-plugins) (Thread[#63,Execution worker,5,main]) started.
+Resolve mutations for :app:mapDebugSourceSetPaths (Thread[#63,Execution worker,5,main]) started.
+:app:mapDebugSourceSetPaths (Thread[#63,Execution worker,5,main]) started.
+
+> Task :app:mapDebugSourceSetPaths
+file or directory 'C:\Marketing\android\app\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor-community\facebook-login\android\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor\android\capacitor\libs', not found
+file or directory 'C:\Marketing\android\capacitor-cordova-android-plugins\src\main\libs', not found
+Caching disabled for task ':app:mapDebugSourceSetPaths' because:
+  Build cache is disabled
+  Caching has been disabled for the task
+Skipping task ':app:mapDebugSourceSetPaths' as it is up-to-date.
+
+> Task :app:mapDebugSourceSetPaths UP-TO-DATE
+Resolve mutations for :app:generateDebugResources (Thread[#63,Execution worker,5,main]) started.
+:app:generateDebugResources (Thread[#63,Execution worker,5,main]) started.
+
+> Task :app:generateDebugResources UP-TO-DATE
+Caching disabled for task ':app:generateDebugResources' because:
+  Build cache is disabled
+Skipping task ':app:generateDebugResources' as it is up-to-date.
+Resolve mutations for :app:mergeDebugResources (Thread[#62,included builds,5,main]) started.
+:app:mergeDebugResources (Thread[#62,included builds,5,main]) started.
+
+> Task :app:mergeDebugResources UP-TO-DATE
+file or directory 'C:\Marketing\android\app\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor-community\facebook-login\android\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor\android\capacitor\libs', not found
+file or directory 'C:\Marketing\android\capacitor-cordova-android-plugins\src\main\libs', not found
+Caching disabled for task ':app:mergeDebugResources' because:
+  Build cache is disabled
+Skipping task ':app:mergeDebugResources' as it is up-to-date.
+Resolve mutations for :app:packageDebugResources (Thread[#63,Execution worker,5,main]) started.
+:app:packageDebugResources (Thread[#63,Execution worker,5,main]) started.
+
+> Task :app:packageDebugResources UP-TO-DATE
+Caching disabled for task ':app:packageDebugResources' because:
+  Build cache is disabled
+Skipping task ':app:packageDebugResources' as it is up-to-date.
+Resolve mutations for :app:parseDebugLocalResources (Thread[#63,Execution worker,5,main]) started.
+:app:parseDebugLocalResources (Thread[#63,Execution worker,5,main]) started.
+
+> Task :app:parseDebugLocalResources UP-TO-DATE
+Caching disabled for task ':app:parseDebugLocalResources' because:
+  Build cache is disabled
+Skipping task ':app:parseDebugLocalResources' as it is up-to-date.
+Resolve mutations for :app:createDebugCompatibleScreenManifests (Thread[#63,Execution worker,5,main]) started.
+:app:createDebugCompatibleScreenManifests (Thread[#63,Execution worker,5,main]) started.
+
+> Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
+Caching disabled for task ':app:createDebugCompatibleScreenManifests' because:
+  Build cache is disabled
+  Caching has been disabled for the task
+Skipping task ':app:createDebugCompatibleScreenManifests' as it is up-to-date.
+Resolve mutations for :app:extractDeepLinksDebug (Thread[#63,Execution worker,5,main]) started.
+:app:extractDeepLinksDebug (Thread[#63,Execution worker,5,main]) started.
+
+> Task :app:extractDeepLinksDebug UP-TO-DATE
+Caching disabled for task ':app:extractDeepLinksDebug' because:
+  Build cache is disabled
+Skipping task ':app:extractDeepLinksDebug' as it is up-to-date.
+Resolve mutations for :capacitor-android:extractDeepLinksDebug (Thread[#63,Execution worker,5,main]) started.
+:capacitor-android:extractDeepLinksDebug (Thread[#63,Execution worker,5,main]) started.
+
+> Task :capacitor-android:extractDeepLinksDebug UP-TO-DATE
+Caching disabled for task ':capacitor-android:extractDeepLinksDebug' because:
+  Build cache is disabled
+Skipping task ':capacitor-android:extractDeepLinksDebug' as it is up-to-date.
+work action resolve navigation.json (project :capacitor-android) (Thread[#63,Execution worker,5,main]) started.
+Resolve mutations for :capacitor-android:processDebugManifest (Thread[#63,Execution worker,5,main]) started.
+:capacitor-android:processDebugManifest (Thread[#63,Execution worker,5,main]) started.
+
+> Task :capacitor-android:processDebugManifest UP-TO-DATE
+Caching disabled for task ':capacitor-android:processDebugManifest' because:
+  Build cache is disabled
+Skipping task ':capacitor-android:processDebugManifest' as it is up-to-date.
+work action resolve AndroidManifest.xml (project :capacitor-android) (Thread[#63,Execution worker,5,main]) started.
+Resolve mutations for :capacitor-community-facebook-login:extractDeepLinksDebug (Thread[#63,Execution worker,5,main]) started.
+:capacitor-community-facebook-login:extractDeepLinksDebug (Thread[#63,Execution worker,5,main]) started.
+
+> Task :capacitor-community-facebook-login:extractDeepLinksDebug UP-TO-DATE
+Caching disabled for task ':capacitor-community-facebook-login:extractDeepLinksDebug' because:
+  Build cache is disabled
+Skipping task ':capacitor-community-facebook-login:extractDeepLinksDebug' as it is up-to-date.
+work action resolve navigation.json (project :capacitor-community-facebook-login) (Thread[#62,included builds,5,main]) started.
+Resolve mutations for :capacitor-community-facebook-login:processDebugManifest (Thread[#62,included builds,5,main]) started.
+:capacitor-community-facebook-login:processDebugManifest (Thread[#62,included builds,5,main]) started.
+
+> Task :capacitor-community-facebook-login:processDebugManifest UP-TO-DATE
+Caching disabled for task ':capacitor-community-facebook-login:processDebugManifest' because:
+  Build cache is disabled
+Skipping task ':capacitor-community-facebook-login:processDebugManifest' as it is up-to-date.
+work action resolve AndroidManifest.xml (project :capacitor-community-facebook-login) (Thread[#62,included builds,5,main]) started.
+Resolve mutations for :capacitor-cordova-android-plugins:extractDeepLinksDebug (Thread[#62,included builds,5,main]) started.
+:capacitor-cordova-android-plugins:extractDeepLinksDebug (Thread[#63,Execution worker,5,main]) started.
+
+> Task :capacitor-cordova-android-plugins:extractDeepLinksDebug UP-TO-DATE
+Caching disabled for task ':capacitor-cordova-android-plugins:extractDeepLinksDebug' because:
+  Build cache is disabled
+Skipping task ':capacitor-cordova-android-plugins:extractDeepLinksDebug' as it is up-to-date.
+work action resolve navigation.json (project :capacitor-cordova-android-plugins) (Thread[#63,Execution worker,5,main]) started.
+Resolve mutations for :capacitor-cordova-android-plugins:processDebugManifest (Thread[#63,Execution worker,5,main]) started.
+:capacitor-cordova-android-plugins:processDebugManifest (Thread[#63,Execution worker,5,main]) started.
+
+> Task :capacitor-cordova-android-plugins:processDebugManifest UP-TO-DATE
+Caching disabled for task ':capacitor-cordova-android-plugins:processDebugManifest' because:
+  Build cache is disabled
+Skipping task ':capacitor-cordova-android-plugins:processDebugManifest' as it is up-to-date.
+work action resolve AndroidManifest.xml (project :capacitor-cordova-android-plugins) (Thread[#63,Execution worker,5,main]) started.
+Resolve mutations for :app:processDebugMainManifest (Thread[#63,Execution worker,5,main]) started.
+:app:processDebugMainManifest (Thread[#63,Execution worker,5,main]) started.
+
+> Task :app:processDebugMainManifest
+file or directory 'C:\Marketing\android\app\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor-community\facebook-login\android\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor\android\capacitor\libs', not found
+file or directory 'C:\Marketing\android\capacitor-cordova-android-plugins\src\main\libs', not found
+file or directory 'C:\Marketing\android\app\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor-community\facebook-login\android\libs', not found
+file or directory 'C:\Marketing\node_modules\@capacitor\android\capacitor\libs', not found
+file or directory 'C:\Marketing\android\capacitor-cordova-android-plugins\src\main\libs', not found
+Caching disabled for task ':app:processDebugMainManifest' because:
+  Build cache is disabled
+Skipping task ':app:processDebugMainManifest' as it is up-to-date.
+
+> Task :app:processDebugMainManifest UP-TO-DATE
+Resolve mutations for :app:processDebugManifest (Thread[#63,Execution worker,5,main]) started.
+:app:processDebugManifest (Thread[#63,Execution worker,5,main]) started.
+
+> Task :app:processDebugManifest UP-TO-DATE
+Caching disabled for task ':app:processDebugManifest' because:
+  Build cache is disabled
+Skipping task ':app:processDebugManifest' as it is up-to-date.
+Resolve mutations for :app:processDebugManifestForPackage (Thread[#63,Execution worker,5,main]) started.
+:app:processDebugManifestForPackage (Thread[#63,Execution worker,5,main]) started.
+
+> Task :app:processDebugManifestForPackage UP-TO-DATE
+Custom actions are attached to task ':app:processDebugManifestForPackage'.
+Caching disabled for task ':app:processDebugManifestForPackage' because:
+  Build cache is disabled
+Skipping task ':app:processDebugManifestForPackage' as it is up-to-date.
+Resolve mutations for :capacitor-android:compileDebugLibraryResources (Thread[#62,included builds,5,main]) started.
+:capacitor-android:compileDebugLibraryResources (Thread[#62,included builds,5,main]) started.
+
+> Task :capacitor-android:compileDebugLibraryResources UP-TO-DATE
+Caching disabled for task ':capacitor-android:compileDebugLibraryResources' because:
+  Build cache is disabled
+Skipping task ':capacitor-android:compileDebugLibraryResources' as it is up-to-date.
+work action resolve out (project :capacitor-android) (Thread[#62,included builds,5,main]) started.
+Resolve mutations for :capacitor-android:parseDebugLocalResources (Thread[#62,included builds,5,main]) started.
+:capacitor-android:parseDebugLocalResources (Thread[#62,included builds,5,main]) started.
+
+> Task :capacitor-android:parseDebugLocalResources UP-TO-DATE
+Caching disabled for task ':capacitor-android:parseDebugLocalResources' because:
+  Build cache is disabled
+Skipping task ':capacitor-android:parseDebugLocalResources' as it is up-to-date.
+Resolve mutations for :capacitor-android:generateDebugRFile (Thread[#62,included builds,5,main]) started.
+:capacitor-android:generateDebugRFile (Thread[#62,included builds,5,main]) started.
+
+> Task :capacitor-android:generateDebugRFile UP-TO-DATE
+Caching disabled for task ':capacitor-android:generateDebugRFile' because:
+  Build cache is disabled
+Skipping task ':capacitor-android:generateDebugRFile' as it is up-to-date.
+work action resolve package-aware-r.txt (project :capacitor-android) (Thread[#62,included builds,5,main]) started.
+Resolve mutations for :capacitor-community-facebook-login:compileDebugLibraryResources (Thread[#62,included builds,5,main]) started.
+:capacitor-community-facebook-login:compileDebugLibraryResources (Thread[#62,included builds,5,main]) started.
+
+> Task :capacitor-community-facebook-login:compileDebugLibraryResources UP-TO-DATE
+Caching disabled for task ':capacitor-community-facebook-login:compileDebugLibraryResources' because:
+  Build cache is disabled
+Skipping task ':capacitor-community-facebook-login:compileDebugLibraryResources' as it is up-to-date.
+work action resolve out (project :capacitor-community-facebook-login) (Thread[#62,included builds,5,main]) started.
+Resolve mutations for :capacitor-community-facebook-login:parseDebugLocalResources (Thread[#62,included builds,5,main]) started.
+:capacitor-community-facebook-login:parseDebugLocalResources (Thread[#62,included builds,5,main]) started.
+
+> Task :capacitor-community-facebook-login:parseDebugLocalResources UP-TO-DATE
+Caching disabled for task ':capacitor-community-facebook-login:parseDebugLocalResources' because:
+  Build cache is disabled
+Skipping task ':capacitor-community-facebook-login:parseDebugLocalResources' as it is up-to-date.
+Resolve mutations for :capacitor-community-facebook-login:generateDebugRFile (Thread[#62,included builds,5,main]) started.
+:capacitor-community-facebook-login:generateDebugRFile (Thread[#62,included builds,5,main]) started.
+
+> Task :capacitor-community-facebook-login:generateDebugRFile UP-TO-DATE
+Caching disabled for task ':capacitor-community-facebook-login:generateDebugRFile' because:
+  Build cache is disabled
+Skipping task ':capacitor-community-facebook-login:generateDebugRFile' as it is up-to-date.
+work action resolve package-aware-r.txt (project :capacitor-community-facebook-login) (Thread[#63,Execution worker,5,main]) started.
+Resolve mutations for :capacitor-cordova-android-plugins:compileDebugLibraryResources (Thread[#63,Execution worker,5,main]) started.
+:capacitor-cordova-android-plugins:compileDebugLibraryResources (Thread[#63,Execution worker,5,main]) started.
+
+> Task :capacitor-cordova-android-plugins:compileDebugLibraryResources UP-TO-DATE
+Caching disabled for task ':capacitor-cordova-android-plugins:compileDebugLibraryResources' because:
+  Build cache is disabled
+Skipping task ':capacitor-cordova-android-plugins:compileDebugLibraryResources' as it is up-to-date.
+work action resolve out (project :capacitor-cordova-android-plugins) (Thread[#62,included builds,5,main]) started.
+Resolve mutations for :capacitor-cordova-android-plugins:parseDebugLocalResources (Thread[#62,included builds,5,main]) started.
+:capacitor-cordova-android-plugins:parseDebugLocalResources (Thread[#62,included builds,5,main]) started.
+Resolve mutations for :capacitor-android:javaPreCompileDebug (Thread[#63,Execution worker,5,main]) started.
+:capacitor-android:javaPreCompileDebug (Thread[#63,Execution worker,5,main]) started.
+
+> Task :capacitor-android:javaPreCompileDebug UP-TO-DATE
+Caching disabled for task ':capacitor-android:javaPreCompileDebug' because:
+  Build cache is disabled
+Skipping task ':capacitor-android:javaPreCompileDebug' as it is up-to-date.
+Resolve mutations for :capacitor-android:compileDebugJavaWithJavac (Thread[#63,Execution worker,5,main]) started.
+:capacitor-android:compileDebugJavaWithJavac (Thread[#63,Execution worker,5,main]) started.
+
+> Task :capacitor-cordova-android-plugins:parseDebugLocalResources
+Caching disabled for task ':capacitor-cordova-android-plugins:parseDebugLocalResources' because:
+  Build cache is disabled
+Task ':capacitor-cordova-android-plugins:parseDebugLocalResources' is not up-to-date because:
+  Task has failed previously.
+The input changes require a full rebuild for incremental task ':capacitor-cordova-android-plugins:parseDebugLocalResources'.
+
+> Task :capacitor-android:compileDebugJavaWithJavac
+file or directory 'C:\Marketing\node_modules\@capacitor\android\capacitor\libs', not found
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\journal-1\file-access.bin
+Custom actions are attached to task ':capacitor-android:compileDebugJavaWithJavac'.
+Caching disabled for task ':capacitor-android:compileDebugJavaWithJavac' because:
+  Build cache is disabled
+Task ':capacitor-android:compileDebugJavaWithJavac' is not up-to-date because:
+  Output property 'destinationDirectory' file C:\Marketing\node_modules\@capacitor\android\capacitor\build\intermediates\javac\debug\compileDebugJavaWithJavac\classes\com has been removed.
+  Output property 'destinationDirectory' file C:\Marketing\node_modules\@capacitor\android\capacitor\build\intermediates\javac\debug\compileDebugJavaWithJavac\classes\com\getcapacitor has been removed.
+  Output property 'destinationDirectory' file C:\Marketing\node_modules\@capacitor\android\capacitor\build\intermediates\javac\debug\compileDebugJavaWithJavac\classes\com\getcapacitor\AndroidProtocolHandler.class has been removed.
+  and more...
+The input changes require a full rebuild for incremental task ':capacitor-android:compileDebugJavaWithJavac'.
+Compilation mode: in-process compilation
+file or directory 'C:\Marketing\node_modules\@capacitor\android\capacitor\libs', not found
+Full recompilation is required because no incremental change information is available. This is usually caused by clean builds or changing compiler arguments.
+Compiling with toolchain 'C:\Program Files\Android\Android Studio\jbr'.
+file or directory 'C:\Marketing\node_modules\@capacitor\android\capacitor\src\debug\java', not found
+Compiling with JDK Java compiler API.
+Note: Some input files use unchecked or unsafe operations.
+Note: Recompile with -Xlint:unchecked for details.
+Invalidating in-memory cache of C:\Marketing\android\.gradle\9.4.1\fileHashes\fileHashes.bin
+Invalidating in-memory cache of C:\Marketing\android\.gradle\9.4.1\fileHashes\resourceHashesCache.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\javaCompile\jarAnalysis.bin
+Invalidating in-memory cache of C:\Users\marce\.gradle\caches\9.4.1\javaCompile\classAnalysis.bin
+Class dependency analysis for incremental compilation took 1.897 secs.
+Created classpath snapshot for incremental compilation in 2.579 secs.
+Invalidating in-memory cache of C:\Marketing\android\.gradle\9.4.1\executionHistory\executionHistory.bin
+Invalidating in-memory cache of C:\Marketing\android\.gradle\buildOutputCleanup\outputFiles.bin
+
+> Task :capacitor-android:compileDebugJavaWithJavac FAILED
+
+[Incubating] Problems report is available at: file:///C:/Marketing/android/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':capacitor-android:compileDebugJavaWithJavac'.
+> Could not store compilation result
+
+* Try:
+> Run with --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+* Exception is:
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':capacitor-android:compileDebugJavaWithJavac'.
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:135)
+	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:288)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:133)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:121)
+	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:41)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.DefaultNodeExecutor.executeLocalTaskNode(DefaultNodeExecutor.java:55)
+	at org.gradle.execution.plan.DefaultNodeExecutor.execute(DefaultNodeExecutor.java:34)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:355)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:343)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:339)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:84)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:339)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:328)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+Caused by: java.lang.IllegalStateException: Could not store compilation result
+	at org.gradle.api.internal.tasks.compile.incremental.recomp.PreviousCompilationAccess.writePreviousCompilationData(PreviousCompilationAccess.java:47)
+	at org.gradle.api.internal.tasks.compile.incremental.IncrementalResultStoringCompiler.storeResult(IncrementalResultStoringCompiler.java:82)
+	at org.gradle.api.internal.tasks.compile.incremental.IncrementalResultStoringCompiler.execute(IncrementalResultStoringCompiler.java:70)
+	at org.gradle.api.internal.tasks.compile.incremental.IncrementalResultStoringCompiler.execute(IncrementalResultStoringCompiler.java:52)
+	at org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler$1.call(CompileJavaBuildOperationReportingCompiler.java:64)
+	at org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler$1.call(CompileJavaBuildOperationReportingCompiler.java:48)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.api.internal.tasks.compile.CompileJavaBuildOperationReportingCompiler.execute(CompileJavaBuildOperationReportingCompiler.java:48)
+	at org.gradle.api.tasks.compile.JavaCompile.performCompilation(JavaCompile.java:224)
+	at org.gradle.api.tasks.compile.JavaCompile.performIncrementalCompilation(JavaCompile.java:165)
+	at org.gradle.api.tasks.compile.JavaCompile.compile(JavaCompile.java:150)
+	at org.gradle.internal.reflect.JavaMethod.invoke(JavaMethod.java:125)
+	at org.gradle.api.internal.project.taskfactory.IncrementalTaskAction.doExecute(IncrementalTaskAction.java:45)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:51)
+	at org.gradle.api.internal.project.taskfactory.IncrementalTaskAction.execute(IncrementalTaskAction.java:26)
+	at org.gradle.api.internal.project.taskfactory.StandardTaskAction.execute(StandardTaskAction.java:29)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:259)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:30)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:27)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:48)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeAction(TaskExecution.java:244)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeActions(TaskExecution.java:227)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeWithPreviousOutputFiles(TaskExecution.java:210)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.execute(TaskExecution.java:176)
+	at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:167)
+	at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:47)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:137)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:134)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:134)
+	at org.gradle.internal.execution.steps.ExecuteStep$Mutable.execute(ExecuteStep.java:80)
+	at org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:42)
+	at org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:75)
+	at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:51)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:29)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.executeMutable(RemovePreviousOutputsStep.java:67)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.executeMutable(RemovePreviousOutputsStep.java:39)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:42)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:24)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.executeMutable(ResolveInputChangesStep.java:39)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.executeMutable(ResolveInputChangesStep.java:28)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$1(BuildCacheStep.java:76)
+	at org.gradle.internal.Either$Right.fold(Either.java:176)
+	at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:74)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:49)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.executeMutable(StoreExecutionStateStep.java:46)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.executeMutable(StoreExecutionStateStep.java:35)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
+	at org.gradle.internal.execution.steps.ResolveMutableCachingStateStep.executeDelegate(ResolveMutableCachingStateStep.java:70)
+	at org.gradle.internal.execution.steps.ResolveMutableCachingStateStep.executeDelegate(ResolveMutableCachingStateStep.java:32)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:69)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:37)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.executeMutable(ResolveChangesStep.java:63)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.executeMutable(ResolveChangesStep.java:34)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.ValidateStep$Mutable.executeDelegate(ValidateStep.java:79)
+	at org.gradle.internal.execution.steps.ValidateStep$Mutable.executeDelegate(ValidateStep.java:65)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:99)
+	at org.gradle.internal.execution.steps.ValidateStep$Mutable.execute(ValidateStep.java:65)
+	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.executeMutable(CaptureMutableStateBeforeExecutionStep.java:86)
+	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.execute(CaptureMutableStateBeforeExecutionStep.java:65)
+	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.execute(CaptureMutableStateBeforeExecutionStep.java:45)
+	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeWithNonEmptySources(SkipEmptyMutableWorkStep.java:210)
+	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeMutable(SkipEmptyMutableWorkStep.java:90)
+	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeMutable(SkipEmptyMutableWorkStep.java:53)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.executeMutable(LoadPreviousExecutionStateStep.java:36)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.executeMutable(LoadPreviousExecutionStateStep.java:23)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.executeMutable(HandleStaleOutputsStep.java:77)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.executeMutable(HandleStaleOutputsStep.java:43)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$executeMutable$0(AssignMutableWorkspaceStep.java:34)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:305)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.executeMutable(AssignMutableWorkspaceStep.java:30)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.executeMutable(AssignMutableWorkspaceStep.java:21)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:56)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:38)
+	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:68)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:132)
+	... 30 more
+Caused by: java.io.FileNotFoundException: C:\Marketing\node_modules\@capacitor\android\capacitor\build\tmp\compileDebugJavaWithJavac\previous-compilation-data.bin (El sistema no puede encontrar la ruta especificada)
+	at org.gradle.api.internal.tasks.compile.incremental.recomp.PreviousCompilationAccess.writePreviousCompilationData(PreviousCompilationAccess.java:44)
+	... 147 more
+Caused by: java.nio.file.NoSuchFileException: C:\Marketing\node_modules\@capacitor\android\capacitor\build\tmp\compileDebugJavaWithJavac\previous-compilation-data.bin
+	... 148 more
+
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.4.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 20m 23s
+40 actionable tasks: 6 executed, 34 up-to-date
+Watched directory hierarchies: [C:\Marketing\android]

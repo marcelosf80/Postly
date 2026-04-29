@@ -47,6 +47,33 @@ router.post('/caption', async (req, res) => {
         
         console.error('[AI] Error generando caption:', error.message);
         res.status(500).json({ error: error.message || 'Error al generar el caption.', masterPrompt });
+<<<<<<< HEAD
+=======
+    }
+});
+
+// POST /api/ai/visual-prompt — Generate professional image prompt
+router.post('/visual-prompt', async (req, res) => {
+    try {
+        const { concept, provider } = req.body;
+        if (!concept) return res.status(400).json({ error: 'Se requiere un concepto para la imagen.' });
+
+        const userProfile = store.users.findById(req.user.id);
+        const visualPrompt = await ai.generateVisualPrompt(concept, { userProfile, provider });
+        res.json({ visualPrompt });
+    } catch (error) {
+        const userProfile = store.users.findById(req.user.id);
+        const masterPrompt = `[VISUAL BRAIN INSTRUCTIONS]\nCreate a professional image prompt for: "${req.body.concept}"\n\nStyle: ${userProfile.visual_style || 'Realistic'}\nElements: ${userProfile.visual_elements || 'none'}`;
+        
+        if (error.message.includes('No hay ninguna API key')) {
+            return res.status(200).json({ 
+                error: 'No hay API configurada', 
+                isManual: true,
+                masterPrompt 
+            });
+        }
+        res.status(500).json({ error: error.message, masterPrompt });
+>>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
     }
 });
 
@@ -73,6 +100,21 @@ router.post('/visual-prompt', async (req, res) => {
         res.status(500).json({ error: error.message, masterPrompt });
     }
 });
+
+// POST /api/ai/generate-image — Generate image using Vertex AI Imagen 3
+router.post('/generate-image', async (req, res) => {
+    try {
+        const { prompt } = req.body;
+        if (!prompt) return res.status(400).json({ error: 'Se requiere un prompt para generar la imagen.' });
+
+        const imageBase64 = await ai.generateImage(prompt);
+        res.json({ imageBase64 });
+    } catch (error) {
+        console.error('[AI] Route Error generating image:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 // POST /api/ai/hashtags — Generate hashtags
 router.post('/hashtags', async (req, res) => {

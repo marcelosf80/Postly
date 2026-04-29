@@ -21,7 +21,7 @@ Tu sistema **SocialPulse** ahora tiene **conexión OAuth automática** con Meta/
 
 ### 1️⃣ Configurar URLs en Meta Developer
 
-Ve a: https://developers.facebook.com/apps/1493782988779942/fb-login/settings/
+Ve a tu Panel de Desarrolladores de Meta y selecciona tu App. Luego ve a: **Facebook Login > Settings**
 
 **Agregar en "Valid OAuth Redirect URIs":**
 ```

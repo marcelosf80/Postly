@@ -2,10 +2,27 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const helmet = require('helmet');
+const xss = require('xss-clean');
+const rateLimit = require('express-rate-limit');
 const path = require('path');
 const fs = require('fs');
 
 const app = express();
+
+// === Security Middleware ===
+app.use(helmet({
+    contentSecurityPolicy: false, // Permitir CDNs externos para iconos/fuentes
+}));
+app.use(xss());
+
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 100, // Limit each IP to 100 requests per windowMs
+    message: { error: 'Demasiadas peticiones desde esta IP, por favor intente de nuevo más tarde.' }
+});
+app.use('/api/', limiter);
+
 const PORT = process.env.PORT || 3000;
 
 // === Ensure directories exist ===
@@ -17,8 +34,8 @@ dirs.forEach(dir => {
 
 // === Middleware ===
 app.use(cors());
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Static files
 app.use(express.static(path.join(__dirname, 'public')));
@@ -36,7 +53,9 @@ app.use((req, res, next) => {
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/ai', require('./routes/ai'));
+app.use('/api/ads', require('./routes/ads'));
 app.use('/api/billing', require('./routes/billing'));
+app.use('/api/admin', require('./routes/admin'));
 
 // === Public Config ===
 app.get('/api/config', (req, res) => {
@@ -55,7 +74,9 @@ app.get('/api/health', (req, res) => {
     res.json({
         status: 'ok',
         platform: 'SocialPulse Marketing SaaS',
-        version: '1.0.0',
+        server_time: new Date().toISOString(),
+        version: '1.1.0',
+        env: process.env.NODE_ENV || 'development',
         uptime: process.uptime()
     });
 });
@@ -67,6 +88,14 @@ app.get('/app', (req, res) => {
 
 app.get('/login', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.get('/forgot-password', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'forgot-password.html'));
+});
+
+app.get('/reset-password', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'reset-password.html'));
 });
 
 // === Error handling ===

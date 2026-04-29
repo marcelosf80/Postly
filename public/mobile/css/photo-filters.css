@@ -1,0 +1,104 @@
+/* photo-filters.css — Filter Editor UI */
+
+/* ── Filter Editor Overlay ── */
+.filter-editor-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.95); z-index: 9000;
+  display: flex; flex-direction: column;
+  animation: filterFadeIn 0.3s ease;
+}
+@keyframes filterFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.filter-editor-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; background: rgba(20,20,20,0.9);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.filter-editor-header h3 {
+  color: #fff; font-size: 16px; font-weight: 600; margin: 0;
+}
+.filter-editor-header button {
+  background: none; border: none; color: #aaa; font-size: 14px;
+  cursor: pointer; padding: 8px 12px; border-radius: 8px;
+  transition: all 0.2s;
+}
+.filter-editor-header button:hover { background: rgba(255,255,255,0.1); color: #fff; }
+.filter-editor-header .btn-apply-filter {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff; font-weight: 600; border-radius: 20px; padding: 8px 20px;
+}
+.filter-editor-header .btn-apply-filter:hover { opacity: 0.9; }
+
+/* ── Image Preview ── */
+.filter-preview-area {
+  flex: 1; display: flex; align-items: center; justify-content: center;
+  overflow: hidden; padding: 16px; position: relative;
+}
+.filter-preview-area canvas {
+  max-width: 100%; max-height: 100%; object-fit: contain;
+  border-radius: 8px; box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.filter-loading {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  color: #fff; font-size: 14px; display: none; align-items: center; gap: 8px;
+}
+.filter-loading.active { display: flex; }
+.filter-spinner {
+  width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.2);
+  border-top-color: #667eea; border-radius: 50%;
+  animation: filterSpin 0.8s linear infinite;
+}
+@keyframes filterSpin { to { transform: rotate(360deg); } }
+
+/* ── Filter Picker Carousel ── */
+.filter-picker {
+  background: rgba(26,26,26,0.95); padding: 12px 0;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  backdrop-filter: blur(10px);
+}
+.filter-picker-scroll {
+  display: flex; gap: 6px; overflow-x: auto; padding: 4px 12px;
+  scroll-behavior: smooth; -webkit-overflow-scrolling: touch;
+}
+.filter-picker-scroll::-webkit-scrollbar { height: 0; }
+
+.filter-chip {
+  flex-shrink: 0; width: 72px; cursor: pointer;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  transition: transform 0.2s;
+}
+.filter-chip:active { transform: scale(0.95); }
+
+.filter-chip-preview {
+  width: 64px; height: 64px; border-radius: 10px; overflow: hidden;
+  border: 2px solid transparent; transition: border-color 0.2s, box-shadow 0.2s;
+  position: relative;
+}
+.filter-chip-preview canvas {
+  width: 100%; height: 100%; display: block; object-fit: cover;
+}
+.filter-chip.active .filter-chip-preview {
+  border-color: #667eea;
+  box-shadow: 0 0 12px rgba(102,126,234,0.5);
+}
+.filter-chip-name {
+  font-size: 10px; color: #888; text-align: center;
+  max-width: 72px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  transition: color 0.2s;
+}
+.filter-chip.active .filter-chip-name { color: #667eea; font-weight: 600; }
+
+/* ── Btn trigger in create post ── */
+.btn-open-filters {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: linear-gradient(135deg, #667eea22, #764ba222);
+  border: 1px solid #667eea44; color: #667eea;
+  padding: 10px 16px; border-radius: 12px; cursor: pointer;
+  font-size: 13px; font-weight: 600; transition: all 0.2s;
+  margin-top: 8px;
+}
+.btn-open-filters:hover {
+  background: linear-gradient(135deg, #667eea33, #764ba233);
+  border-color: #667eea88; transform: translateY(-1px);
+}
+.btn-open-filters svg { width: 18px; height: 18px; }

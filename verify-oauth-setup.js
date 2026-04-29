@@ -156,7 +156,7 @@ if (errors === 0) {
     console.log('');
     console.log('   IMPORTANTE:');
     console.log('   - Configurar URLs en Meta Developer:');
-    console.log('     https://developers.facebook.com/apps/1493782988779942/settings/basic/');
+    console.log(`     https://developers.facebook.com/apps/${process.env.FACEBOOK_APP_ID || 'TU_APP_ID'}/settings/basic/`);
     console.log('   - Agregar http://localhost:3000/ en "Valid OAuth Redirect URIs"');
     console.log('');
 } else {

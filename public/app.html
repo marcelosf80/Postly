@@ -6,7 +6,6 @@
     <title>Dashboard — Postly</title>
     <link rel="stylesheet" href="/css/main.css">
     <link rel="icon" href="/assets/img/logo.png">
-    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
     <div class="dashboard">
@@ -61,17 +60,20 @@
                     Administración
                 </button>
             </nav>
-            <div class="sidebar-footer" style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-lg);">
-                <div class="sidebar-user" onclick="navigateTo('settings')" style="padding: 0; gap: 12px; cursor: pointer; flex: 1;">
-                    <div class="avatar" id="user-avatar" style="background: #e2e8f0; color: #1e293b; width: 36px; height: 36px; font-size: 14px;">M</div>
-                    <div class="sidebar-user-info">
-                        <div class="sidebar-user-name" id="user-name" style="color: #1e293b; font-weight: 700; font-size: 13px;">Usuario</div>
-                        <div class="sidebar-user-plan" id="user-plan" style="color: #10b981; text-transform: lowercase; font-size: 11px;">🟢 activo</div>
+            <div class="sidebar-footer" style="display: flex; flex-direction: column; padding: var(--space-lg); border-top: 1px solid var(--border);">
+                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 8px;">
+                    <div class="sidebar-user" onclick="navigateTo('settings')" style="padding: 0; gap: 12px; cursor: pointer; flex: 1;">
+                        <div class="avatar" id="user-avatar" style="background: #e2e8f0; color: #1e293b; width: 36px; height: 36px; font-size: 14px;">M</div>
+                        <div class="sidebar-user-info">
+                            <div class="sidebar-user-name" id="user-name" style="color: #1e293b; font-weight: 700; font-size: 13px;">Usuario</div>
+                            <div class="sidebar-user-plan" id="user-plan" style="color: #10b981; text-transform: lowercase; font-size: 11px;">🟢 activo</div>
+                        </div>
                     </div>
+                    <button onclick="logout()" title="Cerrar Sesión" style="border: none; background: rgba(239, 68, 68, 0.1); color: var(--danger); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                    </button>
                 </div>
-                <button onclick="logout()" title="Cerrar Sesión" style="border: none; background: rgba(239, 68, 68, 0.1); color: var(--danger); width: 32px; height: 32px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
-                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
-                </button>
+                <div style="text-align: center; font-size: 10px; color: var(--text-muted); opacity: 0.7;" id="app-version-label">v1.0.0</div>
             </div>
         </aside>
 
@@ -79,13 +81,16 @@
         <div class="main-content">
             <header class="main-header">
                 <div style="display:flex;align-items:center;gap:12px;">
-                    <button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+                    <div class="mobile-brand" style="display:none; align-items:center; gap:8px;">
+                        <img src="/assets/img/logo.png" alt="Logo" style="width:28px; height:28px; border-radius:6px;">
+                    </div>
                     <h1 id="page-title">Dashboard</h1>
                 </div>
                 <div class="main-header-actions">
-                    <button class="btn btn-primary btn-sm" onclick="navigateTo('create')">
+                    <button class="btn btn-primary btn-sm hide-mobile" onclick="navigateTo('create')">
                         ➕ Nuevo Post
                     </button>
+                    <div class="show-mobile avatar avatar-sm" id="mobile-user-avatar" onclick="navigateTo('settings')" style="display:none; background:var(--gradient-primary); color:white; cursor:pointer;">U</div>
                 </div>
             </header>
             <div class="main-body" id="main-body">
@@ -142,9 +147,36 @@
         </div>
     </div>
 
+    <!-- Bottom Navigation Bar (Mobile Only) -->
+    <nav class="bottom-nav" id="bottom-nav">
+        <button class="bottom-nav-item active" data-section="overview" onclick="navigateTo('overview')">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Inicio</span>
+        </button>
+        <button class="bottom-nav-item" data-section="posts" onclick="navigateTo('posts')">
+            <i data-lucide="file-text"></i>
+            <span>Posts</span>
+        </button>
+        <div class="bottom-nav-fab-container">
+            <button class="bottom-nav-fab" data-section="create" onclick="navigateTo('create')">
+                <i data-lucide="plus"></i>
+            </button>
+        </div>
+        <button class="bottom-nav-item" data-section="ai" onclick="navigateTo('ai')">
+            <i data-lucide="sparkles"></i>
+            <span>IA</span>
+        </button>
+        <button class="bottom-nav-item" onclick="toggleSidebar()">
+            <i data-lucide="menu"></i>
+            <span>Menú</span>
+        </button>
+    </nav>
+
     <script src="https://sdk.mercadopago.com/js/v2"></script>
-    <script src="/js/api.js?v=1.5"></script>
-    <script src="/js/facebook-oauth.js?v=1.5"></script>
-    <script src="/js/app.js?v=1.5"></script>
+    <script src="/js/config.js"></script>
+    <script src="/js/local-store.js"></script>
+    <script src="/js/api.js?v=2.0"></script>
+    <script src="/js/facebook-oauth.js?v=2.0"></script>
+    <script src="/js/app.js?v=2.0"></script>
 </body>
 </html>

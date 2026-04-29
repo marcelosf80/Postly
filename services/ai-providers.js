@@ -2,11 +2,103 @@
 // Soporta: Meta AI (Llama), Groq, OpenAI, Claude
 
 const axios = require('axios');
+<<<<<<< HEAD
+const { GoogleAuth } = require('google-auth-library');
+=======
+>>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
 
 // ============================================
 // CONFIGURACIÓN DE PROVIDERS
 // ============================================
 
+<<<<<<< HEAD
+    // Ollama (Local AI - 100% Offline y Privado)
+    ollama: {
+        url: 'http://localhost:11434/api/chat',
+        model: 'llama3', // Modelo recomendado para Ollama
+        apiKeyEnv: 'OLLAMA_ENABLED', // Flag para habilitarlo en .env
+        name: 'Ollama (Local)',
+        formatPayload: (messages, temperature, maxTokens) => ({
+            model: 'llama3',
+            messages,
+            stream: false,
+            options: {
+                temperature,
+                num_predict: maxTokens
+            }
+        }),
+        extractResponse: (data) => data.message.content
+    }
+};
+
+// ============================================
+// CONFIGURACIÓN DE IMAGE PROVIDERS
+// ============================================
+
+const IMAGE_PROVIDERS = {
+    pollinations: {
+        name: 'Pollinations AI (Gratis)',
+        type: 'free',
+        available: true, // Siempre disponible
+        generate: async (prompt) => {
+            const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&nologo=true&seed=${Math.floor(Math.random() * 100000)}`;
+            const response = await axios.get(url, { responseType: 'arraybuffer' });
+            return Buffer.from(response.data, 'binary').toString('base64');
+        }
+    },
+
+    vertex: {
+        name: 'Vertex AI Imagen 3 (GCP)',
+        type: 'vertex',
+        apiKeyEnv: 'GCP_PROJECT_ID',
+        available: !!process.env.GCP_PROJECT_ID,
+        generate: async (prompt) => {
+            const projectId = process.env.GCP_PROJECT_ID;
+            const location = process.env.GCP_LOCATION || 'us-central1';
+            
+            const { GoogleAuth } = require('google-auth-library');
+            const auth = new GoogleAuth({
+                scopes: ['https://www.googleapis.com/auth/cloud-platform']
+            });
+            const client = await auth.getClient();
+            
+            const url = `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/imagen-3.0-generate-001:predict`;
+            
+            const res = await client.request({
+                url,
+                method: 'POST',
+                data: {
+                    instances: [ { prompt } ],
+                    parameters: { sampleCount: 1, aspectRatio: "1:1" }
+                }
+            });
+
+            if (res.data?.predictions?.length > 0) {
+                return res.data.predictions[0].bytesBase64Encoded;
+            }
+            throw new Error('Respuesta inválida de Vertex AI');
+        }
+    },
+
+    openai: {
+        name: 'OpenAI DALL-E 3',
+        type: 'openai',
+        apiKeyEnv: 'OPENAI_API_KEY',
+        available: !!process.env.OPENAI_API_KEY,
+        generate: async (prompt) => {
+            const apiKey = process.env.OPENAI_API_KEY;
+            const res = await axios.post('https://api.openai.com/v1/images/generations', {
+                model: "dall-e-3",
+                prompt: prompt,
+                n: 1,
+                size: "1024x1024",
+                response_format: "b64_json"
+            }, {
+                headers: { 'Authorization': `Bearer ${apiKey}` }
+            });
+            return res.data.data[0].b64_json;
+        }
+=======
 const PROVIDERS = {
     // Meta AI API (Llama - Gratis y especializado en redes sociales)
     meta: {
@@ -55,6 +147,7 @@ const PROVIDERS = {
             }))
         }),
         extractResponse: (data) => data.content[0].text
+>>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
     }
 };
 
@@ -63,6 +156,29 @@ const PROVIDERS = {
 // ============================================
 
 function getAvailableProvider() {
+<<<<<<< HEAD
+    // Orden de preferencia: Cloud primero para movilidad (Meta, Groq), Ollama como fallback local
+    const preferenceOrder = ['meta', 'groq', 'openai', 'claude', 'ollama'];
+    
+    for (const providerKey of preferenceOrder) {
+        const provider = PROVIDERS[providerKey];
+        
+        // Para proveedores Cloud: verificar API Key en el .env
+        if (providerKey !== 'ollama') {
+            const apiKey = process.env[provider.apiKeyEnv];
+            if (apiKey) {
+                console.log(`[AI] Usando provider cloud: ${provider.name}`);
+                return { key: providerKey, ...provider, apiKey };
+            }
+        } else {
+            // Ollama: solo si ya no hay nada en la nube y el usuario lo habilitó
+             console.log(`[AI] Probando provider local (fallback): ${provider.name}`);
+             return { key: providerKey, ...provider, apiKey: 'local' };
+        }
+    }
+    
+    throw new Error('No hay ninguna IA configurada (necesitas una API key en el .env)');
+=======
     // Orden de preferencia
     const preferenceOrder = ['meta', 'groq', 'openai', 'claude'];
     
@@ -77,6 +193,7 @@ function getAvailableProvider() {
     }
     
     throw new Error('No hay ninguna API key de IA configurada. Revisa tu .env');
+>>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
 }
 
 // ============================================
@@ -267,8 +384,14 @@ INSTRUCCIONES:
 - Usa hooks potentes que resuelvan un problema o despierten curiosidad.
 - Usa emojis estratégicamente para enfatizar, no para decorar.
 - Estructura el texto con párrafos cortos para facilitar la lectura.
+<<<<<<< HEAD
+- Termina con un CTA (Call to Action) potente que genere conversación.
+- Incluye siempre una lista de 5 a 10 hashtags estratégicos al final del post, separados por espacios.
+- Responde SOLO con el contenido del post (caption + hashtags), sin comentarios adicionales ni introducciones.`;
+=======
 - Termina con un CTA (Call to Action) que genere conversación.
 - Responde SOLO con el caption, sin comentarios adicionales.`;
+>>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
 
 
     const userPrompt = `Genera caption para: ${description}`;
@@ -457,20 +580,89 @@ Sé conciso y directo.`;
 }
 
 // ============================================
+<<<<<<< HEAD
+// GENERACIÓN DE IMÁGENES (Multi-Provider)
+// ============================================
+
+async function generateImage(prompt, options = {}) {
+    const { provider: requestedProvider = null } = options;
+    
+    // 1. Determinar provider a usar
+    let providerKey = requestedProvider;
+    
+    if (!providerKey) {
+        // Prioridad: Vertex (si está configurado) > Pollinations (siempre disponible)
+        providerKey = process.env.GCP_PROJECT_ID ? 'vertex' : 'pollinations';
+    }
+
+    const provider = IMAGE_PROVIDERS[providerKey] || IMAGE_PROVIDERS.pollinations;
+    
+    console.log(`[AI] Generando imagen con: ${provider.name}...`);
+
+    try {
+        return await provider.generate(prompt);
+    } catch (error) {
+        console.warn(`[AI] Falló ${provider.name}:`, error.response?.data?.error?.message || error.message);
+        
+        // Si falló el solicitado y no es pollinations, intentar pollinations como fallback
+        if (providerKey !== 'pollinations') {
+            console.log('[AI] Reintentando con Pollinations AI (Gratis)...');
+            try {
+                return await IMAGE_PROVIDERS.pollinations.generate(prompt);
+            } catch (fallbackError) {
+                console.error('[AI] Fallback también falló:', fallbackError.message);
+            }
+        }
+
+        // Si llegamos aquí, dar un error útil
+        if (error.response?.data?.error?.code === 403 || error.message.includes('billing')) {
+            throw new Error('Google Cloud requiere habilitar facturación. Usa Pollinations o activa el billing en GCP.');
+        }
+        
+        throw new Error(`Error generando imagen (${provider.name}): ${error.message}`);
+    }
+}
+
+// ============================================
+=======
+>>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
 // INFO DE PROVIDERS DISPONIBLES
 // ============================================
 
 function getProviderStatus() {
+<<<<<<< HEAD
+    const status = {
+        text: {},
+        image: {}
+    };
+    
+    // Status de Texto
+    for (const [key, config] of Object.entries(PROVIDERS)) {
+        status.text[key] = {
+=======
     const status = {};
     
     for (const [key, config] of Object.entries(PROVIDERS)) {
         status[key] = {
+>>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
             name: config.name,
             model: config.model,
             available: !!process.env[config.apiKeyEnv],
             envVar: config.apiKeyEnv
         };
     }
+<<<<<<< HEAD
+
+    // Status de Imagen
+    for (const [key, config] of Object.entries(IMAGE_PROVIDERS)) {
+        status.image[key] = {
+            name: config.name,
+            available: config.available,
+            envVar: config.apiKeyEnv || 'NONE'
+        };
+    }
+=======
+>>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
     
     return status;
 }
@@ -483,6 +675,10 @@ module.exports = {
     generateVisualPrompt,
     getMasterPrompt,
     analyzeImage,
+<<<<<<< HEAD
+    generateImage,
+=======
+>>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
     callAI,
     getProviderStatus
 };

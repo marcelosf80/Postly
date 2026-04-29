@@ -13,8 +13,13 @@ function getMPClient() {
         return new MercadoPagoConfig({ accessToken: adminUser.mp_access_token });
     }
     
+    // Fallback a variable de entorno
+    if (process.env.MP_ACCESS_TOKEN) {
+        return new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
+    }
+    
     // Si no hay token configurado
-    throw new Error('Pagos no disponibles actualmente. El Administrador debe configurar la pasarela de pago.');
+    throw new Error('Pagos no disponibles actualmente. El Administrador debe configurar la pasarela de pago en el Panel.');
 }
 
 const PLANS = {

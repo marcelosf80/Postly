@@ -1,0 +1,46 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.7.3'
+        classpath 'com.google.gms:google-services:4.4.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.21"
+        classpath "org.jetbrains.kotlin:compose-compiler-gradle-plugin:2.0.21"
+    }
+}
+
+apply from: "variables.gradle"
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    
+    // Usamos el Toolchain de Java 26 que acabas de instalar
+    afterEvaluate { project ->
+        if (project.plugins.hasPlugin('org.jetbrains.kotlin.android') || project.plugins.hasPlugin('kotlin-android')) {
+            project.kotlin {
+                jvmToolchain(21)
+            }
+        }
+        
+        if (project.hasProperty('android')) {
+            project.android {
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_21 // Mantenemos compatibilidad de salida en 21 para estabilidad
+                    targetCompatibility JavaVersion.VERSION_21
+                }
+            }
+        }
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
