@@ -18,37 +18,37 @@ if "%JAVA_HOME%"=="" (
 )
 
 echo [1/3] Sincronizando interfaz (V2 Web -> Android)...
-call npx cap sync android
+set "LOG_PATH=%~dp0build_log.txt"
+echo Inciando sincronizacion... > "%LOG_PATH%" 2>&1
+call npx cap sync android >> "%LOG_PATH%" 2>&1
 if %ERRORLEVEL% neq 0 (
     echo.
     echo [X] ERROR: La sincronizacion de Capacitor fallo. 
-    echo Asegurate de tener instalado Node.js y haber ejecutado "npm install".
+    echo Revisa "build_log.txt" para ver los detalles.
     pause
     exit /b %ERRORLEVEL%
 )
 
-echo.
 echo [2/3] Compilando sistema nativo (DEBUG MODE)...
 echo El proceso esta en marcha. Revisa build_log.txt para ver el progreso real.
 if exist "gradlew" (
     echo [!] Ya en carpeta android.
-    call gradlew clean
-    call gradlew assembleDebug --stacktrace --info
+    call gradlew clean >> "%LOG_PATH%" 2>&1
+    call gradlew assembleDebug --stacktrace --info >> "%LOG_PATH%" 2>&1
 ) else (
-    cd android
-    call gradlew clean
-    call gradlew assembleDebug --stacktrace --info
+    pushd android
+    call gradlew clean >> "%LOG_PATH%" 2>&1
+    call gradlew assembleDebug --stacktrace --info >> "%LOG_PATH%" 2>&1
+    popd
 )
 
 if %ERRORLEVEL% neq 0 (
     echo.
     echo [X] ERROR: La compilacion fallo. 
     echo Revisa el archivo "build_log.txt" que se acaba de crear en la carpeta raiz.
-    cd ..
     pause
     exit /b %ERRORLEVEL%
 )
-cd ..
 
 echo.
 echo [3/3] Generando Key Hash para Facebook...

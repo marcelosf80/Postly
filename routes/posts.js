@@ -141,13 +141,18 @@ async function executePublishing(post, user) {
         }
         
         const api = new InstagramAPI(user.ig_page_id, user.ig_access_token);
-        const relativePath = post.image_path.startsWith('/') ? post.image_path.substring(1) : post.image_path;
+        const relativePath = post.image_path ? (post.image_path.startsWith('/') ? post.image_path.substring(1) : post.image_path) : '';
+        if (!relativePath) {
+            console.error(`[PUBLISH] Error: Instagram requiere una imagen.`);
+            throw new Error('Instagram requiere una imagen para publicar.');
+        }
+
         const absImagePath = path.join(__dirname, '..', relativePath);
         
         console.log(`[PUBLISH] Verificando imagen en: ${absImagePath}`);
         if (!fs.existsSync(absImagePath)) {
             console.error(`[PUBLISH] Error: Imagen no encontrada en ${absImagePath}`);
-            throw new Error('Imagen no encontrada en disco');
+            throw new Error('El archivo de imagen no existe en el servidor.');
         }
 
         const mediaType = post.aspect_ratio === 'story' ? 'STORIES' : 'IMAGE';

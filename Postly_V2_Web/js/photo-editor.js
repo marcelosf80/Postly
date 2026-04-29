@@ -44,7 +44,13 @@ const PhotoEditor = {
             case 'b-w': return 'grayscale(1) contrast(1.1)';
             case 'warm': return 'sepia(0.2) saturate(1.5) brightness(1.1)';
             case 'cool': return 'hue-rotate(30deg) saturate(1.2) brightness(1.05)';
-            case 'vibrant': return 'saturate(1.8) contrast(1.1)';
+            case 'vibrant': return 'saturate(2) contrast(1.1)';
+            case 'noir': return 'grayscale(1) contrast(1.5) brightness(0.9)';
+            case 'golden': return 'sepia(0.3) saturate(1.4) brightness(1.1) hue-rotate(-10deg)';
+            case 'cyberpunk': return 'hue-rotate(150deg) saturate(1.6) contrast(1.2)';
+            case 'lomo': return 'contrast(1.3) saturate(1.6) brightness(0.9)';
+            case 'fade': return 'brightness(1.1) contrast(0.85) saturate(0.8)';
+            case 'teal': return 'hue-rotate(130deg) saturate(1.4) contrast(1.1)';
             case 'dramatic': return 'contrast(1.5) brightness(0.8) saturate(0.8)';
             default: return 'none';
         }

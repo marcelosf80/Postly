@@ -4,6 +4,9 @@
     <!-- Permite a la app comunicarse directamente con la app nativa de Facebook -->
     <queries>
         <package android:name="com.facebook.katana" />
+        <package android:name="com.facebook.orca" />
+        <package android:name="com.facebook.android" />
+        <package android:name="com.instagram.android" />
     </queries>
 
     <application
@@ -40,6 +43,7 @@
             android:name="com.facebook.FacebookActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
             android:label="@string/app_name"
+            android:theme="@style/com_facebook_activity_theme"
         />
         <activity android:name="com.facebook.CustomTabActivity" android:exported="true">
             <intent-filter>

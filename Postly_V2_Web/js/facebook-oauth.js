@@ -42,22 +42,27 @@ async function connectWithFacebook() {
             btn.disabled = true;
         }
 
-        if (isCapacitor && window.Capacitor && Capacitor.Plugins.FacebookLogin) {
+        if (isCapacitor && window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.FacebookLogin) {
             console.log('[META] Usando plugin nativo de Facebook...');
-            const { FacebookLogin } = Capacitor.Plugins;
+            const { FacebookLogin } = window.Capacitor.Plugins;
             
             const result = await FacebookLogin.login({
                 permissions: ['email', 'public_profile', 'pages_manage_posts', 'pages_read_engagement', 'instagram_basic', 'instagram_content_publish', 'business_management', 'pages_show_list']
             });
 
+            console.log('[META] Resultado login nativo:', result);
+
             if (result.accessToken) {
                 exchangeTokenAndSaveUser(result.accessToken.token);
             } else {
-                showToast('Login cancelado', 'info');
+                showToast('Login cancelado o fallido', 'info');
                 resetConnectButton();
             }
         } else {
-            console.log('[META] Usando SDK de navegador...');
+            console.log('[META] Usando SDK de navegador o plugin no encontrado...');
+            console.log('[META] Capacitor status:', !!window.Capacitor);
+            console.log('[META] Plugin status:', !!(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.FacebookLogin));
+            
             if (typeof FB === 'undefined') {
                 showToast('Error: El SDK web de Facebook no cargó correctamente.', 'error');
                 resetConnectButton();
@@ -156,7 +161,7 @@ async function exchangeTokenAndSaveUser(token) {
                 <div style="font-size:54px; margin-bottom:16px;">✨</div>
                 <h3 style="margin-bottom:8px; font-size:22px;">¡Bienvenido, ${profile.name}!</h3>
                 <p style="color:var(--text-secondary); margin-bottom:24px; line-height:1.5;">Tu cuenta de Meta se ha vinculado correctamente a Postly.</p>
-                <button class="btn btn-primary" style="width:100%;" onclick="window.location.href='./app.html';">
+                <button class="btn btn-primary" style="width:100%;" onclick="if(window.navigate) { window.navigate('dashboard'); } else { window.location.reload(); }">
                     Ingresar al Panel
                 </button>
             </div>

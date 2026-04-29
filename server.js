@@ -82,8 +82,13 @@ app.get('/api/health', (req, res) => {
 });
 
 // === SPA fallback — serve app.html for /app routes ===
+app.get('/v2', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'v2', 'index.html'));
+});
+
 app.get('/app', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'app.html'));
+    // Redirigir a la nueva versión V2
+    res.redirect('/v2');
 });
 
 app.get('/login', (req, res) => {
