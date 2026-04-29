@@ -1,7 +1,7 @@
 {
   "appId": "com.socialpulse.marketing",
   "appName": "Postly",
-  "webDir": "public/mobile",
+  "webDir": "Postly_V2_Web",
   "bundledWebRuntime": false,
   "backgroundColor": "#ffffff",
   "android": {

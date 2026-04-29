@@ -1,7 +1,7 @@
 @echo off
 echo ==========================================
 echo    Postly - Generar APK Android (MODO LOG)
-echo    (Fuente: Carpeta /public/mobile)
+echo    (Fuente: Carpeta /Postly_V2_Web)
 echo ==========================================
 echo.
 
@@ -17,7 +17,7 @@ if "%JAVA_HOME%"=="" (
     set "PATH=%JAVA_HOME%\bin;%PATH%"
 )
 
-echo [1/3] Sincronizando interfaz (Mobile -> Android)...
+echo [1/3] Sincronizando interfaz (V2 Web -> Android)...
 call npx cap sync android
 if %ERRORLEVEL% neq 0 (
     echo.
