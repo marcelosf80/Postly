@@ -1,10 +1,10 @@
 // Postly V2 — Web API Client
 if (window.Capacitor && (window.Capacitor.getPlatform() === 'android' || window.Capacitor.getPlatform() === 'ios')) {
-    window.API_BASE_URL = "https://postly-z7cf.onrender.com";
+    window.API_BASE_URL = "https://marketing-4778.onrender.com";
 } else {
     window.API_BASE_URL = window.location.origin.includes('localhost') 
         ? 'http://localhost:3002' 
-        : 'https://postly-z7cf.onrender.com';
+        : 'https://marketing-4778.onrender.com';
 }
 
 const API = {
