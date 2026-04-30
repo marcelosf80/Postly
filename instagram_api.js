@@ -28,7 +28,11 @@ class InstagramAPI {
             if (response.data && response.data.status === 'success') {
                 // Tmpfiles retorna una URL de visualización. Transformamos a descarga directa.
                 const viewUrl = response.data.data.url;
-                const directUrl = viewUrl.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
+                let directUrl = viewUrl.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
+                // Forzar HTTPS porque Meta Graph API lo requiere estrictamente
+                if (directUrl.startsWith('http://')) {
+                    directUrl = directUrl.replace('http://', 'https://');
+                }
                 return directUrl;
             }
             throw new Error("Respuesta inválida del servidor de archivos temporal.");

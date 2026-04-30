@@ -384,9 +384,10 @@ async function runAI(type) {
             resultDiv.innerHTML = `<div style="color: var(--primary); font-weight: 600;">${res.hashtags}</div>`;
         } else if (type === 'image') {
             res = await API.generateImage(input);
+            const imageBase64 = res.imageBase64 || res; // Fallback in case the API was modified to return the string directly
             resultDiv.innerHTML = `
-                <img src="${res}" style="width: 100%; border-radius: 12px; margin-bottom: 10px;">
-                <button class="btn btn-sm" onclick="useAIImage('${res}')" style="background: var(--success); color: white;">Usar en mi Post</button>
+                <img src="${imageBase64}" style="width: 100%; border-radius: 12px; margin-bottom: 10px;">
+                <button class="btn btn-sm" onclick="useAIImage('${imageBase64}')" style="background: var(--success); color: white;">Usar en mi Post</button>
             `;
         }
     } catch (e) {

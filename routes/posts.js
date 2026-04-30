@@ -350,6 +350,9 @@ router.post('/:id/publish', async (req, res) => {
             console.log(`[PUBLISH] Intentando publicar post ${post.id} en Instagram real...`);
             try {
                 const api = new InstagramAPI(user.ig_page_id, user.ig_access_token);
+                if (!post.image_path) {
+                    throw new Error('Instagram requiere una imagen para publicar.');
+                }
                 const relativePath = post.image_path.startsWith('/') ? post.image_path.substring(1) : post.image_path;
                 const absImagePath = path.join(__dirname, '..', relativePath);
                 

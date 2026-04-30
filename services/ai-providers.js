@@ -30,7 +30,8 @@ const IMAGE_PROVIDERS = {
         generate: async (prompt) => {
             const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&nologo=true&seed=${Math.floor(Math.random() * 100000)}`;
             const response = await axios.get(url, { responseType: 'arraybuffer' });
-            return Buffer.from(response.data, 'binary').toString('base64');
+            const base64Str = Buffer.from(response.data, 'binary').toString('base64');
+            return `data:image/jpeg;base64,${base64Str}`;
         }
     }
 };
