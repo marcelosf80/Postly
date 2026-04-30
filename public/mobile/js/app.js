@@ -89,6 +89,13 @@ document.addEventListener('DOMContentLoaded', () => {
     navigateTo('overview');
     renderIcons();
     renderVersion();
+    
+    // Verificar PhotoFilters
+    if (window.PhotoFilters) {
+        console.log('[INIT] PhotoFilters cargado correctamente');
+    } else {
+        console.error('[INIT] ⚠️ PhotoFilters NO se cargó');
+    }
 });
 
 function renderVersion() {
@@ -519,8 +526,13 @@ function renderCreatePost() {
                 </div>
                 <input type="file" id="post-image" accept="image/*" style="display:none;" onchange="handleImagePreview(event)">
                 
-                <div id="filter-btn-container" style="display:none; margin-top:12px;">
-                    <button class="btn btn-outline btn-sm" style="width:100%; border-radius:12px; background:white;" onclick="openFilterEditor()">🎨 Aplicar Filtros Profesionales</button>
+                <div id="filter-btn-container" style="display:none; margin-top:12px; gap:8px; flex-wrap:wrap;">
+                    <button type="button" class="btn btn-outline btn-sm" onclick="openFilterEditor()" style="flex:1; border-radius:12px; background:white;">
+                        🎨 Filtros
+                    </button>
+                    <button type="button" class="btn btn-outline btn-sm" onclick="removeImage()" style="flex:0; border-radius:12px; background:#fef2f2; color:#ef4444; border-color:#fecaca;">
+                        🗑️ Quitar
+                    </button>
                 </div>
             </div>
 
@@ -574,8 +586,22 @@ function renderCreatePost() {
 
     // Precargar anuncio si estamos en la app nativa
     if (window.Capacitor && window.Capacitor.Plugins.AdMob) {
-        console.log("[ADS] Precargando anuncio rewarded...");
-        window.Capacitor.Plugins.AdMob.loadRewardedAd().catch(e => console.warn("[ADS] Error precarga:", e));
+        console.log("[ADS] Inicializando y precargando anuncio rewarded...");
+        (async () => {
+            try {
+                await window.Capacitor.Plugins.AdMob.initialize({
+                    testingDevices: [], 
+                    initializeForTesting: false
+                });
+                await window.Capacitor.Plugins.AdMob.prepareRewardVideoAd({
+                    adId: 'ca-app-pub-5343221992536229/3520448384',
+                    isTesting: false
+                });
+                console.log("[ADS] AdMob inicializado y anuncio preparado");
+            } catch (e) {
+                console.warn("[ADS] Error en inicialización:", e);
+            }
+        })();
     }
 }
 
@@ -652,9 +678,21 @@ function handleImagePreview(e) {
     reader.onload = (ex) => {
         currentImageBase64 = ex.target.result;
         updateMockup();
-        document.getElementById('filter-btn-container').style.display = 'block';
+        const editorActions = document.getElementById('filter-btn-container');
+        if (editorActions) editorActions.style.display = 'flex';
+        showToast('Imagen cargada. Puedes aplicar filtros.', 'success');
     };
     reader.readAsDataURL(file);
+}
+
+function removeImage() {
+    currentImageBase64 = null;
+    const editorActions = document.getElementById('filter-btn-container');
+    if (editorActions) editorActions.style.display = 'none';
+    const input = document.getElementById('post-image');
+    if (input) input.value = '';
+    updateMockup();
+    showToast('Imagen eliminada', 'info');
 }
 
 let lastAIType = 'caption';
@@ -717,32 +755,18 @@ async function submitPost() {
         if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob) {
             btn.textContent = 'Cargando Anuncio...';
             try {
-                let isReady = await window.Capacitor.Plugins.AdMob.isAdReady();
+                const adResult = await window.Capacitor.Plugins.AdMob.showRewardVideoAd();
                 
-                if (!isReady.ready) {
-                    btn.textContent = 'Cargando Video...';
-                    await window.Capacitor.Plugins.AdMob.loadRewardedAd();
-                    // Wait a second for it to actually be ready
-                    await new Promise(r => setTimeout(r, 1500));
-                    isReady = await window.Capacitor.Plugins.AdMob.isAdReady();
-                }
-
-                if (isReady.ready) {
-                    const result = await window.Capacitor.Plugins.AdMob.showRewardedAd();
-                    if (result.completed) {
-                        btn.textContent = 'Verificando...';
-                        try { await API.verifyAdReward(); } catch(e) {}
-                        showToast('¡Anuncio visto!', 'success');
-                    } else {
-                        throw new Error('Debes ver el anuncio para publicar.');
-                    }
+                if (adResult && adResult.value === true) {
+                    btn.textContent = 'Verificando...';
+                    showToast('¡Anuncio visto completo!', 'success');
+                    try { await API.verifyAdReward(); } catch(e) {}
                 } else {
-                    console.warn('[ADS] Ad still not ready after load attempt.');
-                    showToast('Anuncio no disponible. Publicando como cortesía...', 'warning');
+                    throw new Error('Debes ver el anuncio completo para publicar.');
                 }
             } catch (adError) {
                 console.error('[ADS] Error:', adError.message);
-                showToast('Error de anuncios. Publicando...', 'warning');
+                showToast('Anuncio no disponible. Publicando...', 'warning');
             }
         }
         // --- FIN LÓGICA MONETIZACIÓN ---

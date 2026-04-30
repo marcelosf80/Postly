@@ -441,6 +441,16 @@ function renderCreatePost() {
                     <input type="file" id="file-input" hidden accept="image/*" onchange="handleFile(event)">
                 </div>
 
+                <!-- Dynamic Controls for Image -->
+                <div id="filter-btn-container" style="display: none; gap: 10px; margin-top: 15px;">
+                    <button class="btn btn-sm" onclick="openNativeEditor()" style="flex: 1; background: var(--primary); color: white; border-radius: 12px; font-weight: 700; height: 44px;">
+                        <i data-lucide="edit-3" style="width: 14px;"></i> Filtros
+                    </button>
+                    <button class="btn btn-sm" onclick="removeImage()" style="flex: 1; background: #fee2e2; color: #991b1b; border-radius: 12px; font-weight: 700; height: 44px;">
+                        <i data-lucide="trash-2" style="width: 14px;"></i> Quitar
+                    </button>
+                </div>
+
                 <!-- Filters -->
                 <div id="filter-section" style="display: none; margin-top: 24px;">
                     <p style="font-size: 0.9rem; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
@@ -600,48 +610,83 @@ function setPostType(type) {
     }
 }
 
-function handleFile(e) {
-    const file = e.target.files[0];
+function handleFile(event) {
+    const file = event.target.files[0];
     if (!file) return;
-    
+
     const reader = new FileReader();
-    reader.onload = (event) => {
-        currentPostData.image = event.target.result;
+    reader.onload = (e) => {
+        currentPostData.image = e.target.result;
         const area = document.getElementById('image-upload-area');
-        area.innerHTML = `<img src="${event.target.result}" id="preview-img" style="width: 100%; height: 100%; object-fit: cover;">`;
+        area.innerHTML = `<img src="${e.target.result}" id="preview-img" style="width: 100%; height: 100%; object-fit: cover;">`;
+        
+        // Mostrar botones de filtros y quitar
+        document.getElementById('filter-btn-container').style.display = 'flex';
         document.getElementById('filter-section').style.display = 'block';
+        lucide.createIcons();
     };
     reader.readAsDataURL(file);
+}
+
+function removeImage() {
+    currentPostData.image = null;
+    currentPostData.filter = 'none';
+    const area = document.getElementById('image-upload-area');
+    area.innerHTML = `
+        <div style="width: 64px; height: 64px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
+            <i data-lucide="image" style="width: 28px; height: 28px; color: var(--primary);"></i>
+        </div>
+        <span style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 600;">Subir una foto increíble</span>
+    `;
+    document.getElementById('filter-btn-container').style.display = 'none';
+    document.getElementById('filter-section').style.display = 'none';
+    lucide.createIcons();
+}
+
+async function openNativeEditor() {
+    if (window.Capacitor && window.Capacitor.Plugins.NativeUI && currentPostData.image) {
+        try {
+            const result = await window.Capacitor.Plugins.NativeUI.openPhotoEditor({
+                image: currentPostData.image
+            });
+            if (result.image) {
+                currentPostData.image = result.image;
+                document.getElementById('preview-img').src = result.image;
+            }
+        } catch (e) {
+            console.error("Native editor failed:", e);
+        }
+    } else {
+        // Fallback: scroll to web filters
+        document.getElementById('filter-section').scrollIntoView({ behavior: 'smooth' });
+    }
 }
 
 function applyFilter(filter) {
     currentPostData.filter = filter;
     const img = document.getElementById('preview-img');
     if (!img) return;
-    
-    // Preview uses CSS filters for speed
-    switch(filter) {
-        case 'none': img.style.filter = 'none'; break;
-        case 'vintage': img.style.filter = 'sepia(0.5) contrast(1.2) brightness(0.9)'; break;
-        case 'b-w': img.style.filter = 'grayscale(1) contrast(1.1)'; break;
-        case 'warm': img.style.filter = 'sepia(0.2) saturate(1.5) brightness(1.1)'; break;
-        case 'cool': img.style.filter = 'hue-rotate(30deg) saturate(1.2) brightness(1.05)'; break;
-        case 'vibrant': img.style.filter = 'saturate(1.8) contrast(1.1)'; break;
-        case 'noir': img.style.filter = 'grayscale(1) contrast(1.5) brightness(0.9)'; break;
-        case 'golden': img.style.filter = 'sepia(0.3) saturate(1.4) brightness(1.1) hue-rotate(-10deg)'; break;
-        case 'cyberpunk': img.style.filter = 'hue-rotate(150deg) saturate(1.6) contrast(1.2)'; break;
-        case 'lomo': img.style.filter = 'contrast(1.3) saturate(1.6) brightness(0.9)'; break;
-        case 'fade': img.style.filter = 'brightness(1.1) contrast(0.85) saturate(0.8)'; break;
-        case 'teal': img.style.filter = 'hue-rotate(130deg) saturate(1.4) contrast(1.1)'; break;
-        case 'dramatic': img.style.filter = 'contrast(1.5) brightness(0.8) saturate(0.8)'; break;
-    }
 
-    // Highlight selected
-    document.querySelectorAll('.filter-thumb').forEach(t => t.style.borderColor = 'transparent');
-    if (event && event.target) {
-        event.target.style.borderColor = 'var(--primary)';
-    }
+    const filters = {
+        'none': 'none',
+        'vintage': 'sepia(0.5) contrast(1.2) brightness(0.9)',
+        'b-w': 'grayscale(1)',
+        'warm': 'sepia(0.2) saturate(1.5) brightness(1.1)',
+        'cool': 'hue-rotate(30deg) saturate(1.2)',
+        'vibrant': 'saturate(2) contrast(1.1)',
+        'noir': 'grayscale(1) contrast(1.5) brightness(0.9)',
+        'golden': 'sepia(0.3) saturate(1.4) brightness(1.1) hue-rotate(-10deg)',
+        'cyberpunk': 'hue-rotate(150deg) saturate(1.6) contrast(1.2)',
+        'lomo': 'contrast(1.3) saturate(1.6) brightness(0.9)',
+        'fade': 'brightness(1.1) contrast(0.85) saturate(0.8)',
+        'teal': 'hue-rotate(130deg) saturate(1.4) contrast(1.1)',
+        'dramatic': 'contrast(1.5) brightness(0.8) saturate(0.8)'
+    };
+
+    img.style.filter = filters[filter] || 'none';
 }
+
+
 
 async function generateAICaption() {
     const text = document.getElementById('post-text').value;
@@ -719,18 +764,39 @@ async function submitPost() {
         return;
     }
 
-    // El sistema ahora es puramente basado en anuncios para cada publicación
-    if (window.Capacitor && window.Capacitor.Plugins.AdMob) {
-        const confirmAd = confirm("Para publicar gratis, debes ver un anuncio corto. ¿Continuar?");
-        if (confirmAd) {
-            window.Capacitor.Plugins.AdMob.showRewardedAd();
-            return;
-        } else {
-            return;
+    // Verificar si AdMob está disponible y el anuncio está listo
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob) {
+        try {
+            const adStatus = await window.Capacitor.Plugins.AdMob.isAdReady();
+            if (adStatus && adStatus.ready) {
+                const confirmAd = confirm("Para publicar gratis, mira un anuncio corto. ¿Continuar?");
+                if (confirmAd) {
+                    try {
+                        const result = await window.Capacitor.Plugins.AdMob.showRewardedAd();
+                        if (result && result.completed) {
+                            // Verificar recompensa en el servidor
+                            try { await API.verifyAdReward(); } catch(e) { console.warn('[ADS] Verify failed:', e); }
+                            finalizePostSubmission();
+                            return;
+                        }
+                    } catch(e) {
+                        console.warn("[ADS] Error mostrando anuncio:", e);
+                        showToast("Anuncio no disponible, publicando directamente...", "info");
+                    }
+                } else {
+                    return; // Usuario canceló
+                }
+            } else {
+                console.log("[ADS] Anuncio no está listo, publicando directamente.");
+                // Pre-cargar para la próxima vez
+                try { window.Capacitor.Plugins.AdMob.loadRewardedAd(); } catch(e) {}
+            }
+        } catch(e) {
+            console.warn("[ADS] AdMob no disponible:", e);
         }
     }
 
-    // Si no estamos en entorno móvil, publicamos directo (modo dev)
+    // Publicar directamente (sin ads o ads no disponibles)
     finalizePostSubmission();
 }
 

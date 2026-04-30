@@ -4,9 +4,10 @@ const axios = require('axios');
 const PROVIDERS = {
     groq: {
         url: 'https://api.groq.com/openai/v1/chat/completions',
-        model: 'llama-3.3-70b-versatile', // Modelo flagship de Groq
+        model: 'meta-llama/llama-4-scout-17b-16e-instruct', // Nuevo modelo Llama 4 Scout
+        secondaryModel: 'qwen/qwen3-32b', // Modelo Qwen 3
         apiKeyEnv: 'GROQ_API_KEY',
-        name: 'Groq'
+        name: 'Groq Next-Gen'
     },
     meta: {
         url: 'https://api.llama-api.com/chat/completions',
@@ -68,10 +69,11 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
         { role: 'system', content: systemPrompt }
     ];
 
-    // Para Groq, si hay imágenes usamos el modelo de visión específicamente
+    // Usamos Llama 4 Scout como modelo preferencial, incluso para visión si está disponible
     let currentModel = provider.model;
     if (provider.key === 'groq' && images && images.length > 0) {
-        currentModel = 'llama-3.2-11b-vision-preview'; // Modelo de visión activo
+        // Llama 4 Scout soporta visión y es más avanzado que el anterior
+        currentModel = 'meta-llama/llama-4-scout-17b-16e-instruct'; 
     }
 
     if (images && images.length > 0) {

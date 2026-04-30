@@ -44,6 +44,7 @@ async function connectWithFacebook() {
 
         if (isCapacitor && window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.FacebookLogin) {
             console.log('[META] Usando plugin nativo de Facebook...');
+            showToast('Iniciando conexión nativa con Meta...', 'info');
             const { FacebookLogin } = window.Capacitor.Plugins;
             
             const result = await FacebookLogin.login({
@@ -52,16 +53,17 @@ async function connectWithFacebook() {
 
             console.log('[META] Resultado login nativo:', result);
 
-            if (result.accessToken) {
+            if (result && result.accessToken) {
+                showToast('¡Token obtenido! Sincronizando...', 'success');
                 exchangeTokenAndSaveUser(result.accessToken.token);
             } else {
-                showToast('Login cancelado o fallido', 'info');
+                const msg = result && result.errorMessage ? result.errorMessage : 'Cancelado o fallido';
+                showToast('Login Nativo: ' + msg, 'info');
                 resetConnectButton();
             }
         } else {
             console.log('[META] Usando SDK de navegador o plugin no encontrado...');
-            console.log('[META] Capacitor status:', !!window.Capacitor);
-            console.log('[META] Plugin status:', !!(window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.FacebookLogin));
+            showToast('Usando fallback de navegador (SDK Web)...', 'warning');
             
             if (typeof FB === 'undefined') {
                 showToast('Error: El SDK web de Facebook no cargó correctamente.', 'error');
@@ -72,7 +74,7 @@ async function connectWithFacebook() {
                 if (response.authResponse) {
                     exchangeTokenAndSaveUser(response.authResponse.accessToken);
                 } else {
-                    showToast('Login cancelado', 'info');
+                    showToast('Login Web: Cancelado o fallido', 'info');
                     resetConnectButton();
                 }
             }, {
@@ -82,7 +84,8 @@ async function connectWithFacebook() {
         }
     } catch (error) {
         console.error('[META] Error en OAuth flow:', error);
-        showToast('Error al conectar con Facebook', 'error');
+        const errorMsg = error.message || JSON.stringify(error);
+        alert('Error de Conexión Meta: ' + errorMsg);
         resetConnectButton();
     }
 }

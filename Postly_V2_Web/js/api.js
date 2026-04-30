@@ -1,7 +1,4 @@
 // Postly V2 — Web API Client
-const GROQ_API_KEY = "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";
-
-// Auto-configurar URL de backend
 if (window.Capacitor && (window.Capacitor.getPlatform() === 'android' || window.Capacitor.getPlatform() === 'ios')) {
     window.API_BASE_URL = "https://postly-z7cf.onrender.com";
 } else {
@@ -66,6 +63,10 @@ const API = {
         });
     },
 
+    async getProfile() {
+        return this.request('/api/auth/me');
+    },
+
     // === POSTS ===
     async getPosts() { return this.request('/api/posts'); },
     async createPost(data) {
@@ -74,96 +75,62 @@ const API = {
             body: data
         });
     },
-
-    // === AI (Hybrid) ===
-    async _fetchGroq(prompt, system = "Eres un asistente experto.") {
-        try {
-            const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${GROQ_API_KEY}`
-                },
-                body: JSON.stringify({
-                    model: "llama-3.3-70b-versatile",
-                    messages: [
-                        { role: "system", content: system },
-                        { role: "user", content: prompt }
-                    ],
-                    temperature: 0.7
-                })
-            });
-            const data = await response.json();
-            if (data.error) throw new Error(data.error.message);
-            return data.choices[0].message.content;
-        } catch (e) {
-            throw new Error(`Error de IA: ${e.message}`);
-        }
+    
+    async publishPost(postId) {
+        return this.request(`/api/posts/${postId}/publish`, {
+            method: 'POST'
+        });
     },
 
+    // === AI (Hybrid) ===
     async generateCaption(description, options = {}) {
-        if (window.API_BASE_URL) {
-            return this.request('/api/ai/caption', {
-                method: 'POST',
-                body: { description, ...options }
-            });
-        }
-        const res = await this._fetchGroq(`Genera un caption para: ${description}`);
-        return { caption: res };
+        return this.request('/api/ai/caption', {
+            method: 'POST',
+            body: { description, ...options }
+        });
     },
 
     async generateFlyer(data, images = []) {
-        if (window.API_BASE_URL) {
-            return this.request('/api/ai/flyer', {
-                method: 'POST',
-                body: { data, images }
-            });
-        }
-        throw new Error("El generador de flyers requiere conexión al servidor.");
+        return this.request('/api/ai/flyer', {
+            method: 'POST',
+            body: { data, images }
+        });
     },
 
     async generateHashtags(description) {
-        if (window.API_BASE_URL) {
-            return this.request('/api/ai/hashtags', {
-                method: 'POST',
-                body: { description }
-            });
-        }
-        const res = await this._fetchGroq(`Hashtags para: ${description}`);
-        return { hashtags: res };
+        return this.request('/api/ai/hashtags', {
+            method: 'POST',
+            body: { description }
+        });
     },
 
     async generateIdeas(industry) {
-        if (window.API_BASE_URL) {
-            return this.request('/api/ai/ideas', {
-                method: 'POST',
-                body: { industry }
-            });
-        }
-        const res = await this._fetchGroq(`Ideas para: ${industry}`);
-        return { ideas: res };
+        return this.request('/api/ai/ideas', {
+            method: 'POST',
+            body: { industry }
+        });
     },
 
     async improveText(text) {
-        if (window.API_BASE_URL) {
-            return this.request('/api/ai/improve', {
-                method: 'POST',
-                body: { text }
-            });
-        }
-        const improved = await this._fetchGroq(`Mejora este texto para redes sociales: "${text}"`);
-        return { improved: improved };
+        return this.request('/api/ai/improve', {
+            method: 'POST',
+            body: { text }
+        });
     },
 
     async generateImage(prompt) {
-        if (window.API_BASE_URL) {
-            return this.request('/api/ai/generate-image', {
-                method: 'POST',
-                body: { prompt }
-            });
-        }
-        // Fallback to Pollinations
-        return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=1024&height=1024&nologo=true`;
+        return this.request('/api/ai/generate-image', {
+            method: 'POST',
+            body: { prompt }
+        });
+    },
+
+    // === ADS ===
+    async verifyAdReward() {
+        return this.request('/api/ads/verify-reward', {
+            method: 'POST',
+            body: {}
+        });
     }
 };
 

@@ -18,7 +18,19 @@ android {
         }
     }
 
+    signingConfigs {
+        debug {
+            storeFile file('socialpulse.keystore')
+            storePassword 'socialpulse'
+            keyAlias 'socialpulse'
+            keyPassword 'socialpulse'
+        }
+    }
+
     buildTypes {
+        debug {
+            signingConfig signingConfigs.debug
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -68,6 +80,7 @@ dependencies {
     implementation "androidx.compose.material:material-icons-extended"
 
     implementation project(':capacitor-android')
+    implementation project(':capacitor-community-facebook-login')
     implementation project(':capacitor-cordova-android-plugins')
 
     testImplementation "junit:junit:4.13.2"

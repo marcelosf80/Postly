@@ -1,6 +1,6 @@
 // public/mobile/js/api.js — Hybrid API Client for Postly (Server-Ready)
 
-const GROQ_API_KEY = "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";
+const GROQ_API_KEY = ""; // Mover a variable de entorno (Backend)
 
 // Auto-configurar URL de backend si estamos en Android nativo (Capacitor)
 if (window.Capacitor && (window.Capacitor.getPlatform() === 'android' || window.Capacitor.getPlatform() === 'ios')) {

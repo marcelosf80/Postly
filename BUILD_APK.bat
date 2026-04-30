@@ -51,8 +51,8 @@ if %ERRORLEVEL% neq 0 (
 )
 
 echo.
-echo [3/3] Generando Key Hash para Facebook...
-keytool -exportcert -alias androiddebugkey -keystore "%USERPROFILE%\.android\debug.keystore" -storepass android 2>nul | openssl dgst -sha1 -binary 2>nul | openssl base64 2>nul
+echo [!] Key Hash para Facebook (Configurar en developers.facebook.com):
+echo U/n2omheGKUYkVuyUyATNfzvqQs=
 
 echo.
 echo ==========================================
