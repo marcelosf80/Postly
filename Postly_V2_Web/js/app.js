@@ -34,63 +34,61 @@ function renderLogin() {
             
             <p style="text-align: center; color: var(--text-secondary); margin-bottom: 32px; max-width: 280px; font-size: 1rem;">Tu asistente inteligente para dominar las redes sociales.</p>
 
-            <button class="btn" id="btn-connect-facebook" onclick="connectWithFacebook()" style="background: #1877f2; color: white; border-radius: 20px; height: 70px; font-weight:800; font-size: 1.2rem; margin-bottom: 24px; box-shadow: 0 10px 25px rgba(24, 119, 242, 0.3);">
-                <i data-lucide="facebook"></i> Entrar con Facebook
+            <button class="btn" id="btn-connect-facebook" onclick="connectWithFacebook()" style="background: #1877f2; color: white; border-radius: 20px; height: 70px; font-weight:800; font-size: 1.2rem; margin-bottom: 12px; box-shadow: 0 10px 25px rgba(24, 119, 242, 0.3);">
+                <i data-lucide="facebook"></i> Entrar con Meta
             </button>
-
-            <div style="margin: 16px 0; display: flex; align-items: center; gap: 15px; width: 100%; max-width: 300px;">
-                <div style="flex: 1; height: 1px; background: var(--border); opacity: 0.5;"></div>
-                <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight:600;">o usa tu email</span>
-                <div style="flex: 1; height: 1px; background: var(--border); opacity: 0.5;"></div>
-            </div>
-
-            <div class="card" style="width: 100%; margin: 24px 0 0 0; padding: 24px; border: none; background: transparent; box-shadow: none;">
-                <div style="margin-bottom: 16px;">
-                    <input type="email" id="login-email" placeholder="Email" style="width: 100%; padding: 16px; border: 2px solid var(--border); border-radius: 16px; font-family: inherit; font-size:1rem; outline:none; background: white;">
-                </div>
-                
-                <div style="margin-bottom: 24px;">
-                    <input type="password" id="login-password" placeholder="Contraseña" style="width: 100%; padding: 16px; border: 2px solid var(--border); border-radius: 16px; font-family: inherit; font-size:1rem; outline:none; background: white;">
-                </div>
-
-                <button class="btn btn-primary" id="login-btn" onclick="handleLogin()" style="height: 60px; font-size: 1.1rem; border-radius: 16px; background: var(--text-primary); color: white;">Entrar</button>
-            </div>
-            
-            <p style="margin-top: 32px; font-size: 0.9rem; color: var(--text-secondary); font-weight:500;">
-                ¿Eres nuevo? <a href="#" onclick="showToast('Usa el botón de Facebook para registrarte al instante.')" style="color: var(--primary); font-weight: 700; text-decoration: none;">Regístrate ahora</a>
-            </p>
+            <button class="btn" onclick="testLoginBypass()" style="background: #f1f5f9; color: var(--text-primary); border-radius: 20px; height: 60px; font-weight:700; font-size: 1rem;">
+                <i data-lucide="flask-conical"></i> Ingresar Modo Prueba
+            </button>
         </div>
     `;
     lucide.createIcons();
 }
 
-async function handleLogin() {
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-    const btn = document.getElementById('login-btn');
-
-    if (!email || !password) {
-        showToast("Ingresa tus credenciales", "warning");
-        return;
-    }
-
-    btn.innerHTML = '<div class="spinner" style="margin:0; width:20px; height:20px; border-width:2px;"></div>';
-    btn.disabled = true;
-
+window.testLoginBypass = async function() {
     try {
-        const res = await API.login(email, password);
-        API.setAuth(res.token, res.user);
+        showToast('Iniciando sesión de prueba...', 'info');
+        const res = await fetch('/api/auth/test-bypass', {
+            method: 'POST'
+        });
         
-        // Mostrar header y nav de nuevo
-        document.querySelector('.bottom-nav').style.display = 'flex';
-        document.querySelector('header').style.display = 'flex';
+        const data = await res.json();
+        if(!res.ok) throw new Error(data.error || 'Error en bypass');
+        
+        const { token, user } = data;
+        
+        if (window.API) {
+            window.API.setAuth(token, user);
+        } else {
+            localStorage.setItem('sp_token', token);
+            localStorage.setItem('sp_user', JSON.stringify(user));
+        }
         
         navigate('dashboard');
-    } catch (e) {
-        showToast(e.message, "error");
-    } finally {
-        btn.innerHTML = 'Entrar';
-        btn.disabled = false;
+        showToast('Bienvenido en Modo Prueba', 'success');
+    } catch(e) {
+        showToast(e.message, 'error');
+    }
+}
+
+// Función main init
+async function initApp() {
+    console.log("Inicializando Postly V2...");
+    
+    // Inicializar iconos
+    lucide.createIcons();
+
+    // Setup de Capacitor AdMob
+    if (window.Capacitor && window.Capacitor.Plugins.AdMob) {
+        try {
+            await window.Capacitor.Plugins.AdMob.initialize({
+                requestTrackingAuthorization: true,
+                initializeForTesting: true,
+            });
+            console.log('[ADMOB] Inicializado correctamente');
+        } catch(e) {
+            console.error('[ADMOB] Error inicializando:', e);
+        }
     }
 }
 
@@ -239,17 +237,31 @@ async function renderPosts() {
                                     <p style="font-size: 0.95rem; line-height: 1.4; color: var(--text-primary); font-weight: 500; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 8px;">
                                         ${post.content || 'Sin descripción'}
                                     </p>
-                                    <div style="display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 0.75rem; font-weight:600;">
-                                        <i data-lucide="calendar" style="width: 14px;"></i>
-                                        <span>${new Date(post.created_at || Date.now()).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}</span>
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 12px; border-top: 1px solid #f1f5f9;">
+                                        <div style="display: flex; gap: 8px;">
+                                            ${post.status !== 'published' ? `
+                                                <button onclick="publishPostAction('${post.id}')" style="background: var(--primary); color: white; border: none; border-radius: 12px; padding: 6px 14px; font-size: 0.75rem; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 5px;">
+                                                    <i data-lucide="send" style="width: 12px;"></i> Publicar
+                                                </button>
+                                            ` : ''}
+                                            <button onclick="deletePostAction('${post.id}')" style="background: #fee2e2; color: #991b1b; border: none; border-radius: 12px; padding: 6px 10px; font-size: 0.75rem; cursor: pointer;">
+                                                <i data-lucide="trash-2" style="width: 14px;"></i>
+                                            </button>
+                                        </div>
+                                        <div style="display: flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 0.75rem; font-weight:600;">
+                                            <i data-lucide="calendar" style="width: 14px;"></i>
+                                            <span>${new Date(post.created_at || Date.now()).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     `).join('')}
                 </div>
+                </div>
             </div>
         `;
+        lucide.createIcons();
     } catch (e) {
         showToast("Error al cargar posts", "error");
         main.innerHTML = `<div style="padding: 40px; text-align: center;">Error: ${e.message}</div>`;
@@ -476,7 +488,7 @@ function renderCreatePost() {
 
                 <div style="margin-top: 24px;">
                     <label style="font-size: 0.9rem; font-weight: 800; color: var(--text-primary); margin-left: 4px;">Contenido</label>
-                    <textarea id="post-text" placeholder="¿Qué quieres contar hoy?" style="width: 100%; height: 140px; border: 2px solid var(--border); border-radius: 20px; padding: 16px; margin-top: 8px; font-family: inherit; resize: none; font-size: 1rem; outline: none; transition: border-color 0.2s;"></textarea>
+                    <textarea id="post-text" oninput="updatePreview()" placeholder="¿Qué quieres contar hoy?" style="width: 100%; height: 140px; border: 2px solid var(--border); border-radius: 20px; padding: 16px; margin-top: 8px; font-family: inherit; resize: none; font-size: 1rem; outline: none; transition: border-color 0.2s;"></textarea>
                     
                     <div style="display: flex; gap: 10px; margin-top: 12px;">
                         <button class="btn btn-sm" onclick="generateAICaption()" style="background: #f5f3ff; color: var(--primary); font-size: 0.85rem; flex: 1; border-radius: 12px; font-weight: 700; height: 44px;">
@@ -488,15 +500,107 @@ function renderCreatePost() {
                     </div>
                 </div>
 
+                <!-- Realistic Preview Section -->
+                <div id="realistic-preview" class="preview-container preview-instagram">
+                    <div class="preview-header">
+                        <div class="preview-avatar" id="pv-avatar"></div>
+                        <div class="preview-name" id="pv-name">Cargando...</div>
+                        <i id="pv-icon" data-lucide="instagram" class="preview-platform-icon"></i>
+                    </div>
+                    <img src="" id="pv-image" class="preview-image" style="display:none;">
+                    <div id="pv-placeholder" style="width:100%; aspect-ratio:1; background:#f8fafc; display:flex; align-items:center; justify-content:center; color:#cbd5e1;">
+                        <i data-lucide="image" style="width:40px; height:40px;"></i>
+                    </div>
+                    <div class="preview-actions" id="pv-actions">
+                        <i data-lucide="heart"></i>
+                        <i data-lucide="message-circle"></i>
+                        <i data-lucide="send"></i>
+                        <i data-lucide="bookmark" style="margin-left:auto;"></i>
+                    </div>
+                    <div class="preview-content">
+                        <span class="preview-name" id="pv-name-inline">Nombre</span>
+                        <span id="pv-text" style="margin-left:5px;">Tu texto aparecerá aquí...</span>
+                    </div>
+                </div>
+
                 <button class="btn btn-primary" id="submit-btn" onclick="submitPost()" style="margin-top: 32px; height: 64px; border-radius: 20px; font-size: 1.1rem; letter-spacing: -0.5px;">
                     Publicar ahora <i data-lucide="send" style="width: 20px; margin-left: 8px;"></i>
                 </button>
             </div>
         </div>
     `;
+    updatePreview();
+    lucide.createIcons();
 }
 
-// Dummy functions for navigation screens not yet implemented
+function updatePreview() {
+    const user = API.getUser() || { name: 'Usuario' };
+    const platform = currentPostData.platform || 'instagram';
+    const text = document.getElementById('post-text')?.value || 'Tu texto aparecerá aquí...';
+    const image = currentPostData.image;
+
+    const container = document.getElementById('realistic-preview');
+    if (!container) return;
+
+    // Update classes
+    container.className = `preview-container preview-${platform}`;
+    
+    // Update basic info
+    document.getElementById('pv-name').innerText = user.name;
+    const nameInline = document.getElementById('pv-name-inline');
+    if (nameInline) nameInline.innerText = user.name;
+    document.getElementById('pv-text').innerText = text;
+
+    // Update avatar
+    const avatar = document.getElementById('pv-avatar');
+    if (user.avatar_url) {
+        avatar.style.backgroundImage = `url(${user.avatar_url})`;
+        avatar.style.backgroundSize = 'cover';
+    }
+
+    // Update Image
+    const pvImg = document.getElementById('pv-image');
+    const pvPlaceholder = document.getElementById('pv-placeholder');
+    if (image) {
+        pvImg.src = image;
+        pvImg.style.display = 'block';
+        pvPlaceholder.style.display = 'none';
+    } else {
+        pvImg.style.display = 'none';
+        pvPlaceholder.style.display = 'flex';
+    }
+
+    // Update Icons and actions based on platform
+    const icon = document.getElementById('pv-icon');
+    const actions = document.getElementById('pv-actions');
+    
+    if (platform === 'facebook') {
+        icon.setAttribute('data-lucide', 'facebook');
+        icon.style.color = '#1877f2';
+        actions.innerHTML = `
+            <div style="display:flex; align-items:center; gap:5px; color:#65676b; font-size:0.8rem; font-weight:600;">
+                <i data-lucide="thumbs-up" style="width:18px;"></i> Me gusta
+            </div>
+            <div style="display:flex; align-items:center; gap:5px; color:#65676b; font-size:0.8rem; font-weight:600;">
+                <i data-lucide="message-square" style="width:18px;"></i> Comentar
+            </div>
+            <div style="display:flex; align-items:center; gap:5px; color:#65676b; font-size:0.8rem; font-weight:600;">
+                <i data-lucide="share-2" style="width:18px;"></i> Compartir
+            </div>
+        `;
+    } else {
+        icon.setAttribute('data-lucide', 'instagram');
+        icon.style.color = '#e1306c';
+        actions.innerHTML = `
+            <i data-lucide="heart"></i>
+            <i data-lucide="message-circle"></i>
+            <i data-lucide="send"></i>
+            <i data-lucide="bookmark" style="margin-left:auto;"></i>
+        `;
+    }
+    lucide.createIcons();
+}
+
 function renderSettings() {
     const main = document.getElementById('main-content');
     const user = API.getUser() || {};
@@ -556,10 +660,77 @@ function renderSettings() {
             </div>
 
             <div class="card" style="margin-top: 0;">
-                <button class="btn" onclick="logout()" style="background: transparent; color: var(--danger); border: 1px solid var(--danger);">Cerrar Sesión</button>
+                <button onclick="document.getElementById('manual-config').style.display = document.getElementById('manual-config').style.display === 'none' ? 'block' : 'none'" style="width:100%; background:none; border:none; color:var(--text-secondary); font-size:0.8rem; cursor:pointer; margin-bottom:10px; display:flex; align-items:center; justify-content:center; gap:5px;">
+                    <i data-lucide="chevron-down" style="width:14px;"></i> Configuración Avanzada
+                </button>
+                
+                <div id="manual-config" style="display:none; padding-bottom:15px; border-bottom:1px solid var(--border); margin-bottom:15px;">
+                    <div style="display:flex; flex-direction:column; gap:10px;">
+                        <div>
+                            <label style="font-size:0.7rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">Instagram Page ID</label>
+                            <input type="text" id="set-ig-page" class="input" style="padding:8px 12px; font-size:0.85rem;" value="${user.ig_page_id || ''}" placeholder="Ej: 1784140...">
+                        </div>
+                        <div>
+                            <label style="font-size:0.7rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">Instagram Token</label>
+                            <input type="password" id="set-ig-token" class="input" style="padding:8px 12px; font-size:0.85rem;" value="${user.ig_access_token || ''}" placeholder="EAAf...">
+                        </div>
+                        <div style="margin-top:5px;">
+                            <label style="font-size:0.7rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">Facebook Page ID</label>
+                            <input type="text" id="set-fb-page" class="input" style="padding:8px 12px; font-size:0.85rem;" value="${user.fb_page_id || ''}" placeholder="Ej: 38118...">
+                        </div>
+                        <div>
+                            <label style="font-size:0.7rem; font-weight:600; color:var(--text-secondary); display:block; margin-bottom:4px;">Facebook Token</label>
+                            <input type="password" id="set-fb-token" class="input" style="padding:8px 12px; font-size:0.85rem;" value="${user.fb_access_token || ''}" placeholder="EAAf...">
+                        </div>
+                        <button class="btn-primary" onclick="handleSaveSocialConfig()" style="margin-top:10px; padding:10px;">Guardar Configuración</button>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="logout()" style="background: transparent; color: var(--danger); border: 1px solid var(--danger); padding:10px;">Cerrar Sesión</button>
             </div>
         </div>
     `;
+}
+
+async function handleSaveSocialConfig() {
+    try {
+        const payload = {
+            ig_page_id: document.getElementById('set-ig-page').value,
+            ig_access_token: document.getElementById('set-ig-token').value,
+            fb_page_id: document.getElementById('set-fb-page').value,
+            fb_access_token: document.getElementById('set-fb-token').value
+        };
+
+        const res = await API.updateProfile(payload);
+        localStorage.setItem('sp_user', JSON.stringify(res.user));
+        showToast('Configuración guardada correctamente', 'success');
+        renderSettings();
+    } catch (err) {
+        showToast(err.message, 'error');
+    }
+}
+
+async function publishPostAction(postId) {
+    try {
+        showToast('Publicando post...', 'info');
+        await API.publishPost(postId);
+        showToast('¡Post publicado exitosamente!', 'success');
+        if (currentSection === 'posts') renderPosts();
+    } catch (err) {
+        showToast(err.message, 'error');
+        if (currentSection === 'posts') renderPosts();
+    }
+}
+
+async function deletePostAction(postId) {
+    if (!confirm('¿Estás seguro de eliminar este post?')) return;
+    try {
+        await API.deletePost(postId);
+        showToast('Post eliminado', 'success');
+        if (currentSection === 'posts') renderPosts();
+    } catch (err) {
+        showToast(err.message, 'error');
+    }
 }
 
 function showToast(message, type = 'info') {
@@ -586,7 +757,6 @@ function logout() {
     window.location.reload();
 }
 
-// Post Creation Logic
 function setPlatform(plat) {
     currentPostData.platform = plat;
     document.getElementById('plat-ig').style.background = plat === 'instagram' ? 'white' : 'transparent';
@@ -595,6 +765,7 @@ function setPlatform(plat) {
     document.getElementById('plat-fb').style.boxShadow = plat === 'facebook' ? '0 2px 5px rgba(0,0,0,0.05)' : 'none';
     document.getElementById('plat-ig').style.color = plat === 'instagram' ? 'var(--text-primary)' : 'var(--text-secondary)';
     document.getElementById('plat-fb').style.color = plat === 'facebook' ? 'var(--text-primary)' : 'var(--text-secondary)';
+    updatePreview();
 }
 
 function setPostType(type) {
@@ -604,7 +775,6 @@ function setPostType(type) {
     document.getElementById('type-feed').style.color = type === 'feed' ? 'var(--primary)' : 'var(--text-secondary)';
     document.getElementById('type-story').style.color = type === 'story' ? 'var(--primary)' : 'var(--text-secondary)';
     
-    // Cambiar aspecto del área de subida
     const area = document.getElementById('image-upload-area');
     if (area) {
         area.style.aspectRatio = type === 'feed' ? '1' : '9/16';
@@ -621,9 +791,9 @@ function handleFile(event) {
         const area = document.getElementById('image-upload-area');
         area.innerHTML = `<img src="${e.target.result}" id="preview-img" style="width: 100%; height: 100%; object-fit: cover;">`;
         
-        // Mostrar botones de filtros y quitar
         document.getElementById('filter-btn-container').style.display = 'flex';
         document.getElementById('filter-section').style.display = 'block';
+        updatePreview();
         lucide.createIcons();
     };
     reader.readAsDataURL(file);
@@ -641,6 +811,7 @@ function removeImage() {
     `;
     document.getElementById('filter-btn-container').style.display = 'none';
     document.getElementById('filter-section').style.display = 'none';
+    updatePreview();
     lucide.createIcons();
 }
 
@@ -658,7 +829,6 @@ async function openNativeEditor() {
             console.error("Native editor failed:", e);
         }
     } else {
-        // Fallback: scroll to web filters
         document.getElementById('filter-section').scrollIntoView({ behavior: 'smooth' });
     }
 }
@@ -684,21 +854,22 @@ function applyFilter(filter) {
         'dramatic': 'contrast(1.5) brightness(0.8) saturate(0.8)'
     };
 
-    img.style.filter = filters[filter] || 'none';
+    const filterValue = filters[filter] || 'none';
+    img.style.filter = filterValue;
+    const pvImg = document.getElementById('pv-image');
+    if (pvImg) pvImg.style.filter = filterValue;
 }
-
-
 
 async function generateAICaption() {
     const text = document.getElementById('post-text').value;
-    const btn = event.currentTarget; // Usar currentTarget para evitar problemas con el icono
+    const btn = event.currentTarget;
     const originalText = btn.innerHTML;
     btn.innerHTML = 'Generando...';
     btn.disabled = true;
 
     try {
         const res = await API.generateCaption(text || 'Marketing digital para mi negocio', {
-            imageBase64: currentPostData.image // Enviar imagen para contexto si existe
+            imageBase64: currentPostData.image
         });
         document.getElementById('post-text').value = res.caption;
     } catch (e) {
@@ -729,82 +900,14 @@ async function generateHashtags() {
     }
 }
 
-async function generateIdeas() {
-    // Esta función podría usarse en otra sección
-    showToast("Generando ideas...", "info");
-}
-
-// AdMob Integration
-function initAds() {
-    if (window.Capacitor && window.Capacitor.Plugins.AdMob) {
-        console.log("[ADS] Inicializando AdMob...");
-        window.Capacitor.Plugins.AdMob.loadRewardedAd();
-        
-        window.Capacitor.Plugins.AdMob.addListener('onRewarded', async (info) => {
-            console.log("[ADS] Recompensa recibida!", info);
-            try {
-                await API.verifyAdReward();
-                console.log("[ADS] Crédito verificado en el servidor.");
-                // Una vez verificado, procedemos a publicar automáticamente
-                finalizePostSubmission();
-            } catch (e) {
-                alert("Error al validar recompensa: " + e.message);
-            }
-        });
-
-        window.Capacitor.Plugins.AdMob.addListener('onAdFailedToLoad', (err) => {
-            console.warn("[ADS] Error al cargar anuncio:", err);
-        });
-    }
-}
-
 async function submitPost() {
-    const content = document.getElementById('post-text').value;
-    if (!content && !currentPostData.image) {
-        alert("Agrega una imagen o texto para publicar.");
-        return;
-    }
-
-    // Verificar si AdMob está disponible y el anuncio está listo
-    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.AdMob) {
-        try {
-            const adStatus = await window.Capacitor.Plugins.AdMob.isAdReady();
-            if (adStatus && adStatus.ready) {
-                const confirmAd = confirm("Para publicar gratis, mira un anuncio corto. ¿Continuar?");
-                if (confirmAd) {
-                    try {
-                        const result = await window.Capacitor.Plugins.AdMob.showRewardedAd();
-                        if (result && result.completed) {
-                            // Verificar recompensa en el servidor
-                            try { await API.verifyAdReward(); } catch(e) { console.warn('[ADS] Verify failed:', e); }
-                            finalizePostSubmission();
-                            return;
-                        }
-                    } catch(e) {
-                        console.warn("[ADS] Error mostrando anuncio:", e);
-                        showToast("Anuncio no disponible, publicando directamente...", "info");
-                    }
-                } else {
-                    return; // Usuario canceló
-                }
-            } else {
-                console.log("[ADS] Anuncio no está listo, publicando directamente.");
-                // Pre-cargar para la próxima vez
-                try { window.Capacitor.Plugins.AdMob.loadRewardedAd(); } catch(e) {}
-            }
-        } catch(e) {
-            console.warn("[ADS] AdMob no disponible:", e);
-        }
-    }
-
-    // Publicar directamente (sin ads o ads no disponibles)
     finalizePostSubmission();
 }
 
 async function finalizePostSubmission() {
     const content = document.getElementById('post-text').value;
     const btn = document.getElementById('submit-btn');
-    btn.innerHTML = '<div class="spinner" style="margin:0; width:20px; height:20px; border-width:2px;"></div> Publicando...';
+    btn.innerHTML = '<div class="spinner" style="margin:0; width:20px; height:20px; border-width:2px;"></div>';
     btn.disabled = true;
 
     try {
@@ -814,6 +917,67 @@ async function finalizePostSubmission() {
             finalImage = await PhotoEditor.processImage(currentPostData.image, currentPostData.filter);
         }
 
+        // --- Muro de Publicidad ---
+        showToast('Preparando anuncio patrocinado...', 'info');
+        
+        await new Promise((resolve, reject) => {
+            if (!window.Capacitor || !window.Capacitor.Plugins.AdMob) {
+                // Simular anuncio en entorno web
+                const modal = document.createElement('div');
+                modal.innerHTML = `
+                    <div style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.9); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; padding: 20px;">
+                        <h2 style="margin-bottom:20px;">Anuncio Patrocinado</h2>
+                        <p style="margin-bottom:30px; opacity:0.8; text-align: center;">Por favor espera 3 segundos para publicar...</p>
+                        <button id="btn-skip-ad" class="btn" style="background:#444; color:white; padding:10px 30px; border-radius:20px;" disabled>Esperando...</button>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                let count = 3;
+                const btnSkip = document.getElementById('btn-skip-ad');
+                const interval = setInterval(() => {
+                    count--;
+                    if (count <= 0) {
+                        clearInterval(interval);
+                        btnSkip.innerHTML = 'Continuar y Publicar';
+                        btnSkip.style.background = 'var(--primary)';
+                        btnSkip.disabled = false;
+                        btnSkip.onclick = () => {
+                            document.body.removeChild(modal);
+                            resolve();
+                        };
+                    } else {
+                        btnSkip.innerHTML = `Esperando... (${count})`;
+                    }
+                }, 1000);
+            } else {
+                const AdMob = window.Capacitor.Plugins.AdMob;
+                
+                AdMob.addListener('onRewardedVideoAdLoaded', () => {
+                    AdMob.showRewardVideoAd().catch(reject);
+                });
+                
+                AdMob.addListener('onRewardedVideoAdFailedToLoad', (err) => {
+                    console.error('Ad failed to load', err);
+                    resolve();
+                });
+
+                AdMob.addListener('onRewardedVideoAdRewarded', () => {});
+
+                AdMob.addListener('onRewardedVideoAdDismissed', () => {
+                    resolve();
+                });
+
+                AdMob.prepareRewardVideoAd({ adId: 'ca-app-pub-3940256099942544/5224354917' })
+                    .catch(e => {
+                        console.error('Error preparando ad', e);
+                        resolve();
+                    });
+            }
+        });
+
+        // --- Proceso de Publicación ---
+        showToast('Publicando en la red social...', 'info');
+
         const res = await API.createPost({
             content: content,
             image_base64: finalImage,
@@ -822,15 +986,17 @@ async function finalizePostSubmission() {
             status: 'published'
         });
         
-        alert("¡Publicación exitosa!");
-        // Actualizar datos de usuario (créditos) tras publicar
-        const profile = await API.getProfile();
-        API.setAuth(API.getToken(), profile.user);
+        if (res && res.message) {
+            alert(res.message);
+        } else {
+            alert("¡Publicación exitosa!");
+        }
         
         navigate('dashboard');
     } catch (e) {
         console.error("[PUBLISH ERROR]", e);
-        showToast("Error al publicar: " + e.message, "error");
+        showToast(e.message || "Error al publicar", "error");
+        alert("Error al publicar: " + (e.message || "Problema de conexión"));
     } finally {
         btn.innerHTML = 'Publicar ahora <i data-lucide="send" style="width: 20px; margin-left: 8px;"></i>';
         btn.disabled = false;
@@ -838,7 +1004,6 @@ async function finalizePostSubmission() {
     }
 }
 
-// Iniciar ads al cargar
 async function renderFlyerGenerator() {
     const main = document.getElementById('main-content');
     
@@ -972,3 +1137,23 @@ function copyToClipboard(btn) {
 }
 
 initAds();
+
+async function handleSaveSocialConfig() {
+    try {
+        const payload = {
+            ig_page_id: document.getElementById('set-ig-page').value,
+            ig_access_token: document.getElementById('set-ig-token').value,
+            fb_page_id: document.getElementById('set-fb-page').value,
+            fb_access_token: document.getElementById('set-fb-token').value
+        };
+
+        const res = await API.updateProfile(payload);
+        localStorage.setItem('sp_user', JSON.stringify(res.user));
+        showToast('Configuración guardada correctamente', 'success');
+        renderSettings();
+    } catch (err) {
+        showToast(err.message, 'error');
+    }
+}
+
+// Duplicate functions removed

@@ -16,7 +16,8 @@
 
     <!-- Dominio de producción: Forzar HTTPS -->
     <domain-config cleartextTrafficPermitted="false">
-        <domain includeSubdomains="true">socialpulse-backend.onrender.com</domain>
+        <domain includeSubdomains="true">marketing-4778.onrender.com</domain>
+        <domain includeSubdomains="true">postly-z7cf.onrender.com</domain>
         <trust-anchors>
             <certificates src="system" />
         </trust-anchors>

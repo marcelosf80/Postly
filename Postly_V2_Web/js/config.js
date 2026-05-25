@@ -8,7 +8,7 @@ const isCapacitor = (
 );
 
 // Mantenemos la variable global. ¡IMPORTANTE!: Cambia esta URL por la de tu servidor de Render una vez la tengas.
-window.API_BASE_URL = "https://postly-z7cf.onrender.com"; 
+window.API_BASE_URL = "https://marketing-4778.onrender.com"; 
 
 console.log('[CONFIG] Entorno:', isCapacitor ? 'Mobile APK (Nativo)' : 'Web Browser');
 console.log('[CONFIG] Modo: Conectado a Servidor (Backend)');

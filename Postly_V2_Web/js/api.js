@@ -1,10 +1,10 @@
 // Postly V2 — Web API Client
 if (window.Capacitor && (window.Capacitor.getPlatform() === 'android' || window.Capacitor.getPlatform() === 'ios')) {
+    // URL de producción en Render
     window.API_BASE_URL = "https://marketing-4778.onrender.com";
 } else {
-    window.API_BASE_URL = window.location.origin.includes('localhost') 
-        ? 'http://localhost:3002' 
-        : 'https://marketing-4778.onrender.com';
+    // Para la web (localhost, ngrok, render, etc.), usar el origen actual automáticamente
+    window.API_BASE_URL = window.location.origin;
 }
 
 const API = {
@@ -67,8 +67,17 @@ const API = {
         return this.request('/api/auth/me');
     },
 
+    async updateProfile(data) {
+        return this.request('/api/auth/profile', {
+            method: 'PUT',
+            body: data
+        });
+    },
+
     // === POSTS ===
     async getPosts() { return this.request('/api/posts'); },
+    async getPostStats() { return this.request('/api/posts/stats'); },
+    async getPost(id) { return this.request(`/api/posts/${id}`); },
     async createPost(data) {
         return this.request('/api/posts', {
             method: 'POST',
@@ -76,9 +85,29 @@ const API = {
         });
     },
     
+    async updatePost(id, data) {
+        return this.request(`/api/posts/${id}`, {
+            method: 'PUT',
+            body: data
+        });
+    },
+
+    async deletePost(id) {
+        return this.request(`/api/posts/${id}`, {
+            method: 'DELETE'
+        });
+    },
+
     async publishPost(postId) {
         return this.request(`/api/posts/${postId}/publish`, {
             method: 'POST'
+        });
+    },
+
+    async schedulePost(id, scheduled_at) {
+        return this.request(`/api/posts/${id}/schedule`, {
+            method: 'POST',
+            body: { scheduled_at }
         });
     },
 

@@ -9,7 +9,7 @@ async function initFacebookSDK() {
                 appId: FB_APP_ID,
                 cookie: true,
                 xfbml: true,
-                version: 'v21.0'
+                version: 'v19.0'
             });
             console.log('[META] SDK de Facebook inicializado (Standalone)');
         };

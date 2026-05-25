@@ -123,16 +123,49 @@ header {
 .fab {
     width: 64px;
     height: 64px;
-    background: linear-gradient(135deg, var(--primary), var(--accent));
+    background: #0f172a;
     border-radius: 22px;
     display: flex;
     justify-content: center;
     align-items: center;
     color: white;
     margin-top: -45px;
-    box-shadow: 0 12px 24px rgba(99, 102, 241, 0.4);
-    border: 5px solid var(--surface);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4);
+    border: 4px solid #0f172a;
     transition: all 0.3s ease;
+    position: relative;
+    z-index: 1001;
+    overflow: hidden;
+}
+
+.fab::before {
+    content: '';
+    position: absolute;
+    width: 150%;
+    height: 150%;
+    background: conic-gradient(
+        #1877f2 0deg,
+        #1877f2 90deg,
+        #e1306c 180deg,
+        #f77737 270deg,
+        #1877f2 360deg
+    );
+    animation: rotateNeon 3s linear infinite;
+    z-index: -1;
+}
+
+.fab::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    background: #0f172a;
+    border-radius: 19px;
+    z-index: -1;
+}
+
+@keyframes rotateNeon {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
 
 .fab:active {
@@ -254,6 +287,76 @@ header {
     animation: spin 1s linear infinite;
     margin: 40px auto;
 }
+
+/* Realistic Previews */
+.preview-container {
+    margin-top: 32px;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    background: white;
+    border: 1px solid #eee;
+}
+
+.preview-header {
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.preview-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: #ddd;
+}
+
+.preview-name {
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.preview-platform-icon {
+    margin-left: auto;
+    width: 18px;
+    height: 18px;
+}
+
+.preview-image {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #f1f5f9;
+    object-fit: cover;
+}
+
+.preview-actions {
+    padding: 12px 16px;
+    display: flex;
+    gap: 16px;
+}
+
+.preview-actions i {
+    width: 22px;
+    height: 22px;
+}
+
+.preview-content {
+    padding: 0 16px 16px 16px;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* Instagram Specific */
+.preview-instagram .preview-header { background: white; }
+.preview-instagram .preview-name { color: #262626; }
+.preview-instagram .preview-actions { border-top: none; }
+
+/* Facebook Specific */
+.preview-facebook .preview-header { background: white; }
+.preview-facebook .preview-name { color: #050505; }
+.preview-facebook .preview-avatar { border-radius: 50%; }
+.preview-facebook .preview-actions { border-top: 1px solid #f0f2f5; padding: 8px 16px; }
 
 @keyframes spin {
     0% { transform: rotate(0deg); }

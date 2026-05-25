@@ -8,7 +8,7 @@
     "country": "AR",
     "plan": "free",
     "subscription_status": "trial",
-    "trial_ends_at": "2026-04-21T20:21:23.353Z",
+    "trial_ends_at": "2027-04-21T20:21:23.353Z",
     "ig_page_id": "17841400624814319",
     "ig_access_token": "EAAfglk5oLQcBRCHhWZBEKMaHWA974JGtg5Pt3oDjocNFyTPyEJjO3tjPUzCZAisFOaDadn9i0hIWdePhcMZBPM4hWDTcyLbBpSEJkaBMuxeHFnpW1WmHR807UmqeXnjRSVqcRlyykHv8eERFfLdZA94pziAoDrhXAZAjqqnAW0LfBVZCZCIBnU22UnZCshAZBWRJ3iPT5GEqPOatqRivJ0ZCQy",
     "fb_page_id": "381188995408484",
@@ -24,13 +24,8 @@
     "posts_remaining": 5,
     "transactions": [],
     "created_at": "2026-04-07T20:21:23.353Z",
-<<<<<<< HEAD
     "updated_at": "2026-04-17T16:54:31.609Z",
     "avatar_url": "https://lh3.googleusercontent.com/a/ACg8ocKCKUPM5lKadr7VqPdSRR8e5v6mQ6kiXr6TfrzySEo4lzL84ntJ=s96-c",
-=======
-    "updated_at": "2026-04-09T16:18:24.157Z",
-    "avatar_url": "https://platform-lookaside.fbsbx.com/platform/profilepic/?asid=4423042991348616&height=200&width=200&ext=1778343502&hash=AT8nCxQbTregKFtUu-QRtrDO",
->>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
     "mp_access_token": "APP_USR-7251013667787967-040721-1f9353a9ca75052c5f8f5bdb33ea3918-93263438",
     "mp_public_key": "APP_USR-6c9e0254-2fee-4b9b-aa8d-fe4b283e9eac"
   }

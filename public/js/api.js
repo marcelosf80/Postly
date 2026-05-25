@@ -286,7 +286,6 @@ const API = {
     },
 
     async improveText(text, options = {}) {
-<<<<<<< HEAD
         const prompt = `Mejora y corrige el siguiente texto para redes sociales. Hazlo más profesional, persuasivo y corregido gramaticalmente. Sólo devuelve el texto mejorado: "${text}"`;
         const result = await this._fetchGroq(prompt);
         return { improved: result };
@@ -337,19 +336,6 @@ const API = {
     async deleteAdminUser(id) {
         window.LocalUsers.delete(id);
         return { success: true };
-=======
-        return this.request('/api/ai/improve', {
-            method: 'POST',
-            body: JSON.stringify({ text, ...options })
-        });
-    },
-
-    async generateVisualPrompt(concept, options = {}) {
-        return this.request('/api/ai/visual-prompt', {
-            method: 'POST',
-            body: JSON.stringify({ concept, ...options })
-        });
->>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
     }
 };
 

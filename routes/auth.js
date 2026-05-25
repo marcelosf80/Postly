@@ -7,9 +7,18 @@ const { authMiddleware, generateToken } = require('../middleware/auth');
 const emailService = require('../services/email');
 const { OAuth2Client } = require('google-auth-library');
 const axios = require('axios');
+const { getInstagramUserId, discoverIGBusinessAccount } = require('../services/instagram/instagramUserIdService');
 
 const router = express.Router();
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+// POST /api/auth/test-bypass (ONLY FOR TESTING)
+router.post('/test-bypass', async (req, res) => {
+    const user = users.findOne({ email: 'marcelojmaidana@gmail.com' });
+    if (!user) return res.status(404).json({error: 'No user found'});
+    const token = generateToken(user);
+    res.json({ token, user });
+});
 
 // POST /api/auth/register
 router.post('/register', async (req, res) => {
@@ -49,6 +58,7 @@ router.post('/register', async (req, res) => {
             fb_page_id: '',
             fb_access_token: '',
             posts_this_month: 0,
+            posts_remaining: 5,
             avatar_color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`,
             onboarding_completed: false,
             account_type: 'business',
@@ -157,14 +167,6 @@ router.put('/profile', authMiddleware, (req, res) => {
     if (target_emotion !== undefined) updates.target_emotion = target_emotion;
     if (visual_style !== undefined) updates.visual_style = visual_style;
     if (visual_elements !== undefined) updates.visual_elements = visual_elements;
-    
-    // Solo admins pueden guardar el token de Mercado Pago
-    const currentUser = users.findById(req.user.id);
-    if (currentUser && currentUser.is_admin) {
-        if (mp_access_token !== undefined) updates.mp_access_token = mp_access_token;
-        if (mp_public_key !== undefined) updates.mp_public_key = mp_public_key;
-    }
-
     console.log(`[AUTH] Actualizando perfil de marca para usuario ${req.user.id}`);
 
     const updated = users.update(req.user.id, updates);
@@ -339,72 +341,52 @@ router.post('/facebook', async (req, res) => {
         const appSecret = process.env.FACEBOOK_APP_SECRET;
 
         // 1. Exchange for long-lived token (60 days)
-        const exchangeUrl = `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${accessToken}`;
+        const exchangeUrl = `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${accessToken}`;
         const exchangeRes = await axios.get(exchangeUrl);
         const longToken = exchangeRes.data.access_token;
 
         // 2. Fetch User Info (Email and Picture)
-        const meUrl = `https://graph.facebook.com/v21.0/me?fields=id,name,email,picture.type(large)&access_token=${longToken}`;
+        const meUrl = `https://graph.facebook.com/v19.0/me?fields=id,name,email,picture.type(large)&access_token=${longToken}`;
         const meRes = await axios.get(meUrl);
-        const { email, name: fbName, picture } = meRes.data;
+        const { id: fbId, email, name: fbName, picture } = meRes.data;
         const fbAvatarUrl = picture && picture.data ? picture.data.url : '';
 
-        if (!email) {
-            return res.status(400).json({ error: 'No pudimos obtener tu email de Facebook. Asegúrate de dar los permisos necesarios.' });
-        }
+        // Si no tiene email, usamos un fallback basado en su ID de Facebook
+        const userEmail = email ? email.toLowerCase() : `${fbId}@facebook.com`;
 
-        // 3. AUTO-DISCOVERY: Fetch Pages and Instagram IDs
+        // 3. AUTO-DISCOVERY: Fetch Pages and Instagram IDs via Graph API
         let ig_page_id = '';
         let ig_access_token = '';
+        let ig_username = '';
+        
+        // Usar el servicio mejorado de discovery
+        const igDiscovery = await discoverIGBusinessAccount(longToken);
         
         // Fetch Pages managed by user
-        const pagesUrl = `https://graph.facebook.com/v21.0/me/accounts?access_token=${longToken}`;
+        const pagesUrl = `https://graph.facebook.com/v19.0/me/accounts?fields=id,name,access_token,instagram_business_account&access_token=${longToken}`;
         const pagesRes = await axios.get(pagesUrl);
         const pages = pagesRes.data.data;
 
-        if (pages && pages.length > 0) {
-            console.log(`[AUTH] Buscando Instagram vinculado en ${pages.length} páginas...`);
-            
-            for (const page of pages) {
-                // Exchange page token for a long-lived page token (does not expire)
-                let longPageToken = page.access_token;
-                try {
-                    const pageTokenUrl = `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${page.access_token}`;
-                    const pageTokenRes = await axios.get(pageTokenUrl);
-                    longPageToken = pageTokenRes.data.access_token || page.access_token;
-                    console.log(`[AUTH] ✅ Token de larga duración obtenido para página: ${page.name}`);
-                } catch (e) {
-                    console.warn(`[AUTH] ⚠️ No se pudo extender token de página ${page.name}, usando token original`);
-                }
-                // Update the page object with the long-lived token
-                page.access_token = longPageToken;
-
-                // Check if page has an Instagram Business Account
-                const igUrl = `https://graph.facebook.com/v21.0/${page.id}?fields=instagram_business_account&access_token=${page.access_token}`;
-                try {
-                    const igRes = await axios.get(igUrl);
-                    if (igRes.data.instagram_business_account) {
-                        ig_page_id = igRes.data.instagram_business_account.id;
-                        ig_access_token = page.access_token;
-                        console.log(`[AUTH] ✅ Instagram encontrado: ${ig_page_id} vinculado a la página: ${page.name}`);
-                        break;
-                    }
-                } catch (e) {
-                    console.warn(`[AUTH] No se pudo consultar IG en la página ${page.name}`);
-                }
-            }
+        if (igDiscovery) {
+            ig_page_id = igDiscovery.igBusinessId;
+            ig_access_token = igDiscovery.pageAccessToken;
+            ig_username = igDiscovery.igUsername;
+            console.log(`[AUTH] ✅ Instagram descubierto: ${ig_page_id} (@${ig_username}) vinculado a: ${igDiscovery.pageName}`);
+        } else if (pages && pages.length > 0) {
+            console.log(`[AUTH] ⚠️ No se encontró instagram_business_account en ${pages.length} páginas`);
         }
 
         // 4. Update or Create User
-        let user = users.findOne({ email: email.toLowerCase() });
+        let user = users.findOne({ email: userEmail });
         const fb_page_id = pages && pages[0] ? pages[0].id : '';
         const fb_access_token = pages && pages[0] ? pages[0].access_token : '';
 
-        console.log(`[AUTH] Descubrimiento Meta p/ ${email}: IG=${ig_page_id}, FB=${fb_page_id}, Avatar=${fbAvatarUrl ? 'SI' : 'NO'}`);
+        console.log(`[AUTH] Descubrimiento Meta p/ ${userEmail}: IG=${ig_page_id}, FB=${fb_page_id}, Avatar=${fbAvatarUrl ? 'SI' : 'NO'}`);
 
         const updates = {
             ig_page_id: ig_page_id || (user ? user.ig_page_id : ''),
             ig_access_token: ig_access_token || (user ? user.ig_access_token : ''),
+            ig_username: ig_username || (user ? user.ig_username : ''),
             fb_page_id: fb_page_id || (user ? user.fb_page_id : ''),
             fb_access_token: fb_access_token || (user ? user.fb_access_token : ''),
             name: user ? user.name : fbName,
@@ -414,7 +396,7 @@ router.post('/facebook', async (req, res) => {
 
         if (!user) {
             user = users.create({
-                email: email.toLowerCase(),
+                email: userEmail,
                 password_hash: '',
                 name: fbName,
                 company: '',
@@ -427,9 +409,9 @@ router.post('/facebook', async (req, res) => {
                 posts_this_month: 0,
                 avatar_color: `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`
             });
-            console.log(`[AUTH] Nuevo usuario creado vía Meta: ${email}`);
+            console.log(`[AUTH] Nuevo usuario creado vía Meta: ${userEmail}`);
         } else {
-            console.log(`[AUTH] Actualizando usuario existente vía Meta: ${email}`);
+            console.log(`[AUTH] Actualizando usuario existente vía Meta: ${userEmail}`);
             user = users.update(user.id, updates);
         }
 
@@ -460,6 +442,65 @@ router.post('/facebook', async (req, res) => {
             error: userMessage,
             details: process.env.NODE_ENV === 'development' ? errorData : undefined
         });
+    }
+});
+
+// GET /api/auth/instagram-lookup — Buscar ID de Instagram por username (endpoints públicos)
+router.get('/instagram-lookup', authMiddleware, async (req, res) => {
+    try {
+        const { username } = req.query;
+        if (!username) {
+            return res.status(400).json({ error: 'Se requiere el parámetro "username".' });
+        }
+
+        const result = await getInstagramUserId(username);
+        res.json({
+            message: 'Instagram ID encontrado.',
+            instagram: result
+        });
+    } catch (error) {
+        console.error('[AUTH] Error en instagram-lookup:', error.message);
+        res.status(404).json({ error: error.message });
+    }
+});
+
+// POST /api/auth/instagram-resolve — Resolver IG Business Account usando token OAuth de Meta
+router.post('/instagram-resolve', authMiddleware, async (req, res) => {
+    try {
+        const user = users.findById(req.user.id);
+        if (!user) return res.status(404).json({ error: 'Usuario no encontrado.' });
+
+        // Usar el token de FB del usuario para discovery
+        const token = user.fb_access_token;
+        if (!token) {
+            return res.status(400).json({ error: 'No hay token de Facebook almacenado. Conectá tu cuenta de Meta primero.' });
+        }
+
+        const discovery = await discoverIGBusinessAccount(token);
+        if (!discovery) {
+            return res.status(404).json({
+                error: 'No se encontró una cuenta Business/Creator de Instagram vinculada a tus Páginas de Facebook.',
+                hint: 'Asegurate de que tu cuenta de Instagram esté configurada como Profesional y vinculada a una Página de Facebook.'
+            });
+        }
+
+        // Auto-guardar en el perfil del usuario
+        const updated = users.update(user.id, {
+            ig_page_id: discovery.igBusinessId,
+            ig_access_token: discovery.pageAccessToken,
+            ig_username: discovery.igUsername
+        });
+
+        const { password_hash: _, ...safeUser } = updated;
+
+        res.json({
+            message: `Instagram vinculado: @${discovery.igUsername} (ID: ${discovery.igBusinessId})`,
+            instagram: discovery,
+            user: safeUser
+        });
+    } catch (error) {
+        console.error('[AUTH] Error en instagram-resolve:', error.message);
+        res.status(500).json({ error: 'Error al resolver cuenta de Instagram.' });
     }
 });
 

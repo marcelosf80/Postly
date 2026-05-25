@@ -134,63 +134,80 @@ async function executePublishing(post, user) {
     const hasIGCredentials = user && user.ig_page_id && user.ig_access_token;
     const hasFBCredentials = user && user.fb_page_id && user.fb_access_token;
 
-    if (post.platform === 'instagram') {
+    let instagramId = '';
+    let facebookId = '';
+
+    // --- Flow for Instagram (or Both) ---
+    if (post.platform === 'instagram' || post.platform === 'both') {
         if (!hasIGCredentials) {
-            console.warn(`[PUBLISH] Post ${post.id} simulado: faltan credenciales IG`);
-            return { simulated: true, message: 'Faltan credenciales IG' };
+            throw new Error('Faltan credenciales de Instagram. Ve a Ajustes y conecta tu cuenta.');
         }
-        
-        const api = new InstagramAPI(user.ig_page_id, user.ig_access_token);
-        const relativePath = post.image_path ? (post.image_path.startsWith('/') ? post.image_path.substring(1) : post.image_path) : '';
-        if (!relativePath) {
-            console.error(`[PUBLISH] Error: Instagram requiere una imagen.`);
-            throw new Error('Instagram requiere una imagen para publicar.');
-        }
-
-        const absImagePath = path.join(__dirname, '..', relativePath);
-        
-        console.log(`[PUBLISH] Verificando imagen en: ${absImagePath}`);
-        if (!fs.existsSync(absImagePath)) {
-            console.error(`[PUBLISH] Error: Imagen no encontrada en ${absImagePath}`);
-            throw new Error('El archivo de imagen no existe en el servidor.');
-        }
-
-        const mediaType = post.aspect_ratio === 'story' ? 'STORIES' : 'IMAGE';
-        const captionText = post.content + (post.hashtags ? '\n\n' + post.hashtags : '');
-        
-        console.log(`[PUBLISH] Llamando a Instagram API (${mediaType})...`);
-        const externalId = await api.processAndPublish(absImagePath, captionText, mediaType);
-        
-        console.log(`[PUBLISH] ✅ Éxito en Instagram! ID: ${externalId}`);
-        return { externalId };
-    } 
-    else if (post.platform === 'facebook') {
-        if (!hasFBCredentials) {
-            console.warn(`[PUBLISH] Post ${post.id} simulado: faltan credenciales FB`);
-            return { simulated: true, message: 'Faltan credenciales FB' };
-        }
-
-        const uploader = new InstagramAPI(user.ig_page_id || 'no-id', user.ig_access_token || 'no-token');
-        const fbApi = new FacebookAPI(user.fb_page_id, user.fb_access_token);
-        const fullMessage = post.content + (post.hashtags ? '\n\n' + post.hashtags : '');
-        let externalId = '';
-
-        if (post.image_path) {
-            const relativePath = post.image_path.startsWith('/') ? post.image_path.substring(1) : post.image_path;
-            const absImagePath = path.join(__dirname, '..', relativePath);
+        try {
+            const api = new InstagramAPI(user.ig_page_id, user.ig_access_token);
+            const relativePath = post.image_path ? (post.image_path.startsWith('/') ? post.image_path.substring(1) : post.image_path) : '';
             
-            console.log('[PUBLISH] Subiendo imagen a tmpfiles para Facebook...');
-            const publicUrl = await uploader.uploadLocalImage(absImagePath);
-            console.log(`[PUBLISH] Imagen subida con éxito: ${publicUrl}. Publicando en Facebook...`);
-            externalId = await fbApi.publishPhoto(publicUrl, fullMessage);
-        } else {
-            console.log('[PUBLISH] Publicando solo texto en Facebook...');
-            externalId = await fbApi.publishText(fullMessage);
+            if (!relativePath) {
+                throw new Error('Instagram requiere que incluyas una imagen en tu post.');
+            }
+            
+            const absImagePath = path.join(__dirname, '..', relativePath);
+            if (!fs.existsSync(absImagePath)) {
+                throw new Error('No se encontró el archivo de imagen en el servidor.');
+            }
+            
+            const mediaType = post.aspect_ratio === 'story' ? 'STORIES' : 'IMAGE';
+            const captionText = post.content + (post.hashtags ? '\n\n' + post.hashtags : '');
+            console.log(`[PUBLISH] Publicando en Instagram (${mediaType})...`);
+            instagramId = await api.processAndPublish(absImagePath, captionText, mediaType);
+        } catch (err) {
+            console.error('[PUBLISH] Error en Instagram:', err.message);
+            throw new Error(`Error de Meta API (Instagram): ${err.message}`);
         }
-        console.log(`[PUBLISH] ✅ Éxito en Facebook! ID: ${externalId}`);
-        return { externalId };
     }
-    return { simulated: true };
+
+    // --- Flow for Facebook (or Both) ---
+    if (post.platform === 'facebook' || post.platform === 'both') {
+        if (!hasFBCredentials) {
+            if (post.platform === 'facebook') {
+                throw new Error('Faltan credenciales de Facebook. Ve a Ajustes y conecta tu cuenta.');
+            }
+            // Si es 'both' y ya publicó en IG, podemos omitir FB o fallar. Para 'both' fallamos si falta una.
+            throw new Error('Faltan credenciales de Facebook para publicar en ambas plataformas.');
+        }
+
+        try {
+            const uploader = new InstagramAPI(user.ig_page_id || 'no-id', user.ig_access_token || 'no-token');
+            const fbApi = new FacebookAPI(user.fb_page_id, user.fb_access_token);
+            const fullMessage = post.content + (post.hashtags ? '\n\n' + post.hashtags : '');
+
+            if (post.image_path) {
+                const relativePath = post.image_path.startsWith('/') ? post.image_path.substring(1) : post.image_path;
+                const absImagePath = path.join(__dirname, '..', relativePath);
+                
+                if (fs.existsSync(absImagePath)) {
+                    const publicUrl = await uploader.uploadLocalImage(absImagePath);
+                    facebookId = await fbApi.publishPhoto(publicUrl, fullMessage);
+                } else {
+                    throw new Error('No se encontró el archivo de imagen en el servidor.');
+                }
+            } else {
+                facebookId = await fbApi.publishText(fullMessage);
+            }
+        } catch (err) {
+            console.error('[PUBLISH] Error en Facebook:', err.message);
+            throw new Error(`Error de Meta API (Facebook): ${err.message}`);
+        }
+    }
+
+    if (!instagramId && !facebookId) {
+        throw new Error('No se pudo publicar. Faltan credenciales o fallaron ambas plataformas.');
+    }
+
+    return { 
+        externalId: instagramId || facebookId,
+        instagramId,
+        facebookId
+    };
 }
 
 // POST /api/posts — Create post
@@ -226,23 +243,17 @@ router.post('/', upload.single('image'), async (req, res) => {
         // AUTO-PUBLISH if status is 'published'
         if (post.status === 'published') {
             const user = users.findById(req.user.id);
-            if (user.posts_remaining > 0 || user.is_admin) {
-                try {
-                    const pubResult = await executePublishing(post, user);
-                    if (!pubResult.simulated) {
-                        posts.update(post.id, {
-                            published_at: new Date().toISOString(),
-                            external_post_id: pubResult.externalId
-                        });
-                        if (!user.is_admin) {
-                            users.update(user.id, { posts_remaining: user.posts_remaining - 1 });
-                        }
-                    }
-                } catch (pubErr) {
-                    console.error('[POSTS] Auto-publish failed:', pubErr.message);
-                    // We don't fail the creation, but maybe we should update status to failed?
-                    posts.update(post.id, { status: 'failed' });
-                }
+            try {
+                const pubResult = await executePublishing(post, user);
+                posts.update(post.id, {
+                    published_at: new Date().toISOString(),
+                    external_post_id: pubResult.externalId
+                });
+            } catch (pubErr) {
+                console.error('[POSTS] Auto-publish failed:', pubErr.message);
+                posts.update(post.id, { status: 'failed' });
+                // We propagate the error so the frontend knows it failed
+                return res.status(500).json({ error: `Error publicando automáticamente: ${pubErr.message}` });
             }
         }
 
@@ -323,16 +334,9 @@ router.post('/:id/publish', async (req, res) => {
         const user = users.findById(req.user.id);
         
         console.log(`[PUBLISH] Usuario ${req.user.id} (${user ? user.email : 'No encontrado'}) intentando publicar post ${post.id}`);
-        console.log(`[PUBLISH] Publicaciones restantes: ${user.posts_remaining || 0}, Admin: ${user.is_admin || false}`);
 
         if (!user) {
             return res.status(404).json({ error: 'Usuario no encontrado en la base de datos.' });
-        }
-        
-        const remaining = user.posts_remaining || 0;
-        if (remaining <= 0 && !user.is_admin) {
-            console.warn(`[PUBLISH] Bloqueado: Usuario ${user.email} no tiene publicaciones disponibles.`);
-            return res.status(403).json({ error: 'No te quedan publicaciones disponibles. Mira un anuncio para continuar.' });
         }
 
         const hasIGCredentials = user && user.ig_page_id && user.ig_access_token;
@@ -340,11 +344,8 @@ router.post('/:id/publish', async (req, res) => {
 
         if (post.platform === 'instagram') {
             if (!hasIGCredentials) {
-                console.log(`[PUBLISH] Post ${post.id} simulado (Faltan credenciales IG)`);
-                return res.json({ 
-                    message: 'Post simulado. Configura tu Instagram Page ID y Access Token en Ajustes para publicar realmente.', 
-                    post: posts.update(req.params.id, { status: 'published', published_at: new Date().toISOString() }) 
-                });
+                console.log(`[PUBLISH] Post ${post.id} falló (Faltan credenciales IG)`);
+                return res.status(403).json({ error: 'Configura tu cuenta de Instagram en Ajustes para publicar.' });
             }
 
             console.log(`[PUBLISH] Intentando publicar post ${post.id} en Instagram real...`);
@@ -370,9 +371,6 @@ router.post('/:id/publish', async (req, res) => {
                     external_post_id: externalId
                 });
 
-                if (!user.is_admin) {
-                    users.update(user.id, { posts_remaining: user.posts_remaining - 1 });
-                }
 
                 return res.json({ message: '¡Post publicado exitosamente en Instagram!', post: updated });
                 
@@ -383,11 +381,8 @@ router.post('/:id/publish', async (req, res) => {
         } 
         else if (post.platform === 'facebook') {
             if (!hasFBCredentials) {
-                 console.log(`[PUBLISH] Post ${post.id} simulado (Faltan credenciales FB)`);
-                 return res.json({ 
-                    message: 'Post simulado. Configura tu Facebook Page ID y Token en Ajustes para publicar realmente.', 
-                    post: posts.update(req.params.id, { status: 'published', published_at: new Date().toISOString() }) 
-                });
+                 console.log(`[PUBLISH] Post ${post.id} falló (Faltan credenciales FB)`);
+                 return res.status(403).json({ error: 'Configura tu cuenta de Facebook en Ajustes para publicar.' });
             }
 
             console.log(`[PUBLISH] Intentando publicar post ${post.id} en Facebook real...`);
@@ -413,9 +408,6 @@ router.post('/:id/publish', async (req, res) => {
                     external_post_id: externalId
                 });
 
-                if (!user.is_admin) {
-                    users.update(user.id, { posts_remaining: user.posts_remaining - 1 });
-                }
 
                 return res.json({ message: '¡Post publicado exitosamente en Facebook!', post: updated });
 
@@ -424,18 +416,38 @@ router.post('/:id/publish', async (req, res) => {
                 return res.status(500).json({ error: `Error de Meta API (Facebook): ${err.message}` });
             }
         }
+        else if (post.platform === 'both') {
+            if (!hasIGCredentials && !hasFBCredentials) {
+                console.log(`[PUBLISH] Post ${post.id} falló (Faltan credenciales IG y FB)`);
+                return res.status(403).json({ error: 'Configura tus cuentas de Instagram y Facebook en Ajustes para publicar.' });
+            }
 
-        // Fallback or simulation if no credentials
-        const updated = posts.update(req.params.id, {
-            status: 'published',
-            published_at: new Date().toISOString()
-        });
+            console.log(`[PUBLISH] Intentando publicar post ${post.id} en AMBAS plataformas...`);
+            try {
+                const result = await executePublishing(post, user);
+                
+                const updated = posts.update(req.params.id, {
+                    status: 'published',
+                    published_at: new Date().toISOString(),
+                    external_post_id: result.externalId,
+                    instagram_post_id: result.instagramId || '',
+                    facebook_post_id: result.facebookId || ''
+                });
 
-        if (!user.is_admin) {
-            users.update(user.id, { posts_remaining: user.posts_remaining - 1 });
+
+                const platforms = [];
+                if (result.instagramId) platforms.push('Instagram');
+                if (result.facebookId) platforms.push('Facebook');
+                return res.json({ message: `¡Post publicado exitosamente en ${platforms.join(' y ')}!`, post: updated });
+
+            } catch (err) {
+                console.error('[PUBLISH] Error publicando en ambas:', err.message);
+                return res.status(500).json({ error: `Error de Meta API: ${err.message}` });
+            }
         }
 
-        res.json({ message: 'Post publicado (Simulado). Configura tus tokens en Ajustes para publicar realmente.', post: updated });
+        // Si llega hasta aquí, hubo algún fallo lógico
+        return res.status(500).json({ error: 'No se pudo publicar en la plataforma seleccionada.' });
     } catch (error) {
         console.error('[POSTS] Error publicando post:', error);
         res.status(500).json({ error: 'Error al publicar el post.' });

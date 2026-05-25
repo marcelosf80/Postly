@@ -1166,8 +1166,6 @@ async function runAITool(tool) {
 
     try {
         let data;
-        let resultHTML = '';
-<<<<<<< HEAD
         const currentTool = tool;
         
         if (tool === 'caption') {
@@ -1185,24 +1183,6 @@ async function runAITool(tool) {
         } else if (tool === 'improve') {
             data = await API.improveText(input);
             resultHTML = formatAIResult(data.improved, data, 'text', currentTool);
-=======
-        
-        if (tool === 'caption') {
-            data = await API.generateCaption(input, { platform: document.getElementById('ai-platform')?.value });
-            resultHTML = formatAIResult(data.caption, data);
-        } else if (tool === 'visual') {
-            data = await API.generateVisualPrompt(input);
-            resultHTML = formatAIResult(data.visualPrompt, data, 'image-prompt');
-        } else if (tool === 'hashtags') {
-            data = await API.generateHashtags(input);
-            resultHTML = formatAIResult(data.hashtags, data);
-        } else if (tool === 'ideas') {
-            data = await API.generateIdeas(input);
-            resultHTML = formatAIResult(data.ideas, data);
-        } else if (tool === 'improve') {
-            data = await API.improveText(input);
-            resultHTML = formatAIResult(data.improved, data);
->>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
         }
 
         result.innerHTML = resultHTML;
@@ -1212,7 +1192,6 @@ async function runAITool(tool) {
     }
 }
 
-<<<<<<< HEAD
 let _lastAIContent = '';
 let _lastAIPromptForImage = '';
 
@@ -1224,12 +1203,6 @@ function formatAIResult(content, data, type = 'text', tool = 'caption') {
     _lastAIContent = content || '';
     if (type === 'image-prompt') _lastAIPromptForImage = content || '';
 
-=======
-function formatAIResult(content, data, type = 'text') {
-    const isManual = data.isManual;
-    const masterPrompt = data.masterPrompt;
-
->>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
     if (isManual) {
         return `
             <div class="ai-result" style="border: 2px dashed var(--accent); background: rgba(236, 72, 153, 0.03);">
@@ -1240,13 +1213,8 @@ function formatAIResult(content, data, type = 'text') {
                 
                 <div style="background:var(--bg-secondary); padding:12px; border-radius:8px; font-family:monospace; font-size:12px; white-space:pre-wrap; border:1px solid var(--border); max-height:200px; overflow-y:auto; margin-bottom:12px;">${masterPrompt}</div>
                 
-<<<<<<< HEAD
                 <div class="ai-result-actions" style="flex-wrap: wrap;">
                     <button class="btn btn-accent btn-sm" onclick="copyLastAIContent()">📋 Copiar Prompt Maestro</button>
-=======
-                <div class="ai-result-actions">
-                    <button class="btn btn-accent btn-sm" onclick="copyToClipboard('${encodeURIComponent(masterPrompt)}')">📋 Copiar Prompt Maestro</button>
->>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
                     <a href="https://chat.openai.com" target="_blank" class="btn btn-outline btn-sm">Ir a ChatGPT</a>
                 </div>
             </div>
@@ -1256,21 +1224,15 @@ function formatAIResult(content, data, type = 'text') {
     return `
         <div class="ai-result">
             <div style="white-space:pre-wrap;line-height:1.7;">${content}</div>
-<<<<<<< HEAD
             <div class="ai-result-actions" style="flex-wrap: wrap;">
                 <button class="btn btn-primary btn-sm" onclick="copyLastAIContent()">📋 Copiar ${type === 'image-prompt' ? 'Prompt' : 'Resultado'}</button>
                 ${type === 'image-prompt' ? `<button class="btn btn-accent btn-sm" style="background:var(--accent); color:white; border:none;" onclick="generateImageFromPrompt()">✨ Generar Imagen</button>` : ''}
                 <button class="btn btn-outline btn-sm" onclick="runAITool('${tool}')">🔄 Regenerar</button>
-=======
-            <div class="ai-result-actions">
-                <button class="btn btn-primary btn-sm" onclick="copyToClipboard('${encodeURIComponent(content)}')">📋 Copiar ${type === 'image-prompt' ? 'Prompt' : 'Resultado'}</button>
-                <button class="btn btn-outline btn-sm" onclick="runAITool('${lastToolActive || 'caption'}')">🔄 Regenerar</button>
->>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
             </div>
         </div>`;
 }
+}
 
-<<<<<<< HEAD
 function copyLastAIContent() {
     if (!_lastAIContent) return;
     navigator.clipboard.writeText(_lastAIContent).then(() => {
@@ -1311,9 +1273,6 @@ async function generateImageFromPrompt() {
         showToast(error.message, 'error');
     }
 }
-
-=======
->>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
 
 function copyToClipboard(encodedText) {
     const text = decodeURIComponent(encodedText);
@@ -1617,11 +1576,7 @@ async function renderBrand() {
 
                 <!-- Configuración de Marketing (Original) -->
                 <div class="settings-section">
-<<<<<<< HEAD
                     <h3 style="display:flex; align-items:center; gap:8px;">📢 Estrategia de Público</h3>
-=======
-                    <h3>📢 Estrategia de Público</h3>
->>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
                     <div class="form-group">
                         <label class="form-label">¿A quién le vendés? (Público Objetivo)</label>
                         <textarea id="brand-audience" class="form-textarea" rows="2">${user.brand_audience || ''}</textarea>
@@ -1645,11 +1600,7 @@ async function renderBrand() {
             </form>
         </div>
     `;
-<<<<<<< HEAD
     renderIcons();
-=======
-    if (typeof lucide !== 'undefined') lucide.createIcons();
->>>>>>> 0d6074004f5f2f1a157b3bfea43781b84dba81f1
 }
 
 async function saveBrand(e) {

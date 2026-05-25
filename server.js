@@ -54,18 +54,13 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/posts', require('./routes/posts'));
 app.use('/api/ai', require('./routes/ai'));
 app.use('/api/ads', require('./routes/ads'));
-app.use('/api/billing', require('./routes/billing'));
 app.use('/api/admin', require('./routes/admin'));
 
 // === Public Config ===
 app.get('/api/config', (req, res) => {
-    const { users } = require('./data/store');
-    const adminUser = users.findOne({ is_admin: true });
-    
     res.json({
         google_client_id: process.env.GOOGLE_CLIENT_ID,
-        facebook_app_id: process.env.FACEBOOK_APP_ID,
-        mp_public_key: (adminUser && adminUser.mp_public_key) || process.env.MP_PUBLIC_KEY
+        facebook_app_id: process.env.FACEBOOK_APP_ID
     });
 });
 
@@ -81,9 +76,12 @@ app.get('/api/health', (req, res) => {
     });
 });
 
-// === SPA fallback — serve app.html for /app routes ===
+// Serve V2 static files under /v2
+app.use('/v2', express.static(path.join(__dirname, 'Postly_V2_Web')));
+
+// === SPA fallback — serve index.html for /v2 routes ===
 app.get('/v2', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'v2', 'index.html'));
+    res.sendFile(path.join(__dirname, 'Postly_V2_Web', 'index.html'));
 });
 
 app.get('/app', (req, res) => {

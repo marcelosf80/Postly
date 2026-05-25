@@ -1,9 +1,12 @@
+require('dotenv').config();
 const { spawn } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 const axios = require('axios');
 
-console.log('\n  🚀 Iniciando SocialPulse con Túnel Seguro (ngrok)...\n');
+const PORT = process.env.PORT || 3000;
+
+console.log(`\n  🚀 Iniciando SocialPulse con Túnel Seguro (ngrok) en puerto ${PORT}...\n`);
 
 // 1. Iniciar Servidor SocialPulse
 const server = spawn('node', ['server.js'], { stdio: 'inherit', shell: true });
@@ -15,8 +18,8 @@ const ngrokCmd = fs.existsSync(path.join(__dirname, localNgrok)) ? localNgrok : 
 
 console.log(`  [INFO] Usando comando: ${ngrokCmd}`);
 
-// 3. Iniciar ngrok
-const ngrok = spawn(ngrokCmd, ['http', '3000'], { shell: true });
+// 3. Iniciar ngrok en el puerto del backend
+const ngrok = spawn(ngrokCmd, ['http', PORT.toString()], { shell: true });
 
 async function getNgrokUrl() {
     try {
@@ -43,7 +46,7 @@ const interval = setInterval(async () => {
         console.log('  ║    ✅ ¡SOCIALPULSE ESTÁ ACTIVO!                      ║');
         console.log('  ║                                                      ║');
         console.log(`  ║    🔗 URL Seguro: ${url}           ║`);
-        console.log(`  ║    🏠 URL Local:  http://localhost:3000              ║`);
+        console.log(`  ║    🏠 URL Local:  http://localhost:${PORT}              ║`);
         console.log('  ║                                                      ║');
         console.log('  ║    ⚠️  RECUERDA: Agrega la URL segura en los          ║');
         console.log('  ║        "Dominios de la App" en Meta Developers.      ║');

@@ -9,7 +9,7 @@ async function initFacebookSDK() {
                 appId: FB_APP_ID,
                 cookie: true,
                 xfbml: true,
-                version: 'v21.0'
+                version: 'v19.0'
             });
             console.log('[META] SDK de Facebook inicializado (Standalone)');
         };
@@ -122,7 +122,6 @@ async function exchangeTokenAndSaveUser(token) {
             localStorage.setItem('sp_token', token);
             localStorage.setItem('sp_user', JSON.stringify(user));
         }
-
         // 3. SINCRONIZAR CON EL SERVIDOR (Backend)
         // Esto es vital para que el servidor pueda publicar en tu nombre
         if (window.API_BASE_URL) {
@@ -133,13 +132,48 @@ async function exchangeTokenAndSaveUser(token) {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ accessToken: token })
                 });
-                const syncData = await syncRes.json();
-                console.log('[META] ✅ Sincronización backend exitosa:', syncData.message);
                 
+                const syncData = await syncRes.json();
+                
+                if (!syncRes.ok) {
+                    throw new Error(syncData.error || `Error en sincronización con backend (${syncRes.status})`);
+                }
+
                 // Si el servidor devolvió un usuario más completo (con IDs descubiertos), lo usamos
                 if (syncData.user) {
                     const newUser = { ...user, ...syncData.user };
                     localStorage.setItem('sp_user', JSON.stringify(newUser));
+                }
+
+                if (syncData.autoConfigured) {
+                    const igUsername = syncData.user?.ig_username ? ` (@${syncData.user.ig_username})` : '';
+                    showToast(`✅ Instagram vinculado automáticamente${igUsername}`, 'success');
+                } else {
+                    // Intentar resolver IG Business Account con el token almacenado en backend
+                    console.log('[META] Intentando resolver Instagram Business Account...');
+                    try {
+                        const resolveToken = syncData.token || token;
+                        const resolveRes = await fetch(`${window.API_BASE_URL}/api/auth/instagram-resolve`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${resolveToken}`
+                            }
+                        });
+                        const resolveData = await resolveRes.json();
+                        if (resolveRes.ok && resolveData.instagram) {
+                            showToast(`✅ Instagram descubierto: @${resolveData.instagram.igUsername}`, 'success');
+                            if (resolveData.user) {
+                                const updatedUser = { ...JSON.parse(localStorage.getItem('sp_user') || '{}'), ...resolveData.user };
+                                localStorage.setItem('sp_user', JSON.stringify(updatedUser));
+                            }
+                        } else {
+                            showToast('⚠️ No se encontró Instagram Business vinculado. Configuralo manualmente en Ajustes.', 'warning');
+                        }
+                    } catch (resolveErr) {
+                        console.warn('[META] instagram-resolve falló:', resolveErr.message);
+                        showToast('⚠️ No se encontró Instagram vinculado. Configuralo manualmente en Ajustes.', 'warning');
+                    }
                 }
                 if (syncData.token) {
                     if (window.API) {
@@ -150,11 +184,16 @@ async function exchangeTokenAndSaveUser(token) {
                 }
             } catch (syncErr) {
                 console.error('[META] ❌ Error sincronizando con backend:', syncErr);
-                // No bloqueamos el acceso, pero advertimos
-                showToast("Vínculo con servidor falló. La publicación automática podría no funcionar.", 'warning');
+                // Clear any partial session so we don't end up in an invalid state
+                if (window.API) {
+                    window.API.clearAuth();
+                } else {
+                    localStorage.removeItem('sp_token');
+                    localStorage.removeItem('sp_user');
+                }
+                throw syncErr;
             }
         }
-
         // Mostrar Modal de Éxito y permitir acceso
         const modal = document.createElement('div');
         modal.className = 'modal-overlay active';
@@ -164,7 +203,7 @@ async function exchangeTokenAndSaveUser(token) {
                 <div style="font-size:54px; margin-bottom:16px;">✨</div>
                 <h3 style="margin-bottom:8px; font-size:22px;">¡Bienvenido, ${profile.name}!</h3>
                 <p style="color:var(--text-secondary); margin-bottom:24px; line-height:1.5;">Tu cuenta de Meta se ha vinculado correctamente a Postly.</p>
-                <button class="btn btn-primary" style="width:100%;" onclick="if(window.navigate) { window.navigate('dashboard'); } else { window.location.reload(); }">
+                <button class="btn btn-primary" style="width:100%;" onclick="this.closest('.modal-overlay').remove(); if(typeof navigate === 'function') { navigate('dashboard'); } else { window.location.reload(); }">
                     Ingresar al Panel
                 </button>
             </div>
@@ -174,6 +213,11 @@ async function exchangeTokenAndSaveUser(token) {
     } catch (err) {
         console.error('FB Sync Error:', err);
         showToast("Error al sincronizar con Meta: " + err.message, 'error');
+        
+        const debugDiv = document.createElement('div');
+        debugDiv.style = "position:fixed; top:0; left:0; right:0; background:red; color:white; padding:20px; z-index:99999; text-align:center; font-weight:bold;";
+        debugDiv.innerText = "DEBUG ERROR: " + err.message;
+        document.body.appendChild(debugDiv);
     } finally {
         resetConnectButton();
     }
