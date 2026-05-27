@@ -52,6 +52,18 @@ const PhotoEditor = {
             case 'fade': return 'brightness(1.1) contrast(0.85) saturate(0.8)';
             case 'teal': return 'hue-rotate(130deg) saturate(1.4) contrast(1.1)';
             case 'dramatic': return 'contrast(1.5) brightness(0.8) saturate(0.8)';
+            case 'polaroid': return 'contrast(1.15) brightness(1.1) saturate(0.9) sepia(0.15)';
+            case 'retro': return 'sepia(0.3) contrast(1.15) saturate(1.1) hue-rotate(-5deg)';
+            case 'summer': return 'saturate(1.4) brightness(1.1) contrast(1.05) sepia(0.05)';
+            case 'winter': return 'hue-rotate(20deg) saturate(0.8) contrast(1.1) brightness(1.05)';
+            case 'haze': return 'brightness(1.15) contrast(0.8) saturate(0.9) sepia(0.05)';
+            case 'neon': return 'saturate(2.2) contrast(1.2) hue-rotate(-20deg) brightness(1.1)';
+            case 'nordic': return 'saturate(0.7) contrast(1.2) brightness(1.02) hue-rotate(10deg)';
+            case 'velvet': return 'contrast(1.3) saturate(1.3) sepia(0.1) brightness(0.95)';
+            case 'sepia-strong': return 'sepia(0.9) contrast(1.1) brightness(0.95)';
+            case 'monochrome': return 'grayscale(1) brightness(1.15) contrast(1.25)';
+            case 'invert': return 'invert(1)';
+            case 'dreamy': return 'brightness(1.1) saturate(1.1) contrast(0.9) blur(0.5px)';
             default: return 'none';
         }
     }

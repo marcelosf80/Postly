@@ -1,35 +1,5 @@
 [
   {
-    "id": "mnqmdezok92e90f9",
-    "user_id": "766f685f-0043-41bb-98bc-b2cf976fa8fb",
-    "content": "¡Lleva a Pikachu a casa! 🎉💛 Figura de vinilo de alta calidad, perfecta para coleccionistas. Disponible ahora en nuestra tienda. #Pikachu #Pokemon #FiguraDeVinilo #Coleccionistas #MarceloMaidana",
-    "platform": "facebook",
-    "image_path": "/uploads/1775687301900-ezwd1kwq.webp",
-    "status": "published",
-    "scheduled_at": null,
-    "published_at": "2026-04-08T22:28:27.191Z",
-    "external_post_id": "1518329820295019",
-    "hashtags": "",
-    "aspect_ratio": "vertical",
-    "created_at": "2026-04-08T22:28:21.924Z",
-    "updated_at": "2026-04-08T22:28:27.192Z"
-  },
-  {
-    "id": "mnqtophi74l3bxso",
-    "user_id": "766f685f-0043-41bb-98bc-b2cf976fa8fb",
-    "content": "¡Lleva a Pikachu a casa! 🎉💛 ¡Descubre nuestra increíble colección de figuras de Pokémon! ¡Disponible ahora en Marcelo Maidana! #Pikachu #Pokemon #Coleccionistas #FigurasDeVinilo",
-    "platform": "instagram",
-    "image_path": "/uploads/1775699586002-zyik8fif.webp",
-    "status": "published",
-    "scheduled_at": null,
-    "published_at": "2026-04-09T01:53:14.845Z",
-    "external_post_id": "18112976434699164",
-    "hashtags": "",
-    "aspect_ratio": "story",
-    "created_at": "2026-04-09T01:53:06.054Z",
-    "updated_at": "2026-04-09T01:53:14.846Z"
-  },
-  {
     "id": "mnrorbz4x86bp2tl",
     "user_id": "mnowycqq2xierge7",
     "content": "Test post for debugging publish error. #test #debug",
@@ -60,18 +30,19 @@
     "updated_at": "2026-04-09T16:24:57.989Z"
   },
   {
-    "id": "mplret607ul2ryqk",
+    "id": "mponcmmajfdb0vy7",
     "user_id": "766f685f-0043-41bb-98bc-b2cf976fa8fb",
-    "content": "¡Vuelve a la nostalgia con Retroplay Gaming! 🚀🎮\n\n\"¡Sumérgete en el pasado y revive los mejores momentos de la historia de los videojuegos! En Retroplay Gaming, encontrarás una amplia variedad de juegos clásicos que te harán sentir como si estuvieras en un arcade de los 80. ¡Disfruta de gráficos pixelados, sonidos icónicos y una experiencia de juego única! 😍\n\n#RetroplayGaming #VideojuegosRetro #Nostalgia #GamingClásico #PixelArt #RetroGaming #JuegosDeVideo #ClásicosDeLaInfancia\"",
-    "platform": "instagram",
-    "image_path": "/uploads/1779746998107-wr01qahf.jpeg",
+    "content": "\"¡Error en la sincronización de interfaz! 😬 Parece que el comando 'npx' no está reconocido. Asegúrate de estar en la carpeta raíz y que el comando esté disponible. 💻 ¿Necesitas ayuda para solucionar el problema? 🤔 #ErrorDeSincronización #ComandoNoReconocido #SoluciónDeErrores\"",
+    "platform": "facebook",
+    "image_path": "/uploads/1779921576993-jr38h76m.jpeg",
     "status": "published",
     "scheduled_at": null,
-    "published_at": "2026-05-25T22:10:18.332Z",
-    "external_post_id": "18106638677480831",
+    "published_at": "2026-05-27T22:39:44.283Z",
+    "external_post_id": "1561690472625620",
     "hashtags": "",
-    "aspect_ratio": "story",
-    "created_at": "2026-05-25T22:09:58.824Z",
-    "updated_at": "2026-05-25T22:10:18.627Z"
+    "aspect_ratio": "feed",
+    "local_image_uri": null,
+    "created_at": "2026-05-27T22:39:37.091Z",
+    "updated_at": "2026-05-27T22:39:44.300Z"
   }
 ]

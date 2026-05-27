@@ -362,3 +362,185 @@ header {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+
+/* ============================================
+   PHONE MOCKUP PREVIEW STYLES FROM BETA OLD
+   ============================================ */
+.phone-mockup-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.phone-mockup {
+    width: 320px;
+    min-height: 500px;
+    height: auto;
+    background: #0f172a;
+    border-radius: 40px;
+    padding: 12px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    margin: 0 auto;
+    position: relative;
+}
+
+.phone-mockup-screen {
+    background: #ffffff;
+    border-radius: 30px;
+    width: 100%;
+    min-height: 476px;
+    height: auto;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+.phone-mockup-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.phone-mockup-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    padding: 2px;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.phone-mockup-avatar-inner {
+    width: 100%;
+    height: 100%;
+    background: #1e293b;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.phone-mockup-username {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.phone-mockup-image {
+    width: 100%;
+    height: 320px;
+    background: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    object-fit: cover;
+}
+
+.phone-mockup-actions {
+    padding: 12px 16px;
+    display: flex;
+    gap: 16px;
+}
+
+.phone-mockup-caption {
+    padding: 0 16px 16px;
+    font-size: 13px;
+    color: #1e293b;
+    line-height: 1.5;
+}
+
+/* Facebook App Mode Override */
+.phone-mockup.platform-facebook .phone-mockup-screen {
+    display: flex;
+    flex-direction: column;
+}
+.phone-mockup.platform-facebook .phone-mockup-header {
+    order: 1;
+    border-bottom: none;
+    padding-bottom: 8px;
+}
+.phone-mockup.platform-facebook .phone-mockup-avatar {
+    background: transparent;
+    padding: 0;
+}
+.phone-mockup.platform-facebook .phone-mockup-avatar-inner {
+    border: none;
+    background: #3b82f6; /* Facebook Blue */
+}
+.phone-mockup.platform-facebook .phone-mockup-username {
+    display: flex;
+    flex-direction: column;
+}
+.phone-mockup.platform-facebook .mockup-fb-time {
+    display: block !important;
+}
+.phone-mockup.platform-facebook .phone-mockup-caption {
+    order: 2;
+    padding: 0 16px 12px;
+    font-weight: 400;
+}
+.phone-mockup.platform-facebook .caption-username-prefix {
+    display: none;
+}
+.phone-mockup.platform-facebook .phone-mockup-image {
+    order: 3;
+}
+.phone-mockup.platform-facebook .phone-mockup-actions {
+    order: 4;
+    padding: 0 16px 16px;
+}
+
+/* Aspect Ratio Formats */
+.phone-mockup.format-vertical .phone-mockup-image {
+    height: 400px; /* 4:5 ratio */
+}
+
+/* Story Format Details */
+.phone-mockup.format-story {
+    min-height: 600px;
+}
+.phone-mockup.format-story .phone-mockup-screen {
+    min-height: 568px; /* 9:16 approx for 320px width */
+    height: 568px;
+    display: flex;
+    flex-direction: column;
+}
+.phone-mockup.format-story .phone-mockup-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+.phone-mockup.format-story .phone-mockup-header,
+.phone-mockup.format-story .phone-mockup-actions,
+.phone-mockup.format-story .phone-mockup-caption {
+    position: relative;
+    z-index: 10;
+    color: white !important;
+}
+.phone-mockup.format-story .phone-mockup-header {
+    background: linear-gradient(to bottom, rgba(0,0,0,0.5) 0%, transparent 100%);
+    border-bottom: none;
+}
+.phone-mockup.format-story .phone-mockup-username {
+    color: white !important;
+}
+.phone-mockup.format-story .phone-mockup-caption {
+    margin-top: auto; /* Push down to bottom */
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+    padding-top: 40px;
+    color: white !important;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+}
+.phone-mockup.format-story .phone-mockup-actions {
+    background: rgba(0,0,0,0.7);
+    padding-bottom: 20px;
+}
+.phone-mockup.format-story .phone-mockup-actions svg {
+    stroke: white !important;
+}

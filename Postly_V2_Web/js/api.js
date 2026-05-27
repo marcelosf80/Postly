@@ -147,10 +147,10 @@ const API = {
         });
     },
 
-    async generateImage(prompt) {
+    async generateImage(prompt, imageBase64 = null) {
         return this.request('/api/ai/generate-image', {
             method: 'POST',
-            body: { prompt }
+            body: { prompt, imageBase64 }
         });
     },
 

@@ -341,57 +341,65 @@ router.post('/facebook', async (req, res) => {
         const appSecret = process.env.FACEBOOK_APP_SECRET;
 
         // 1. Exchange for long-lived token (60 days)
-        const exchangeUrl = `https://graph.facebook.com/v19.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${accessToken}`;
+        const exchangeUrl = `https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=${appId}&client_secret=${appSecret}&fb_exchange_token=${accessToken}`;
         const exchangeRes = await axios.get(exchangeUrl);
         const longToken = exchangeRes.data.access_token;
 
-        // 2. Fetch User Info (Email and Picture)
-        const meUrl = `https://graph.facebook.com/v19.0/me?fields=id,name,email,picture.type(large)&access_token=${longToken}`;
-        const meRes = await axios.get(meUrl);
+        // 2. Fetch User Profile (Personal ID) and Accounts (Pages) concurrently
+        const [meRes, pagesRes] = await Promise.all([
+            axios.get(`https://graph.facebook.com/v21.0/me?fields=id,name,email,picture.type(large)&access_token=${longToken}`),
+            axios.get(`https://graph.facebook.com/v21.0/me/accounts?fields=id,name,access_token,instagram_business_account&access_token=${longToken}`)
+        ]);
+
         const { id: fbId, email, name: fbName, picture } = meRes.data;
         const fbAvatarUrl = picture && picture.data ? picture.data.url : '';
-
-        // Si no tiene email, usamos un fallback basado en su ID de Facebook
         const userEmail = email ? email.toLowerCase() : `${fbId}@facebook.com`;
 
-        // 3. AUTO-DISCOVERY: Fetch Pages and Instagram IDs via Graph API
-        let ig_page_id = '';
-        let ig_access_token = '';
-        let ig_username = '';
+        const pagesData = pagesRes.data.data || [];
         
-        // Usar el servicio mejorado de discovery
-        const igDiscovery = await discoverIGBusinessAccount(longToken);
-        
-        // Fetch Pages managed by user
-        const pagesUrl = `https://graph.facebook.com/v19.0/me/accounts?fields=id,name,access_token,instagram_business_account&access_token=${longToken}`;
-        const pagesRes = await axios.get(pagesUrl);
-        const pages = pagesRes.data.data;
+        // Mapear las páginas según el nuevo formato
+        const pages = pagesData.map(page => ({
+            pageId: page.id,
+            pageName: page.name,
+            pageToken: page.access_token,
+            instagramId: page.instagram_business_account ? page.instagram_business_account.id : null
+        }));
 
-        if (igDiscovery) {
-            ig_page_id = igDiscovery.igBusinessId;
-            ig_access_token = igDiscovery.pageAccessToken;
-            ig_username = igDiscovery.igUsername;
-            console.log(`[AUTH] ✅ Instagram descubierto: ${ig_page_id} (@${ig_username}) vinculado a: ${igDiscovery.pageName}`);
-        } else if (pages && pages.length > 0) {
-            console.log(`[AUTH] ⚠️ No se encontró instagram_business_account en ${pages.length} páginas`);
+        // Mantener compatibilidad hacia atrás: Asignar la primera página encontrada a fb_page_id e ig_page_id
+        let ig_page_id = '';
+        let fb_page_id = '';
+        let fb_access_token = '';
+        let ig_access_token = '';
+
+        if (pages.length > 0) {
+            fb_page_id = pages[0].pageId;
+            fb_access_token = pages[0].pageToken;
+            
+            // Buscar la primera página que tenga instagramId
+            const pageWithIg = pages.find(p => p.instagramId);
+            if (pageWithIg) {
+                ig_page_id = pageWithIg.instagramId;
+                // Usamos el token de la página de Facebook asociada a ese IG Business
+                ig_access_token = pageWithIg.pageToken; 
+                console.log(`[AUTH] ✅ Instagram descubierto: ${ig_page_id} vinculado a Page: ${pageWithIg.pageName}`);
+            }
         }
 
-        // 4. Update or Create User
-        let user = users.findOne({ email: userEmail });
-        const fb_page_id = pages && pages[0] ? pages[0].id : '';
-        const fb_access_token = pages && pages[0] ? pages[0].access_token : '';
+        // 3. Update or Create User
+        let user = users.findOne({ fb_user_id: fbId }) || users.findOne({ email: userEmail });
 
-        console.log(`[AUTH] Descubrimiento Meta p/ ${userEmail}: IG=${ig_page_id}, FB=${fb_page_id}, Avatar=${fbAvatarUrl ? 'SI' : 'NO'}`);
+        console.log(`[AUTH] Descubrimiento Meta p/ ${userEmail}: IG=${ig_page_id}, FB=${fb_page_id}`);
 
         const updates = {
+            fb_user_id: fbId,
+            fb_access_token: fb_access_token || (user ? user.fb_access_token : ''),
             ig_page_id: ig_page_id || (user ? user.ig_page_id : ''),
             ig_access_token: ig_access_token || (user ? user.ig_access_token : ''),
-            ig_username: ig_username || (user ? user.ig_username : ''),
             fb_page_id: fb_page_id || (user ? user.fb_page_id : ''),
-            fb_access_token: fb_access_token || (user ? user.fb_access_token : ''),
             name: user ? user.name : fbName,
             avatar_url: fbAvatarUrl || (user ? user.avatar_url : ''),
-            auth_provider: 'facebook'
+            auth_provider: 'facebook',
+            pages: pages // Nuevo campo
         };
 
         if (!user) {
@@ -415,7 +423,7 @@ router.post('/facebook', async (req, res) => {
             user = users.update(user.id, updates);
         }
 
-        // 5. Generate Response
+        // 4. Generate Response
         const token = generateToken(user);
         const { password_hash: _, ...safeUser } = user;
 
@@ -430,7 +438,6 @@ router.post('/facebook', async (req, res) => {
         const errorData = error.response ? error.response.data : error.message;
         console.error('[AUTH] ❌ Error en login Facebook:', errorData);
         
-        // Return a more descriptive error if possible
         let userMessage = 'Error al conectar con Facebook. ';
         if (error.response && error.response.data && error.response.data.error) {
             userMessage += error.response.data.error.message;

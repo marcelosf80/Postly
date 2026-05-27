@@ -214,7 +214,7 @@ async function executePublishing(post, user) {
 router.post('/', upload.single('image'), async (req, res) => {
     console.log('[POSTS] Creando post. Body keys:', Object.keys(req.body));
     try {
-        const { content, platform, status, scheduled_at, image_base64 } = req.body;
+        const { content, platform, status, scheduled_at, image_base64, local_image_uri } = req.body;
 
         if (!content && !req.file && !image_base64) {
             return res.status(400).json({ error: 'Se requiere contenido o imagen.' });
@@ -237,7 +237,8 @@ router.post('/', upload.single('image'), async (req, res) => {
             published_at: null,
             external_post_id: null,
             hashtags: req.body.hashtags || '',
-            aspect_ratio: req.body.aspect_ratio || 'feed'
+            aspect_ratio: req.body.aspect_ratio || 'feed',
+            local_image_uri: local_image_uri || null
         });
 
         // AUTO-PUBLISH if status is 'published'

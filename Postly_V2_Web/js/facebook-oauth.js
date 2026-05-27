@@ -194,21 +194,12 @@ async function exchangeTokenAndSaveUser(token) {
                 throw syncErr;
             }
         }
-        // Mostrar Modal de Éxito y permitir acceso
-        const modal = document.createElement('div');
-        modal.className = 'modal-overlay active';
-        modal.style.zIndex = '9999';
-        modal.innerHTML = `
-            <div class="modal" style="text-align:center; max-width:400px; padding:32px;">
-                <div style="font-size:54px; margin-bottom:16px;">✨</div>
-                <h3 style="margin-bottom:8px; font-size:22px;">¡Bienvenido, ${profile.name}!</h3>
-                <p style="color:var(--text-secondary); margin-bottom:24px; line-height:1.5;">Tu cuenta de Meta se ha vinculado correctamente a Postly.</p>
-                <button class="btn btn-primary" style="width:100%;" onclick="this.closest('.modal-overlay').remove(); if(typeof navigate === 'function') { navigate('dashboard'); } else { window.location.reload(); }">
-                    Ingresar al Panel
-                </button>
-            </div>
-        `;
-        document.body.appendChild(modal);
+        // Redirigir directo al Inicio
+        if (typeof navigate === 'function') {
+            navigate('dashboard');
+        } else {
+            window.location.reload();
+        }
 
     } catch (err) {
         console.error('FB Sync Error:', err);

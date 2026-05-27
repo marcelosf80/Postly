@@ -31,14 +31,23 @@ if %ERRORLEVEL% neq 0 (
 
 echo [2/3] Compilando sistema nativo (DEBUG MODE)...
 echo El proceso esta en marcha. Revisa build_log.txt para ver el progreso real.
+set "SHOULD_CLEAN=0"
+if "%~1"=="clean" set "SHOULD_CLEAN=1"
+
 if exist "gradlew" (
     echo [!] Ya en carpeta android.
-    call gradlew clean >> "%LOG_PATH%" 2>&1
-    call gradlew assembleDebug --stacktrace --info >> "%LOG_PATH%" 2>&1
+    if "%SHOULD_CLEAN%"=="1" (
+        echo [!] Ejecutando clean...
+        call gradlew clean >> "%LOG_PATH%" 2>&1
+    )
+    call gradlew assembleDebug --stacktrace >> "%LOG_PATH%" 2>&1
 ) else (
     pushd android
-    call gradlew clean >> "%LOG_PATH%" 2>&1
-    call gradlew assembleDebug --stacktrace --info >> "%LOG_PATH%" 2>&1
+    if "%SHOULD_CLEAN%"=="1" (
+        echo [!] Ejecutando clean...
+        call gradlew clean >> "%LOG_PATH%" 2>&1
+    )
+    call gradlew assembleDebug --stacktrace >> "%LOG_PATH%" 2>&1
     popd
 )
 

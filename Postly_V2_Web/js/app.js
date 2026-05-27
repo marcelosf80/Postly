@@ -1,11 +1,41 @@
 
 // Postly V2 — Core Application Logic
 let currentSection = 'dashboard';
+let cachedPosts = [];
 let currentPostData = {
     content: '',
     image: null,
     platform: 'instagram',
-    aspect_ratio: 'feed'
+    aspect_ratio: 'feed',
+    filter: 'none'
+};
+
+const PHOTO_FILTERS = {
+    'none': { name: 'Original', style: 'none' },
+    'vintage': { name: 'Vintage', style: 'sepia(0.5) contrast(1.2) brightness(0.9)' },
+    'b-w': { name: 'B&N', style: 'grayscale(1) contrast(1.1)' },
+    'warm': { name: 'Cálido', style: 'sepia(0.2) saturate(1.5) brightness(1.1)' },
+    'cool': { name: 'Frío', style: 'hue-rotate(30deg) saturate(1.2) brightness(1.05)' },
+    'vibrant': { name: 'Vibrante', style: 'saturate(2) contrast(1.1)' },
+    'noir': { name: 'Noir', style: 'grayscale(1) contrast(1.5) brightness(0.9)' },
+    'golden': { name: 'Dorado', style: 'sepia(0.3) saturate(1.4) brightness(1.1) hue-rotate(-10deg)' },
+    'cyberpunk': { name: 'Cyberpunk', style: 'hue-rotate(150deg) saturate(1.6) contrast(1.2)' },
+    'lomo': { name: 'Lomo', style: 'contrast(1.3) saturate(1.6) brightness(0.9)' },
+    'fade': { name: 'Fade', style: 'brightness(1.1) contrast(0.85) saturate(0.8)' },
+    'teal': { name: 'Teal', style: 'hue-rotate(130deg) saturate(1.4) contrast(1.1)' },
+    'dramatic': { name: 'Dramático', style: 'contrast(1.5) brightness(0.8) saturate(0.8)' },
+    'polaroid': { name: 'Polaroid', style: 'contrast(1.15) brightness(1.1) saturate(0.9) sepia(0.15)' },
+    'retro': { name: 'Retro', style: 'sepia(0.3) contrast(1.15) saturate(1.1) hue-rotate(-5deg)' },
+    'summer': { name: 'Verano', style: 'saturate(1.4) brightness(1.1) contrast(1.05) sepia(0.05)' },
+    'winter': { name: 'Invierno', style: 'hue-rotate(20deg) saturate(0.8) contrast(1.1) brightness(1.05)' },
+    'haze': { name: 'Niebla', style: 'brightness(1.15) contrast(0.8) saturate(0.9) sepia(0.05)' },
+    'neon': { name: 'Neón', style: 'saturate(2.2) contrast(1.2) hue-rotate(-20deg) brightness(1.1)' },
+    'nordic': { name: 'Nórdico', style: 'saturate(0.7) contrast(1.2) brightness(1.02) hue-rotate(10deg)' },
+    'velvet': { name: 'Terciopelo', style: 'contrast(1.3) saturate(1.3) sepia(0.1) brightness(0.95)' },
+    'sepia-strong': { name: 'Sepia F.', style: 'sepia(0.9) contrast(1.1) brightness(0.95)' },
+    'monochrome': { name: 'Monocromo', style: 'grayscale(1) brightness(1.15) contrast(1.25)' },
+    'invert': { name: 'Invertir', style: 'invert(1)' },
+    'dreamy': { name: 'Ensueño', style: 'brightness(1.1) saturate(1.1) contrast(0.9) blur(0.5px)' }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -35,10 +65,7 @@ function renderLogin() {
             <p style="text-align: center; color: var(--text-secondary); margin-bottom: 32px; max-width: 280px; font-size: 1rem;">Tu asistente inteligente para dominar las redes sociales.</p>
 
             <button class="btn" id="btn-connect-facebook" onclick="connectWithFacebook()" style="background: #1877f2; color: white; border-radius: 20px; height: 70px; font-weight:800; font-size: 1.2rem; margin-bottom: 12px; box-shadow: 0 10px 25px rgba(24, 119, 242, 0.3);">
-                <i data-lucide="facebook"></i> Entrar con Meta
-            </button>
-            <button class="btn" onclick="testLoginBypass()" style="background: #f1f5f9; color: var(--text-primary); border-radius: 20px; height: 60px; font-weight:700; font-size: 1rem;">
-                <i data-lucide="flask-conical"></i> Ingresar Modo Prueba
+                <i data-lucide="facebook"></i> Vincular Fanpage de Meta
             </button>
         </div>
     `;
@@ -83,11 +110,21 @@ async function initApp() {
         try {
             await window.Capacitor.Plugins.AdMob.initialize({
                 requestTrackingAuthorization: true,
-                initializeForTesting: true,
+                initializeForTesting: false,
             });
             console.log('[ADMOB] Inicializado correctamente');
+            
+            const bannerOptions = {
+                adId: 'ca-app-pub-5343221992536229/3520448384',
+                adSize: 'BANNER',
+                position: 'BOTTOM_CENTER',
+                margin: 0,
+                isTesting: false
+            };
+            await window.Capacitor.Plugins.AdMob.showBanner(bannerOptions);
+            console.log('[ADMOB] Banner mostrado');
         } catch(e) {
-            console.error('[ADMOB] Error inicializando:', e);
+            console.error('[ADMOB] Error inicializando o mostrando AdMob:', e);
         }
     }
 }
@@ -108,7 +145,7 @@ function navigate(section) {
             case 'dashboard': renderDashboard(); break;
             case 'posts': renderPosts(); break;
             case 'create': renderCreatePost(); break;
-            case 'flyers': renderFlyerGenerator(); break;
+            case 'editor-ia': renderAIPhotoEditor(); break;
             case 'settings': renderSettings(); break;
         }
         lucide.createIcons();
@@ -203,6 +240,7 @@ async function renderPosts() {
 
     try {
         const { posts } = await API.getPosts();
+        cachedPosts = posts;
         
         main.innerHTML = `
             <div class="fade-in">
@@ -422,21 +460,22 @@ function useAIImage(base64) {
 function renderCreatePost() {
     const main = document.getElementById('main-content');
     main.innerHTML = `
-        <div class="fade-in">
-            <div style="padding: 32px 24px 16px 24px;">
-                <h2 style="font-weight: 800; font-size: 2rem; letter-spacing: -1px;">Crear Post</h2>
-                <p style="color: var(--text-secondary); font-size: 1rem; font-weight: 500;">Diseña tu próxima publicación viral.</p>
+        <div class="fade-in" style="padding-bottom: 40px;">
+            <div style="padding: 24px 20px 16px 20px;">
+                <h2 style="font-weight: 800; font-size: 1.8rem; letter-spacing: -1px;">Crear Publicación</h2>
+                <p style="color: var(--text-secondary); font-size: 0.9rem; font-weight: 500;">Tu mockup en tiempo real.</p>
             </div>
 
-            <div class="card" style="margin-top: 0; padding: 24px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+            <!-- Editor Card -->
+            <div class="card" style="margin: 0 20px; padding: 20px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
                 <!-- Platform Toggle -->
-                <div style="display: flex; gap: 8px; margin-bottom: 24px; background: #f1f5f9; padding: 6px; border-radius: 18px;">
+                <div style="display: flex; gap: 8px; margin-bottom: 16px; background: #f1f5f9; padding: 6px; border-radius: 18px;">
                     <button class="btn btn-sm" id="plat-ig" onclick="setPlatform('instagram')" style="flex: 1; border-radius: 14px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); font-weight: 700;">Instagram</button>
                     <button class="btn btn-sm" id="plat-fb" onclick="setPlatform('facebook')" style="flex: 1; border-radius: 14px; background: transparent; font-weight: 700; color: var(--text-secondary);">Facebook</button>
                 </div>
 
                 <!-- Post Type Toggle (Feed vs Stories) -->
-                <div style="display: flex; gap: 8px; margin-bottom: 24px;">
+                <div style="display: flex; gap: 8px; margin-bottom: 20px;">
                     <button class="btn btn-sm" id="type-feed" onclick="setPostType('feed')" style="flex: 1; border-radius: 12px; background: #f1f5f9; font-weight: 700; border: 1.5px solid var(--primary); color: var(--primary);">
                         <i data-lucide="layout" style="width: 14px;"></i> Feed
                     </button>
@@ -445,159 +484,228 @@ function renderCreatePost() {
                     </button>
                 </div>
 
-                <!-- Image Upload Area -->
-                <div id="image-upload-area" onclick="document.getElementById('file-input').click()" style="width: 100%; aspect-ratio: 1; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 24px; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 12px; cursor: pointer; overflow: hidden; position: relative; transition: all 0.3s ease;">
-                    <div style="width: 64px; height: 64px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
-                        <i data-lucide="image" style="width: 28px; height: 28px; color: var(--primary);"></i>
-                    </div>
-                    <span style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 600;">Subir una foto increíble</span>
-                    <input type="file" id="file-input" hidden accept="image/*" onchange="handleFile(event)">
-                </div>
+                <!-- Integrated Preview Mockup (Acts as upload zone + preview) -->
+                <input type="file" id="file-input" hidden accept="image/*" onchange="handleFile(event)">
+                <div id="realistic-preview" style="margin-bottom: 16px;"></div>
 
-                <!-- Dynamic Controls for Image -->
-                <div id="filter-btn-container" style="display: none; gap: 10px; margin-top: 15px;">
-                    <button class="btn btn-sm" onclick="openNativeEditor()" style="flex: 1; background: var(--primary); color: white; border-radius: 12px; font-weight: 700; height: 44px;">
-                        <i data-lucide="edit-3" style="width: 14px;"></i> Filtros
-                    </button>
-                    <button class="btn btn-sm" onclick="removeImage()" style="flex: 1; background: #fee2e2; color: #991b1b; border-radius: 12px; font-weight: 700; height: 44px;">
-                        <i data-lucide="trash-2" style="width: 14px;"></i> Quitar
-                    </button>
+                <!-- Image Controls Row -->
+                <div id="image-info-row" style="display:none; justify-content:space-between; align-items:center; background:#f8fafc; padding:12px; border-radius:12px; margin-bottom:20px; border:1px solid #cbd5e1;">
+                    <span style="font-size:0.85rem; font-weight:600; color:var(--text-primary);">Imagen del Flyer</span>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn btn-sm" onclick="document.getElementById('filter-section').style.display = document.getElementById('filter-section').style.display === 'none' ? 'block' : 'none'" style="background: #e2e8f0; color: var(--text-primary); width:auto; border-radius:8px; padding:6px 12px;">Filtros</button>
+                        <button class="btn btn-sm" onclick="removeImage()" style="background:#fee2e2; color:#b91c1c; width:auto; border-radius:8px; padding:6px 12px;">Eliminar</button>
+                    </div>
                 </div>
 
                 <!-- Filters -->
-                <div id="filter-section" style="display: none; margin-top: 24px;">
-                    <p style="font-size: 0.9rem; font-weight: 800; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
-                        <i data-lucide="palette" style="width: 16px; color: var(--primary);"></i> Filtros Profesionales
-                    </p>
-                    <div style="display: flex; gap: 12px; overflow-x: auto; padding: 4px 0; scrollbar-width: none; -webkit-overflow-scrolling: touch;">
-                        <div class="filter-thumb" onclick="applyFilter('none')" style="border-radius: 14px; min-width: 70px; height: 70px;">Original</div>
-                        <div class="filter-thumb" onclick="applyFilter('vintage')" style="filter: sepia(0.5) contrast(1.2) brightness(0.9); border-radius: 14px; min-width: 70px; height: 70px;">Vintage</div>
-                        <div class="filter-thumb" onclick="applyFilter('b-w')" style="filter: grayscale(1); border-radius: 14px; min-width: 70px; height: 70px;">B&N</div>
-                        <div class="filter-thumb" onclick="applyFilter('warm')" style="filter: sepia(0.2) saturate(1.5) brightness(1.1); border-radius: 14px; min-width: 70px; height: 70px;">Warm</div>
-                        <div class="filter-thumb" onclick="applyFilter('cool')" style="filter: hue-rotate(30deg) saturate(1.2); border-radius: 14px; min-width: 70px; height: 70px;">Cool</div>
-                        <div class="filter-thumb" onclick="applyFilter('vibrant')" style="filter: saturate(2) contrast(1.1); border-radius: 14px; min-width: 70px; height: 70px;">Vibrant</div>
-                        <div class="filter-thumb" onclick="applyFilter('noir')" style="filter: grayscale(1) contrast(1.5) brightness(0.9); border-radius: 14px; min-width: 70px; height: 70px;">Noir</div>
-                        <div class="filter-thumb" onclick="applyFilter('golden')" style="filter: sepia(0.3) saturate(1.4) brightness(1.1) hue-rotate(-10deg); border-radius: 14px; min-width: 70px; height: 70px;">Golden</div>
-                        <div class="filter-thumb" onclick="applyFilter('cyberpunk')" style="filter: hue-rotate(150deg) saturate(1.6) contrast(1.2); border-radius: 14px; min-width: 70px; height: 70px;">Cyber</div>
-                        <div class="filter-thumb" onclick="applyFilter('lomo')" style="filter: contrast(1.3) saturate(1.6) brightness(0.9); border-radius: 14px; min-width: 70px; height: 70px;">Lomo</div>
-                        <div class="filter-thumb" onclick="applyFilter('fade')" style="filter: brightness(1.1) contrast(0.85) saturate(0.8); border-radius: 14px; min-width: 70px; height: 70px;">Fade</div>
-                        <div class="filter-thumb" onclick="applyFilter('teal')" style="filter: hue-rotate(130deg) saturate(1.4) contrast(1.1); border-radius: 14px; min-width: 70px; height: 70px;">Teal</div>
-                        <div class="filter-thumb" onclick="applyFilter('dramatic')" style="filter: contrast(1.5) brightness(0.8) saturate(0.8); border-radius: 14px; min-width: 70px; height: 70px;">Dramatic</div>
-                    </div>
+                <div id="filter-section" style="display: none; padding: 16px; background: #fafafa; border-radius: 12px; border: 1px solid #eee; margin-bottom: 20px;">
+                    <p style="font-size: 0.85rem; font-weight: 700; margin-bottom: 10px; color: var(--text-secondary);">Filtros</p>
+                    <div id="filter-thumbnails-list" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none;"></div>
                 </div>
 
-                <div style="margin-top: 24px;">
-                    <label style="font-size: 0.9rem; font-weight: 800; color: var(--text-primary); margin-left: 4px;">Contenido</label>
-                    <textarea id="post-text" oninput="updatePreview()" placeholder="¿Qué quieres contar hoy?" style="width: 100%; height: 140px; border: 2px solid var(--border); border-radius: 20px; padding: 16px; margin-top: 8px; font-family: inherit; resize: none; font-size: 1rem; outline: none; transition: border-color 0.2s;"></textarea>
-                    
-                    <div style="display: flex; gap: 10px; margin-top: 12px;">
-                        <button class="btn btn-sm" onclick="generateAICaption()" style="background: #f5f3ff; color: var(--primary); font-size: 0.85rem; flex: 1; border-radius: 12px; font-weight: 700; height: 44px;">
-                            <i data-lucide="sparkles" style="width: 14px;"></i> IA Texto
+                <!-- Textarea Editor -->
+                <div style="margin-bottom: 20px;">
+                    <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:8px;">Texto de la publicación</label>
+                    <textarea id="post-text" oninput="updatePreview()" placeholder="Escribe el texto de tu publicación aquí..." style="width: 100%; min-height: 100px; padding: 14px; border: 1.5px solid var(--border); border-radius: 14px; outline: none; font-family: inherit; font-size: 0.95rem; resize: vertical; line-height: 1.5;"></textarea>
+                </div>
+
+                <!-- AI Dynamic Area -->
+                <div style="background: #f8fafc; padding: 12px; border-radius: 16px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
+                    <div style="margin-bottom: 10px;">
+                        <input type="text" id="ai-context" placeholder="💡 Opcional: Dile a la IA sobre qué escribir..." style="width: 100%; border: 1px solid #cbd5e1; padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; outline: none; background: white;">
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn btn-sm" id="btn-ai-suggest" onclick="generateAICaption()" style="background: #f5f3ff; color: var(--primary); font-size: 0.85rem; flex: 1; border-radius: 10px; font-weight: 700; height: 40px;">
+                            <i data-lucide="sparkles" style="width: 14px;"></i> Sugerencia IA
                         </button>
-                        <button class="btn btn-sm" onclick="generateHashtags()" style="background: #fff1f2; color: var(--secondary); font-size: 0.85rem; flex: 1; border-radius: 12px; font-weight: 700; height: 44px;">
-                            <i data-lucide="hash" style="width: 14px;"></i> Hashtags
+                        <button class="btn btn-sm" onclick="generateHashtags()" style="background: #fff1f2; color: var(--secondary); font-size: 0.85rem; border-radius: 10px; font-weight: 700; height: 40px; padding: 0 16px;">
+                            <i data-lucide="hash" style="width: 14px;"></i>
                         </button>
                     </div>
                 </div>
 
-                <!-- Realistic Preview Section -->
-                <div id="realistic-preview" class="preview-container preview-instagram">
-                    <div class="preview-header">
-                        <div class="preview-avatar" id="pv-avatar"></div>
-                        <div class="preview-name" id="pv-name">Cargando...</div>
-                        <i id="pv-icon" data-lucide="instagram" class="preview-platform-icon"></i>
-                    </div>
-                    <img src="" id="pv-image" class="preview-image" style="display:none;">
-                    <div id="pv-placeholder" style="width:100%; aspect-ratio:1; background:#f8fafc; display:flex; align-items:center; justify-content:center; color:#cbd5e1;">
-                        <i data-lucide="image" style="width:40px; height:40px;"></i>
-                    </div>
-                    <div class="preview-actions" id="pv-actions">
-                        <i data-lucide="heart"></i>
-                        <i data-lucide="message-circle"></i>
-                        <i data-lucide="send"></i>
-                        <i data-lucide="bookmark" style="margin-left:auto;"></i>
-                    </div>
-                    <div class="preview-content">
-                        <span class="preview-name" id="pv-name-inline">Nombre</span>
-                        <span id="pv-text" style="margin-left:5px;">Tu texto aparecerá aquí...</span>
-                    </div>
-                </div>
-
-                <button class="btn btn-primary" id="submit-btn" onclick="submitPost()" style="margin-top: 32px; height: 64px; border-radius: 20px; font-size: 1.1rem; letter-spacing: -0.5px;">
-                    Publicar ahora <i data-lucide="send" style="width: 20px; margin-left: 8px;"></i>
+                <button class="btn btn-primary" id="submit-btn" onclick="submitPost()" style="height: 60px; border-radius: 16px; font-size: 1.05rem; font-weight: 800;">
+                    Publicar ahora <i data-lucide="send" style="width: 18px; margin-left: 8px;"></i>
                 </button>
             </div>
         </div>
     `;
     updatePreview();
+    updateFilterThumbnails();
     lucide.createIcons();
 }
 
 function updatePreview() {
     const user = API.getUser() || { name: 'Usuario' };
     const platform = currentPostData.platform || 'instagram';
-    const text = document.getElementById('post-text')?.value || 'Tu texto aparecerá aquí...';
+    const postType = currentPostData.aspect_ratio || 'feed';
+    const text = document.getElementById('post-text')?.value || '';
     const image = currentPostData.image;
+    const filterKey = currentPostData.filter || 'none';
+    const filterStyleVal = PHOTO_FILTERS[filterKey]?.style || 'none';
 
     const container = document.getElementById('realistic-preview');
     if (!container) return;
 
-    // Update classes
-    container.className = `preview-container preview-${platform}`;
-    
-    // Update basic info
-    document.getElementById('pv-name').innerText = user.name;
-    const nameInline = document.getElementById('pv-name-inline');
-    if (nameInline) nameInline.innerText = user.name;
-    document.getElementById('pv-text').innerText = text;
-
-    // Update avatar
-    const avatar = document.getElementById('pv-avatar');
-    if (user.avatar_url) {
-        avatar.style.backgroundImage = `url(${user.avatar_url})`;
-        avatar.style.backgroundSize = 'cover';
+    // Actualizar visibilidad en el editor de controles
+    const imgInfoRow = document.getElementById('image-info-row');
+    if (imgInfoRow) {
+        imgInfoRow.style.display = image ? 'flex' : 'none';
     }
 
-    // Update Image
-    const pvImg = document.getElementById('pv-image');
-    const pvPlaceholder = document.getElementById('pv-placeholder');
-    if (image) {
-        pvImg.src = image;
-        pvImg.style.display = 'block';
-        pvPlaceholder.style.display = 'none';
+    const avatarUrl = user.avatar_url;
+    const userName = user.name || 'Usuario';
+    const avatarColor = user.avatar_color || '#6366f1';
+    const avatarInitial = userName.charAt(0).toUpperCase();
+
+    const avatarHtml = avatarUrl 
+        ? `<div style="width: 100%; height: 100%; border-radius: 50%; background-image: url('${avatarUrl}'); background-size: cover; background-position: center;"></div>`
+        : `<div style="width: 100%; height: 100%; border-radius: 50%; background: ${avatarColor}; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem;">${avatarInitial}</div>`;
+
+    let innerContent = "";
+
+    if (platform === 'instagram') {
+        if (postType === 'story') {
+            innerContent = `
+                <div class="phone-mockup-header" style="position: absolute; top: 20px; left: 12px; right: 12px; display: flex; align-items: center; gap: 10px; z-index: 10;">
+                    <div class="phone-mockup-avatar" style="margin: 0; padding: 0; border: none;">${avatarHtml}</div>
+                    <span style="color: white; font-weight: 600; font-size: 0.85rem; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">${userName}</span>
+                    <span style="color: rgba(255,255,255,0.6); font-size: 0.75rem; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">Hace un momento</span>
+                </div>
+
+                <div class="phone-mockup-image" style="position: absolute; inset: 0; width: 100%; height: 100%; background: #121212;">
+                    ${image 
+                        ? `<img id="pv-image" src="${image}" style="width:100%; height:100%; object-fit:cover; filter: ${filterStyleVal};" onclick="document.getElementById('file-input').click()">` 
+                        : `<div onclick="document.getElementById('file-input').click()" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#777; cursor:pointer; gap: 8px;">
+                            <i data-lucide="image-plus" style="width:36px; height:36px; color:var(--primary);"></i>
+                            <span style="font-size:0.75rem; font-weight:600;">Subir Imagen</span>
+                           </div>`}
+                </div>
+                
+                <div style="position: absolute; top: 10px; left: 10px; right: 10px; height: 2px; background: rgba(255,255,255,0.2); border-radius: 2px; z-index: 10;">
+                    <div style="width: 75%; height: 100%; background: white; border-radius: 2px;"></div>
+                </div>
+
+                ${text ? `
+                <div style="position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); width: 85%; max-height: 120px; background: rgba(0,0,0,0.75); color: white; padding: 12px 16px; border-radius: 12px; font-size: 0.85rem; font-weight: 700; text-align: center; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px); box-shadow: 0 8px 24px rgba(0,0,0,0.2); z-index: 10;">
+                    <p style="margin: 0; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; word-break: break-word;">${text}</p>
+                </div>
+                ` : ''}
+
+                <div class="phone-mockup-actions" style="position: absolute; bottom: 15px; left: 12px; right: 12px; display: flex; align-items: center; gap: 16px; z-index: 10; background: transparent; padding: 0;">
+                    <div style="flex: 1; height: 40px; border: 1px solid rgba(255,255,255,0.4); border-radius: 20px; background: rgba(0,0,0,0.25); display: flex; align-items: center; padding: 0 12px; color: rgba(255,255,255,0.6); font-size: 0.75rem;">
+                        Enviar mensaje...
+                    </div>
+                    <i data-lucide="heart" style="color: white; width: 22px; height: 22px;"></i>
+                    <i data-lucide="send" style="color: white; width: 22px; height: 22px;"></i>
+                </div>
+            `;
+        } else {
+            innerContent = `
+                <div class="phone-mockup-header">
+                    <div class="phone-mockup-avatar">${avatarHtml}</div>
+                    <div style="display:flex; flex-direction:column;">
+                        <span class="phone-mockup-username">${userName}</span>
+                        <span style="font-size: 0.7rem; color: #8e8e8e;">Original audio</span>
+                    </div>
+                    <i data-lucide="more-horizontal" style="margin-left: auto; color: #262626; width: 18px;"></i>
+                </div>
+                
+                <div class="phone-mockup-image">
+                    ${image 
+                        ? `<img id="pv-image" src="${image}" style="width:100%; height:100%; object-fit:cover; filter: ${filterStyleVal};" onclick="document.getElementById('file-input').click()">` 
+                        : `<div onclick="document.getElementById('file-input').click()" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#cbd5e1; cursor:pointer; gap: 8px;">
+                            <i data-lucide="image-plus" style="width:36px; height:36px; color:var(--primary);"></i>
+                            <span style="font-size:0.75rem; font-weight:600; color: #8e8e8e;">Subir Imagen</span>
+                           </div>`}
+                </div>
+
+                <div class="phone-mockup-actions">
+                    <i data-lucide="heart" style="color: #262626; width: 22px; height: 22px; cursor: pointer;"></i>
+                    <i data-lucide="message-circle" style="color: #262626; width: 22px; height: 22px; cursor: pointer;"></i>
+                    <i data-lucide="send" style="color: #262626; width: 22px; height: 22px; cursor: pointer;"></i>
+                    <i data-lucide="bookmark" style="margin-left: auto; color: #262626; width: 22px; height: 22px; cursor: pointer;"></i>
+                </div>
+
+                <div style="padding: 0 16px 4px 16px; font-weight: 700; font-size: 0.8rem; color: #262626;">
+                    Le gusta a tu_marca y a otras personas
+                </div>
+
+                <div class="phone-mockup-caption" style="padding-top: 0;">
+                    <span class="caption-username-prefix" style="font-weight: 700; margin-right: 6px;">${userName}</span>
+                    <span style="word-break: break-word;">${text || 'Tu texto aparecerá aquí...'}</span>
+                </div>
+            `;
+        }
     } else {
-        pvImg.style.display = 'none';
-        pvPlaceholder.style.display = 'flex';
-    }
+        innerContent = `
+            <div class="phone-mockup-header" style="border-bottom: none; padding-bottom: 8px;">
+                <div class="phone-mockup-avatar" style="background: transparent; padding: 0;">
+                    <div style="width:100%; height:100%; border-radius:50%; overflow:hidden;">${avatarHtml}</div>
+                </div>
+                <div style="display:flex; flex-direction:column;">
+                    <span class="phone-mockup-username" style="display:flex; align-items:center; gap:4px;">
+                        ${userName} <i data-lucide="check-circle" style="width:14px; height:14px; fill:#1877f2; color:white;"></i>
+                    </span>
+                    <div style="display:flex; align-items:center; gap:4px; color:#65676b; font-size:0.7rem; font-weight: 400;">
+                        <span>Hace un momento</span>
+                        <span>•</span>
+                        <i data-lucide="globe" style="width:10px; height:10px;"></i>
+                    </div>
+                </div>
+                <i data-lucide="more-horizontal" style="margin-left: auto; color: #65676b; width: 20px;"></i>
+            </div>
+            
+            <div class="phone-mockup-caption" style="padding: 0 16px 12px 16px; font-size: 0.85rem; color: #050505;">
+                ${text || 'Escribe algo aquí...'}
+            </div>
 
-    // Update Icons and actions based on platform
-    const icon = document.getElementById('pv-icon');
-    const actions = document.getElementById('pv-actions');
-    
-    if (platform === 'facebook') {
-        icon.setAttribute('data-lucide', 'facebook');
-        icon.style.color = '#1877f2';
-        actions.innerHTML = `
-            <div style="display:flex; align-items:center; gap:5px; color:#65676b; font-size:0.8rem; font-weight:600;">
-                <i data-lucide="thumbs-up" style="width:18px;"></i> Me gusta
+            <div class="phone-mockup-image" style="height: ${postType === 'vertical' ? '400px' : '220px'};">
+                ${image 
+                    ? `<img id="pv-image" src="${image}" style="width:100%; height:100%; object-fit:cover; filter: ${filterStyleVal};" onclick="document.getElementById('file-input').click()">` 
+                    : `<div onclick="document.getElementById('file-input').click()" style="width:100%; height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#cbd5e1; cursor:pointer; gap: 8px;">
+                        <i data-lucide="image-plus" style="width:36px; height:36px; color:var(--primary);"></i>
+                        <span style="font-size:0.75rem; font-weight:600; color: #65676b;">Subir Imagen</span>
+                       </div>`}
             </div>
-            <div style="display:flex; align-items:center; gap:5px; color:#65676b; font-size:0.8rem; font-weight:600;">
-                <i data-lucide="message-square" style="width:18px;"></i> Comentar
+
+            <div style="padding: 8px 16px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; font-size: 0.75rem; color: #65676b;">
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <span style="background:#1877f2; color:white; border-radius:50%; width:14px; height:14px; display:flex; align-items:center; justify-content:center; font-size:8px;">👍</span>
+                    <span style="background:#e1306c; color:white; border-radius:50%; width:14px; height:14px; display:flex; align-items:center; justify-content:center; font-size:8px;">❤️</span>
+                    <span>42</span>
+                </div>
+                <div>
+                    <span>8 comentarios</span>
+                    <span style="margin: 0 4px;">•</span>
+                    <span>2 compartidos</span>
+                </div>
             </div>
-            <div style="display:flex; align-items:center; gap:5px; color:#65676b; font-size:0.8rem; font-weight:600;">
-                <i data-lucide="share-2" style="width:18px;"></i> Compartir
+
+            <div class="phone-mockup-actions" style="padding: 6px; display: flex; justify-content: space-around; align-items: center; background: #ffffff;">
+                <button style="flex:1; background:none; border:none; height:32px; border-radius:6px; display:flex; align-items:center; justify-content:center; gap:6px; color:#65676b; font-weight:600; font-size:0.75rem; cursor:pointer;">
+                    <i data-lucide="thumbs-up" style="width: 16px;"></i> Me gusta
+                </button>
+                <button style="flex:1; background:none; border:none; height:32px; border-radius:6px; display:flex; align-items:center; justify-content:center; gap:6px; color:#65676b; font-weight:600; font-size:0.75rem; cursor:pointer;">
+                    <i data-lucide="message-square" style="width: 16px;"></i> Comentar
+                </button>
+                <button style="flex:1; background:none; border:none; height:32px; border-radius:6px; display:flex; align-items:center; justify-content:center; gap:6px; color:#65676b; font-weight:600; font-size:0.75rem; cursor:pointer;">
+                    <i data-lucide="share-2" style="width: 16px;"></i> Compartir
+                </button>
             </div>
         `;
-    } else {
-        icon.setAttribute('data-lucide', 'instagram');
-        icon.style.color = '#e1306c';
-        actions.innerHTML = `
-            <i data-lucide="heart"></i>
-            <i data-lucide="message-circle"></i>
-            <i data-lucide="send"></i>
-            <i data-lucide="bookmark" style="margin-left:auto;"></i>
-        `;
     }
+
+    container.innerHTML = `
+        <div class="phone-mockup-wrapper">
+            <div class="phone-mockup ${platform === 'facebook' ? 'platform-facebook' : ''} format-${postType}">
+                <div class="phone-mockup-screen">
+                    ${innerContent}
+                </div>
+            </div>
+        </div>
+    `;
+
     lucide.createIcons();
 }
 
@@ -725,7 +833,20 @@ async function publishPostAction(postId) {
 async function deletePostAction(postId) {
     if (!confirm('¿Estás seguro de eliminar este post?')) return;
     try {
+        const post = cachedPosts.find(p => p.id === postId);
+        const localUri = post ? post.local_image_uri : null;
+
         await API.deletePost(postId);
+
+        if (localUri && window.Capacitor && window.Capacitor.Plugins.NativeUI) {
+            try {
+                showToast('Eliminando imagen del celular...', 'info');
+                await window.Capacitor.Plugins.NativeUI.deleteFromGallery({ uri: localUri });
+            } catch (err) {
+                console.error("Failed to delete local image from mobile gallery:", err);
+            }
+        }
+
         showToast('Post eliminado', 'success');
         if (currentSection === 'posts') renderPosts();
     } catch (err) {
@@ -775,10 +896,7 @@ function setPostType(type) {
     document.getElementById('type-feed').style.color = type === 'feed' ? 'var(--primary)' : 'var(--text-secondary)';
     document.getElementById('type-story').style.color = type === 'story' ? 'var(--primary)' : 'var(--text-secondary)';
     
-    const area = document.getElementById('image-upload-area');
-    if (area) {
-        area.style.aspectRatio = type === 'feed' ? '1' : '9/16';
-    }
+    updatePreview();
 }
 
 function handleFile(event) {
@@ -787,14 +905,33 @@ function handleFile(event) {
 
     const reader = new FileReader();
     reader.onload = (e) => {
-        currentPostData.image = e.target.result;
-        const area = document.getElementById('image-upload-area');
-        area.innerHTML = `<img src="${e.target.result}" id="preview-img" style="width: 100%; height: 100%; object-fit: cover;">`;
-        
-        document.getElementById('filter-btn-container').style.display = 'flex';
-        document.getElementById('filter-section').style.display = 'block';
-        updatePreview();
-        lucide.createIcons();
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            const maxDim = 800;
+            if (width > maxDim || height > maxDim) {
+                if (width > height) {
+                    height = Math.round(height * (maxDim / width));
+                    width = maxDim;
+                } else {
+                    width = Math.round(width * (maxDim / height));
+                    height = maxDim;
+                }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            
+            currentPostData.image = compressedBase64;
+            updatePreview();
+            updateFilterThumbnails();
+            generateAICaption();
+        };
+        img.src = e.target.result;
     };
     reader.readAsDataURL(file);
 }
@@ -802,16 +939,24 @@ function handleFile(event) {
 function removeImage() {
     currentPostData.image = null;
     currentPostData.filter = 'none';
-    const area = document.getElementById('image-upload-area');
-    area.innerHTML = `
-        <div style="width: 64px; height: 64px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 20px rgba(0,0,0,0.05);">
-            <i data-lucide="image" style="width: 28px; height: 28px; color: var(--primary);"></i>
-        </div>
-        <span style="color: var(--text-secondary); font-size: 0.95rem; font-weight: 600;">Subir una foto increíble</span>
-    `;
-    document.getElementById('filter-btn-container').style.display = 'none';
-    document.getElementById('filter-section').style.display = 'none';
+    
     updatePreview();
+    updateFilterThumbnails();
+    
+    const filterSection = document.getElementById('filter-section');
+    if(filterSection) filterSection.style.display = 'none';
+}
+
+function handleTextTyping() {
+    const text = document.getElementById('post-text').value;
+    const btnAi = document.getElementById('btn-ai-suggest');
+    if (!btnAi) return;
+    
+    if (text.length > 5) {
+        btnAi.innerHTML = '<i data-lucide="sparkles" style="width: 14px;"></i> Reescribir con IA';
+    } else {
+        btnAi.innerHTML = '<i data-lucide="sparkles" style="width: 14px;"></i> Generar Sugerencia IA';
+    }
     lucide.createIcons();
 }
 
@@ -833,50 +978,60 @@ async function openNativeEditor() {
     }
 }
 
+function updateFilterThumbnails() {
+    const listContainer = document.getElementById('filter-thumbnails-list');
+    if (!listContainer) return;
+
+    listContainer.innerHTML = Object.keys(PHOTO_FILTERS).map(key => {
+        const f = PHOTO_FILTERS[key];
+        const isSelected = currentPostData.filter === key || (key === 'none' && !currentPostData.filter);
+        return `
+            <div class="filter-thumb-container" 
+                 onclick="applyFilter('${key}')" 
+                 style="position: relative; min-width: 75px; height: 75px; border-radius: 14px; border: 3px solid ${isSelected ? 'var(--primary)' : 'transparent'}; overflow: hidden; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);">
+                <div style="width: 100%; height: 100%; background: #64748b; filter: ${f.style}; background-image: url('${currentPostData.image || './assets/img/logo.png'}'); background-size: cover; background-position: center;"></div>
+                <span style="position: absolute; bottom: 4px; left: 0; right: 0; text-align: center; color: white; text-shadow: 0 1px 4px rgba(0,0,0,0.9); font-size: 0.65rem; font-weight: 800; letter-spacing: -0.2px;">${f.name}</span>
+            </div>
+        `;
+    }).join('');
+}
+
 function applyFilter(filter) {
     currentPostData.filter = filter;
-    const img = document.getElementById('preview-img');
-    if (!img) return;
-
-    const filters = {
-        'none': 'none',
-        'vintage': 'sepia(0.5) contrast(1.2) brightness(0.9)',
-        'b-w': 'grayscale(1)',
-        'warm': 'sepia(0.2) saturate(1.5) brightness(1.1)',
-        'cool': 'hue-rotate(30deg) saturate(1.2)',
-        'vibrant': 'saturate(2) contrast(1.1)',
-        'noir': 'grayscale(1) contrast(1.5) brightness(0.9)',
-        'golden': 'sepia(0.3) saturate(1.4) brightness(1.1) hue-rotate(-10deg)',
-        'cyberpunk': 'hue-rotate(150deg) saturate(1.6) contrast(1.2)',
-        'lomo': 'contrast(1.3) saturate(1.6) brightness(0.9)',
-        'fade': 'brightness(1.1) contrast(0.85) saturate(0.8)',
-        'teal': 'hue-rotate(130deg) saturate(1.4) contrast(1.1)',
-        'dramatic': 'contrast(1.5) brightness(0.8) saturate(0.8)'
-    };
-
-    const filterValue = filters[filter] || 'none';
-    img.style.filter = filterValue;
-    const pvImg = document.getElementById('pv-image');
-    if (pvImg) pvImg.style.filter = filterValue;
+    const img = document.getElementById('pv-image');
+    const filterStyleVal = PHOTO_FILTERS[filter]?.style || 'none';
+    if (img) img.style.filter = filterStyleVal;
+    
+    updateFilterThumbnails();
 }
 
 async function generateAICaption() {
-    const text = document.getElementById('post-text').value;
-    const btn = event.currentTarget;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = 'Generando...';
-    btn.disabled = true;
+    const contextText = document.getElementById('ai-context') ? document.getElementById('ai-context').value : '';
+    const mainText = document.getElementById('post-text').value;
+    
+    // Si el usuario escribió algo en el post-text, lo sumamos como contexto adicional para "reescribir"
+    const descriptionToSend = contextText + (mainText ? " (Texto actual del post para reescribir/mejorar: " + mainText + ")" : "");
+    
+    const btn = document.getElementById('btn-ai-suggest');
+    const originalText = btn ? btn.innerHTML : '';
+    if (btn) {
+        btn.innerHTML = 'Generando...';
+        btn.disabled = true;
+    }
 
     try {
-        const res = await API.generateCaption(text || 'Marketing digital para mi negocio', {
+        const res = await API.generateCaption(descriptionToSend, {
             imageBase64: currentPostData.image
         });
         document.getElementById('post-text').value = res.caption;
     } catch (e) {
         showToast("Error de IA: " + e.message, "error");
     } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+        if (btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+        handleTextTyping(); // Update button state to "Reescribir" if text is filled
         lucide.createIcons();
     }
 }
@@ -900,6 +1055,96 @@ async function generateHashtags() {
     }
 }
 
+function drawTextOnImage(base64Src, text) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            
+            // Dibujar la imagen base
+            ctx.drawImage(img, 0, 0);
+            
+            const padding = Math.max(20, Math.floor(img.width * 0.05));
+            const maxTextWidth = img.width - (padding * 2);
+            const fontSize = Math.max(18, Math.floor(img.width * 0.04));
+            
+            ctx.font = `bold ${fontSize}px "Outfit", "Inter", "Arial", sans-serif`;
+            ctx.textBaseline = 'top';
+            
+            const words = text.split(' ');
+            const lines = [];
+            let currentLine = '';
+            
+            for (let n = 0; n < words.length; n++) {
+                if (words[n].includes('\n')) {
+                    const subParts = words[n].split('\n');
+                    for (let i = 0; i < subParts.length; i++) {
+                        let testLine = currentLine + (currentLine ? ' ' : '') + subParts[i];
+                        let metrics = ctx.measureText(testLine);
+                        if (metrics.width > maxTextWidth && currentLine) {
+                            lines.push(currentLine);
+                            currentLine = subParts[i];
+                        } else {
+                            currentLine = testLine;
+                        }
+                        if (i < subParts.length - 1) {
+                            lines.push(currentLine);
+                            currentLine = '';
+                        }
+                    }
+                } else {
+                    let testLine = currentLine + (currentLine ? ' ' : '') + words[n];
+                    let metrics = ctx.measureText(testLine);
+                    if (metrics.width > maxTextWidth && currentLine) {
+                        lines.push(currentLine);
+                        currentLine = words[n];
+                    } else {
+                        currentLine = testLine;
+                    }
+                }
+            }
+            if (currentLine) lines.push(currentLine);
+            
+            const lineHeight = fontSize * 1.35;
+            const textBlockHeight = lines.length * lineHeight;
+            
+            const startX = padding;
+            const startY = img.height - textBlockHeight - padding - Math.floor(img.height * 0.1);
+            
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            const radius = Math.floor(fontSize * 0.4);
+            const boxPaddingX = Math.floor(fontSize * 0.6);
+            const boxPaddingY = Math.floor(fontSize * 0.4);
+            
+            const boxX = startX - boxPaddingX > 10 ? startX - boxPaddingX : 10;
+            const boxY = startY - boxPaddingY;
+            const boxWidth = Math.min(maxTextWidth + (boxPaddingX * 2), img.width - (boxX * 2));
+            const boxHeight = textBlockHeight + (boxPaddingY * 2);
+            
+            ctx.beginPath();
+            if (typeof ctx.roundRect === 'function') {
+                ctx.roundRect(boxX, boxY, boxWidth, boxHeight, radius);
+            } else {
+                ctx.rect(boxX, boxY, boxWidth, boxHeight);
+            }
+            ctx.fill();
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.textAlign = 'left';
+            lines.forEach((line, index) => {
+                ctx.fillText(line, startX, startY + (index * lineHeight));
+            });
+            
+            resolve(canvas.toDataURL('image/jpeg', 0.9));
+        };
+        img.onerror = () => resolve(base64Src);
+        img.src = base64Src;
+    });
+}
+
 async function submitPost() {
     finalizePostSubmission();
 }
@@ -915,6 +1160,12 @@ async function finalizePostSubmission() {
         
         if (currentPostData.image && currentPostData.filter && currentPostData.filter !== 'none') {
             finalImage = await PhotoEditor.processImage(currentPostData.image, currentPostData.filter);
+        }
+
+        // Si es historia de Instagram, Meta no soporta texto en el caption. Dibujamos el texto en la imagen.
+        if (currentPostData.aspect_ratio === 'story' && content && currentPostData.platform !== 'facebook') {
+            showToast('Añadiendo texto a la historia...', 'info');
+            finalImage = await drawTextOnImage(finalImage, content);
         }
 
         // --- Muro de Publicidad ---
@@ -978,12 +1229,27 @@ async function finalizePostSubmission() {
         // --- Proceso de Publicación ---
         showToast('Publicando en la red social...', 'info');
 
+        let localImageUri = null;
+        if (window.Capacitor && window.Capacitor.Plugins.NativeUI && finalImage) {
+            try {
+                showToast('Guardando en la galería...', 'info');
+                const saveRes = await window.Capacitor.Plugins.NativeUI.saveToGallery({ image: finalImage });
+                if (saveRes && saveRes.uri) {
+                    localImageUri = saveRes.uri;
+                }
+            } catch (err) {
+                console.error("Failed to save to device gallery:", err);
+                showToast("No se pudo guardar copia local: " + err.message, "warning");
+            }
+        }
+
         const res = await API.createPost({
             content: content,
             image_base64: finalImage,
             platform: currentPostData.platform,
             aspect_ratio: currentPostData.aspect_ratio,
-            status: 'published'
+            status: 'published',
+            local_image_uri: localImageUri
         });
         
         if (res && res.message) {
@@ -1004,128 +1270,156 @@ async function finalizePostSubmission() {
     }
 }
 
-async function renderFlyerGenerator() {
+async function renderAIPhotoEditor() {
     const main = document.getElementById('main-content');
     
     main.innerHTML = `
         <div class="fade-in" style="padding: 20px 16px;">
             <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px;">
                 <div style="background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                    <i data-lucide="palette"></i>
+                    <i data-lucide="wand-2"></i>
                 </div>
                 <div>
-                    <h2 style="font-weight: 800; font-size: 1.5rem; margin: 0;">Diseño con IA</h2>
-                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">Crea flyers profesionales en segundos</p>
+                    <h2 style="font-weight: 800; font-size: 1.5rem; margin: 0;">Retoque IA</h2>
+                    <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 0;">Edita tus fotos usando Inteligencia Artificial</p>
                 </div>
             </div>
 
             <div class="card" style="padding: 20px; border-radius: 24px; margin-bottom: 20px;">
-                <h3 style="font-size: 1rem; margin-bottom: 16px; font-weight: 700;">1. Referencias Visuales</h3>
-                <div id="flyer-images-area" onclick="document.getElementById('flyer-files').click()" style="border: 2px dashed var(--border); border-radius: 20px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.2s;">
+                <h3 style="font-size: 1rem; margin-bottom: 16px; font-weight: 700;">1. Sube la foto original</h3>
+                <div id="editor-images-area" onclick="document.getElementById('editor-file').click()" style="border: 2px dashed var(--border); border-radius: 20px; padding: 30px 20px; text-align: center; cursor: pointer; transition: all 0.2s;">
                     <i data-lucide="image-plus" style="width: 32px; height: 32px; color: var(--primary); margin-bottom: 10px;"></i>
-                    <p style="font-size: 0.9rem; font-weight: 600;">Sube tu logo y fotos</p>
-                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Analizaremos colores y estilo</p>
-                    <input type="file" id="flyer-files" multiple accept="image/*" style="display: none;" onchange="handleFlyerFiles(this)">
+                    <p style="font-size: 0.9rem; font-weight: 600;">Selecciona una foto para editar</p>
+                    <p style="font-size: 0.75rem; color: var(--text-secondary);">Fotos de personas, productos o paisajes</p>
+                    <input type="file" id="editor-file" accept="image/*" style="display: none;" onchange="handleEditorFile(this)">
                 </div>
-                <div id="flyer-previews" style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px;"></div>
+                <div id="editor-preview-container" style="display: none; margin-top: 16px; position: relative;">
+                    <img id="editor-original-preview" style="width: 100%; max-height: 250px; object-fit: contain; border-radius: 14px; border: 1.5px solid var(--border);">
+                    <button onclick="removeEditorFile(event)" style="position: absolute; top: 10px; right: 10px; background: rgba(239, 68, 68, 0.9); color: white; border: none; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">
+                        <i data-lucide="trash" style="width: 16px;"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="card" style="padding: 20px; border-radius: 24px; margin-bottom: 20px;">
-                <h3 style="font-size: 1rem; margin-bottom: 16px; font-weight: 700;">2. Datos del Negocio</h3>
-                <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <input type="text" id="f-negocio" placeholder="Nombre del Negocio / Rubro" style="width: 100%; padding: 14px; border: 1.5px solid var(--border); border-radius: 14px; outline: none; font-family: inherit;">
-                    <input type="text" id="f-oferta" placeholder="¿Qué quieres promocionar? (Ej: 2x1 en Pizzas)" style="width: 100%; padding: 14px; border: 1.5px solid var(--border); border-radius: 14px; outline: none; font-family: inherit;">
-                    <input type="text" id="f-contacto" placeholder="WhatsApp / Instagram / Dirección" style="width: 100%; padding: 14px; border: 1.5px solid var(--border); border-radius: 14px; outline: none; font-family: inherit;">
-                    
-                    <select id="f-formato" style="width: 100%; padding: 14px; border: 1.5px solid var(--border); border-radius: 14px; outline: none; font-family: inherit; background: white;">
-                        <option value="instagram_feed">Post Cuadrado (1:1)</option>
-                        <option value="instagram_vertical">Post Vertical (4:5)</option>
-                        <option value="instagram_story">Story / Reel (9:16)</option>
-                    </select>
-                </div>
+                <h3 style="font-size: 1rem; margin-bottom: 16px; font-weight: 700;">2. Indicaciones de Edición</h3>
+                <textarea id="editor-prompt" placeholder="Ej: 'Ponle un traje formal de negocios', 'Cambia el fondo por una playa soleada', 'Añade lentes de sol y una sonrisa'..." style="width: 100%; padding: 14px; border: 1.5px solid var(--border); border-radius: 14px; outline: none; font-family: inherit; resize: vertical; min-height: 100px; font-size: 0.9rem;"></textarea>
             </div>
 
-            <button class="btn btn-primary" id="btn-gen-flyer" onclick="generateFlyerConcept()" style="height: 60px; border-radius: 20px; font-weight: 800; font-size: 1rem; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);">
-                <i data-lucide="zap" style="width: 18px;"></i> GENERAR CONCEPTO
+            <button class="btn btn-primary" id="btn-process-editor" onclick="processAIPhotoEdit()" style="height: 60px; border-radius: 20px; font-weight: 800; font-size: 1rem; box-shadow: 0 10px 20px rgba(99, 102, 241, 0.2);">
+                <i data-lucide="sparkles" style="width: 18px;"></i> APLICAR RETOQUE IA
             </button>
 
-            <div id="flyer-result" style="margin-top: 24px; display: none;"></div>
+            <div id="editor-result" style="margin-top: 24px; display: none;"></div>
         </div>
     `;
     lucide.createIcons();
 }
 
-let flyerImages = [];
+let editorImageBase64 = null;
 
-function handleFlyerFiles(input) {
-    const files = Array.from(input.files);
-    const container = document.getElementById('flyer-previews');
-    
-    files.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            flyerImages.push(e.target.result);
-            const div = document.createElement('div');
-            div.style.width = '60px';
-            div.style.height = '60px';
-            div.style.borderRadius = '10px';
-            div.style.overflow = 'hidden';
-            div.style.border = '1px solid var(--border)';
-            div.innerHTML = `<img src="${e.target.result}" style="width: 100%; height: 100%; object-fit: cover;">`;
-            container.appendChild(div);
+function handleEditorFile(input) {
+    const file = input.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+            const maxDim = 800;
+            if (width > maxDim || height > maxDim) {
+                if (width > height) {
+                    height = Math.round(height * (maxDim / width));
+                    width = maxDim;
+                } else {
+                    width = Math.round(width * (maxDim / height));
+                    height = maxDim;
+                }
+            }
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+            
+            editorImageBase64 = compressedBase64;
+            document.getElementById('editor-original-preview').src = compressedBase64;
+            document.getElementById('editor-images-area').style.display = 'none';
+            document.getElementById('editor-preview-container').style.display = 'block';
+            lucide.createIcons();
         };
-        reader.readAsDataURL(file);
-    });
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
 }
 
-async function generateFlyerConcept() {
-    const btn = document.getElementById('btn-gen-flyer');
-    const resultDiv = document.getElementById('flyer-result');
-    
-    const data = {
-        negocio: document.getElementById('f-negocio').value,
-        oferta: document.getElementById('f-oferta').value,
-        contacto: document.getElementById('f-contacto').value,
-        formato: document.getElementById('f-formato').value,
-        precio: '', // Opcional
-        tono: 'Profesional e impactante',
-        extra: ''
-    };
+function removeEditorFile(event) {
+    if (event) event.stopPropagation();
+    editorImageBase64 = null;
+    document.getElementById('editor-file').value = '';
+    document.getElementById('editor-images-area').style.display = 'block';
+    document.getElementById('editor-preview-container').style.display = 'none';
+    lucide.createIcons();
+}
 
-    if (!data.negocio || !data.oferta) {
-        showToast("Completa los datos básicos", "warning");
+async function processAIPhotoEdit() {
+    const btn = document.getElementById('btn-process-editor');
+    const prompt = document.getElementById('editor-prompt').value.trim();
+    const resultDiv = document.getElementById('editor-result');
+
+    if (!editorImageBase64) {
+        showToast("Sube una foto primero", "warning");
+        return;
+    }
+    if (!prompt) {
+        showToast("Escribe las indicaciones de edición", "warning");
         return;
     }
 
-    btn.innerHTML = 'Diseñando...';
+    btn.innerHTML = 'Procesando Retoque IA...';
     btn.disabled = true;
     resultDiv.style.display = 'none';
 
     try {
-        const res = await API.generateFlyer(data, flyerImages);
+        const res = await API.generateImage(prompt, editorImageBase64);
         
-        resultDiv.innerHTML = `
-            <div class="card fade-in" style="padding: 20px; border-radius: 24px; background: #fafafa; border: 2px solid #eee;">
-                <h3 style="color: var(--primary); font-weight: 800; margin-bottom: 15px;">Diseño Propuesto</h3>
-                <div style="white-space: pre-wrap; font-size: 0.9rem; line-height: 1.6; color: #334155;">
-                    ${res.concept.replace(/###/g, '<br><strong>').replace(/  /g, '</strong> ')}
+        if (res.imageBase64) {
+            resultDiv.innerHTML = `
+                <div class="card fade-in" style="padding: 20px; border-radius: 24px; background: #fafafa; border: 2px solid #eee; margin-top:0;">
+                    <h3 style="color: var(--primary); font-weight: 800; margin-bottom: 15px;">Foto Retocada con IA</h3>
+                    <div style="border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; background: #fafafa; margin-bottom: 16px;">
+                        <img src="${res.imageBase64}" id="editor-result-img" style="width: 100%; max-height: 400px; object-fit: contain; display: block; background: black;">
+                    </div>
+                    <button class="btn btn-primary" onclick="useEditedPhoto('${res.imageBase64}')" style="width:100%; border-radius:12px; height: 50px; font-weight:700; font-size:1rem;">
+                        <i data-lucide="check"></i> Usar esta Foto en mi Post
+                    </button>
                 </div>
-                
-                <button class="btn" onclick="copyToClipboard(this)" data-text="${res.concept.replace(/"/g, '&quot;')}" style="margin-top: 20px; background: white; border: 1.5px solid #ddd; font-size: 0.8rem;">
-                    Copiar Concepto
-                </button>
-            </div>
-        `;
-        resultDiv.style.display = 'block';
-        window.scrollTo({ top: resultDiv.offsetTop - 100, behavior: 'smooth' });
+            `;
+            resultDiv.style.display = 'block';
+            window.scrollTo({ top: resultDiv.offsetTop - 100, behavior: 'smooth' });
+        } else {
+            throw new Error("No se pudo obtener la imagen editada.");
+        }
     } catch (e) {
         showToast("Error: " + e.message, "error");
     } finally {
-        btn.innerHTML = '<i data-lucide="zap" style="width: 18px;"></i> GENERAR CONCEPTO';
+        btn.innerHTML = '<i data-lucide="sparkles" style="width: 18px;"></i> APLICAR RETOQUE IA';
         btn.disabled = false;
         lucide.createIcons();
     }
 }
+
+window.useEditedPhoto = function(base64) {
+    currentPostData.image = base64;
+    navigate('create');
+    setTimeout(() => {
+        updatePreview();
+    }, 500);
+};
+
 
 function copyToClipboard(btn) {
     const text = btn.getAttribute('data-text');
