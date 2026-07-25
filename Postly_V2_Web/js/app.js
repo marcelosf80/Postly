@@ -1166,7 +1166,7 @@ async function generateHashtags() {
     }
 
     try {
-        const res = await API.generateHashtags(text || 'Marketing digital');
+        const res = await API.generateHashtags(text || 'Marketing digital', currentPostData.image || null);
         document.getElementById('post-text').value += "\n\n" + res.hashtags;
         updatePreview();
     } catch (e) {

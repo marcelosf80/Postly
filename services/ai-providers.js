@@ -65,6 +65,49 @@ function getAvailableProvider() {
     throw new Error('No hay ninguna API key de IA configurada en el archivo .env. Por favor, agregá tu GROQ_API_KEY o tu OPENAI_API_KEY.');
 }
 
+/**
+ * Usa Hugging Face BLIP para describir una imagen en texto.
+ * Esto permite que modelos sin visión (como GPT-OSS) entiendan la imagen.
+ */
+async function describeImage(imageBase64) {
+    const token = process.env.HF_API_KEY;
+    if (!token || token.length < 5) {
+        console.warn('[VISION] No hay HF_API_KEY configurada. No se puede analizar la imagen.');
+        return null;
+    }
+
+    try {
+        // Extraer solo los bytes base64 sin el prefijo data:image/...
+        const rawBase64 = imageBase64.includes('base64,') 
+            ? imageBase64.split('base64,')[1] 
+            : imageBase64;
+        const imageBuffer = Buffer.from(rawBase64, 'base64');
+
+        console.log('[VISION] Analizando imagen con Hugging Face BLIP...');
+        const response = await axios.post(
+            'https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large',
+            imageBuffer,
+            {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/octet-stream'
+                },
+                timeout: 30000
+            }
+        );
+
+        if (response.data && response.data[0] && response.data[0].generated_text) {
+            const description = response.data[0].generated_text;
+            console.log('[VISION] Imagen descrita:', description);
+            return description;
+        }
+        return null;
+    } catch (e) {
+        console.error('[VISION] Error analizando imagen:', e.message);
+        return null;
+    }
+}
+
 async function callAI(systemPrompt, userPrompt, options = {}) {
     let { temperature = 0.7, maxTokens = 1200, images = [], imageBase64 = null, provider: requestedProvider = null } = options;
 
@@ -131,11 +174,26 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
 }
 
 async function generateCaption(description, options = {}) {
-    const systemPrompt = "Eres un experto en marketing digital. Tu objetivo es generar captions (textos para redes sociales) altamente atractivos con emojis y hashtags. IMPORTANTE: Tu respuesta debe ser ÚNICA Y EXCLUSIVAMENTE el texto del caption listo para publicar. NO uses frases conversacionales como 'Aquí tienes' ni comillas. Solo el texto final.";
-    let userPrompt = "Analiza la imagen adjunta (si hay alguna) y genera un caption perfecto para ella.";
-    if (description && description.trim() !== "") {
-        userPrompt += ` Toma en cuenta estas instrucciones o contexto específico del usuario: "${description}"`;
+    const { imageBase64 = null } = options;
+    
+    // Si hay imagen, primero la analizamos con HF BLIP
+    let imageContext = '';
+    if (imageBase64) {
+        const imageDesc = await describeImage(imageBase64);
+        if (imageDesc) {
+            imageContext = `\n\nDESCRIPCIÓN DE LA IMAGEN (generada por IA de visión): "${imageDesc}". Usa esta información para crear un caption que se relacione perfectamente con lo que muestra la imagen.`;
+        }
     }
+
+    const systemPrompt = `Eres un experto en marketing digital y redes sociales. Tu objetivo es generar captions (textos para publicaciones) altamente atractivos con emojis y hashtags.
+IMPORTANTE: Tu respuesta debe ser ÚNICA Y EXCLUSIVAMENTE el texto del caption listo para publicar. NO uses frases conversacionales como 'Aquí tienes' ni comillas. Solo el texto final.`;
+    
+    let userPrompt = 'Genera un caption perfecto para una publicación en redes sociales.';
+    if (description && description.trim() !== '') {
+        userPrompt += ` Contexto del usuario: "${description}"`;
+    }
+    userPrompt += imageContext;
+
     return callAI(systemPrompt, userPrompt, options);
 }
 
@@ -164,7 +222,23 @@ Formato: ${data.formato}`;
 }
 
 async function generateHashtags(description, options = {}) {
-    return callAI("Genera 15 hashtags relevantes.", description, options);
+    const { imageBase64 = null } = options;
+    
+    // Si hay imagen, primero la analizamos
+    let imageContext = '';
+    if (imageBase64) {
+        const imageDesc = await describeImage(imageBase64);
+        if (imageDesc) {
+            imageContext = ` La imagen muestra: "${imageDesc}".`;
+        }
+    }
+
+    const systemPrompt = `Eres un experto en SEO y hashtags para redes sociales (Instagram, Facebook, TikTok).
+Genera exactamente 15 hashtags ultra-relevantes, mezclando populares (alto alcance) con hashtags de nicho (alto engagement).
+Respuesta: SOLO los hashtags separados por espacios. Sin explicaciones ni numeración.`;
+    
+    const userPrompt = `Genera 15 hashtags estratégicos para: ${description || 'publicación de redes sociales'}.${imageContext}`;
+    return callAI(systemPrompt, userPrompt, options);
 }
 
 async function generateIdeas(industry, options = {}) {
@@ -226,7 +300,15 @@ async function generateImage(prompt, options = {}) {
 
 
 async function analyzeImage(imageBase64, options = {}) {
-    return callAI("Analiza esta imagen y dame insights.", "Analiza la imagen.", { ...options, images: [imageBase64] });
+    const imageDesc = await describeImage(imageBase64);
+    if (imageDesc) {
+        return callAI(
+            'Eres un experto en marketing visual para redes sociales.',
+            `La imagen muestra: "${imageDesc}". Basándote en eso, dame: 1) Elementos visuales principales, 2) Emociones que transmite, 3) Sugerencias para el caption, 4) 10 hashtags recomendados.`,
+            options
+        );
+    }
+    return 'No se pudo analizar la imagen. Asegúrate de tener tu HF_API_KEY configurada.';
 }
 
 function getProviderStatus() {

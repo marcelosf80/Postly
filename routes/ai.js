@@ -68,8 +68,8 @@ router.post('/flyer', async (req, res) => {
 
 router.post('/hashtags', async (req, res) => {
     try {
-        const { description, provider } = req.body;
-        const result = await ai.generateHashtags(description, { provider });
+        const { description, imageBase64, provider } = req.body;
+        const result = await ai.generateHashtags(description, { imageBase64, provider });
         res.json({ hashtags: result });
     } catch (error) {
         res.status(500).json({ error: error.message });

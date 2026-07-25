@@ -126,10 +126,10 @@ const API = {
         });
     },
 
-    async generateHashtags(description) {
+    async generateHashtags(description, imageBase64 = null) {
         return this.request('/api/ai/hashtags', {
             method: 'POST',
-            body: { description }
+            body: { description, imageBase64 }
         });
     },
 
