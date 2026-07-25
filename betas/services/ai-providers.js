@@ -16,20 +16,20 @@ const PROVIDERS = {
         name: 'Meta Llama'
     },
     
-    // Hugging Face (Llama 3 Serverless)
+    // Groq (Llama 3.3 - Ultra rápido y gratis)
+    groq: {
+        url: 'https://api.groq.com/openai/v1/chat/completions',
+        model: 'llama-3.3-70b-versatile',
+        apiKeyEnv: 'GROQ_API_KEY',
+        name: 'Groq (Llama 3.3)'
+    },
+
+    // Hugging Face (Llama 3 Router)
     huggingface: {
-        url: 'https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct/v1/chat/completions',
+        url: 'https://router.huggingface.co/hf-inference/v1/chat/completions',
         model: 'meta-llama/Meta-Llama-3-8B-Instruct',
         apiKeyEnv: 'HF_API_KEY',
         name: 'Hugging Face (Llama-3)'
-    },
-    
-    // Groq (Llama ultra-rápido - Actual)
-    groq: {
-        url: 'https://api.groq.com/openai/v1/chat/completions',
-        model: 'llama-3.1-70b-versatile',
-        apiKeyEnv: 'GROQ_API_KEY',
-        name: 'Groq (Llama)'
     },
     
     // OpenAI (GPT-4 - Pago)
@@ -72,7 +72,7 @@ const PROVIDERS = {
 
 function getAvailableProvider() {
     // Orden de preferencia
-    const preferenceOrder = ['huggingface', 'meta', 'groq', 'openai', 'claude'];
+    const preferenceOrder = ['groq', 'huggingface', 'meta', 'openai', 'claude'];
     
     for (const providerKey of preferenceOrder) {
         const provider = PROVIDERS[providerKey];

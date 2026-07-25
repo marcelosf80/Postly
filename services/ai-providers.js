@@ -2,18 +2,18 @@
 const axios = require('axios');
 
 const PROVIDERS = {
+    groq: {
+        url: 'https://api.groq.com/openai/v1/chat/completions',
+        model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+        secondaryModel: 'llama-3.1-8b-instant',
+        apiKeyEnv: 'GROQ_API_KEY',
+        name: 'Groq (Llama 3.3)'
+    },
     huggingface: {
-        url: 'https://api-inference.huggingface.co/models/meta-llama/Meta-Llama-3-8B-Instruct/v1/chat/completions',
+        url: 'https://router.huggingface.co/hf-inference/v1/chat/completions',
         model: 'meta-llama/Meta-Llama-3-8B-Instruct',
         apiKeyEnv: 'HF_API_KEY',
         name: 'Hugging Face (Llama-3)'
-    },
-    groq: {
-        url: 'https://api.groq.com/openai/v1/chat/completions',
-        model: process.env.GROQ_MODEL || 'llama-3.1-70b-versatile',
-        secondaryModel: 'llama-3.1-8b-instant', // Modelo de respaldo
-        apiKeyEnv: 'GROQ_API_KEY',
-        name: 'Groq Next-Gen'
     },
     meta: {
         url: 'https://api.llama-api.com/chat/completions',
@@ -66,7 +66,7 @@ const IMAGE_PROVIDERS = {
 };
 
 function getAvailableProvider() {
-    const preferenceOrder = ['huggingface', 'openai', 'groq', 'meta'];
+    const preferenceOrder = ['groq', 'huggingface', 'openai', 'meta'];
     for (const key of preferenceOrder) {
         const provider = PROVIDERS[key];
         const apiKey = process.env[provider.apiKeyEnv];

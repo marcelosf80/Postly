@@ -106,6 +106,33 @@ class InstagramAPI {
         }
     }
 
+    async waitForContainerReady(creationId, maxWaitMs = 30000) {
+        const startTime = Date.now();
+        while (Date.now() - startTime < maxWaitMs) {
+            try {
+                const res = await axios.get(`${this.graphUrl}/${creationId}`, {
+                    params: {
+                        fields: 'status_code,status',
+                        access_token: this.accessToken
+                    }
+                });
+                const statusCode = res.data.status_code;
+                console.log(`[INSTAGRAM] Estado del contenedor ${creationId}: ${statusCode}`);
+                if (statusCode === 'FINISHED') {
+                    return true;
+                } else if (statusCode === 'ERROR') {
+                    throw new Error(`Instagram no pudo procesar la imagen (${res.data.status || 'Error en formato o descarga'}).`);
+                }
+            } catch (e) {
+                if (e.message.includes('Instagram no pudo procesar')) throw e;
+                console.warn('[INSTAGRAM] Esperando procesamiento del contenedor...', e.message);
+            }
+            await new Promise(resolve => setTimeout(resolve, 3000));
+        }
+        // Si después de 30s no responde FINISHED, intentamos publicar de todos modos o fallamos
+        return true;
+    }
+
     /**
      * Flujo completo de publicación
      */
@@ -119,6 +146,9 @@ class InstagramAPI {
         console.log(`[INSTAGRAM] 2. Creando contenedor ${mediaType} en Meta Graph con URL:`, publicUrl);
         const creationId = await this.createMediaContainer(publicUrl, caption, mediaType);
         
+        console.log('[INSTAGRAM] 2.5. Esperando a que Meta termine de procesar el archivo multimedia...');
+        await this.waitForContainerReady(creationId);
+
         console.log('[INSTAGRAM] 3. Publicando en Instagram...');
         const postId = await this.publishMedia(creationId);
         
