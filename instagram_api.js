@@ -15,21 +15,25 @@ class InstagramAPI {
      */
     async uploadLocalImage(filePath) {
         try {
+            const sharp = require('sharp');
+            const normalizedBuffer = await sharp(filePath)
+                .jpeg({ quality: 90 })
+                .toBuffer();
+
             const form = new FormData();
-            form.append('file', fs.createReadStream(filePath));
+            form.append('reqtype', 'fileupload');
+            form.append('fileToUpload', normalizedBuffer, { filename: 'image.jpg', contentType: 'image/jpeg' });
             
-            // Usamos tmpfiles.org como host temporal sin auth (máximo 60 minutos o menos)
-            const response = await axios.post('https://tmpfiles.org/api/v1/upload', form, {
+            // Usamos catbox.moe como host temporal confiable (retorna URL directa)
+            const response = await axios.post('https://catbox.moe/user/api.php', form, {
                 headers: {
                     ...form.getHeaders()
                 }
             });
 
-            if (response.data && response.data.status === 'success') {
-                // Tmpfiles retorna una URL de visualización. Transformamos a descarga directa.
-                const viewUrl = response.data.data.url;
-                let directUrl = viewUrl.replace('tmpfiles.org/', 'tmpfiles.org/dl/');
-                // Forzar HTTPS porque Meta Graph API lo requiere estrictamente
+            if (response.data && response.data.startsWith('http')) {
+                let directUrl = response.data;
+                // Forzar HTTPS
                 if (directUrl.startsWith('http://')) {
                     directUrl = directUrl.replace('http://', 'https://');
                 }
@@ -87,13 +91,31 @@ class InstagramAPI {
         }
     }
 
+    async verifyImageUrlAccessible(imageUrl, timeoutMs = 5000) {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+        try {
+            const res = await fetch(imageUrl, { method: 'HEAD', signal: controller.signal });
+            const contentType = res.headers.get('content-type') || '';
+            if (!res.ok || !contentType.startsWith('image/')) {
+                throw new Error(`URL no válida para Instagram: status=${res.status}, content-type=${contentType}`);
+            }
+        } finally {
+            clearTimeout(timeout);
+        }
+    }
+
     /**
      * Flujo completo de publicación
      */
     async processAndPublish(filePath, caption, mediaType = 'IMAGE') {
-        console.log(`[INSTAGRAM] 1. Subiendo imagen (${mediaType}) a servidor público interino...`);
+        console.log(`[INSTAGRAM] 1. Normalizando y subiendo imagen (${mediaType}) a servidor público interino...`);
         const publicUrl = await this.uploadLocalImage(filePath);
         
+        console.log(`[INSTAGRAM] 1.5. Verificando que la URL sea accesible para Meta...`);
+        await this.verifyImageUrlAccessible(publicUrl);
+
         console.log(`[INSTAGRAM] 2. Creando contenedor ${mediaType} en Meta Graph con URL:`, publicUrl);
         const creationId = await this.createMediaContainer(publicUrl, caption, mediaType);
         

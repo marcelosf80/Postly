@@ -35,7 +35,17 @@ const PHOTO_FILTERS = {
     'sepia-strong': { name: 'Sepia F.', style: 'sepia(0.9) contrast(1.1) brightness(0.95)' },
     'monochrome': { name: 'Monocromo', style: 'grayscale(1) brightness(1.15) contrast(1.25)' },
     'invert': { name: 'Invertir', style: 'invert(1)' },
-    'dreamy': { name: 'Ensueño', style: 'brightness(1.1) saturate(1.1) contrast(0.9) blur(0.5px)' }
+    'dreamy': { name: 'Ensueño', style: 'brightness(1.1) saturate(1.1) contrast(0.9)' },
+    'cinematic': { name: 'Cine', style: 'contrast(1.25) saturate(1.3) sepia(0.15) hue-rotate(-10deg)' },
+    'warm-sunset': { name: 'Atardecer', style: 'sepia(0.35) saturate(1.6) brightness(1.08) hue-rotate(-15deg)' },
+    'rose-gold': { name: 'Oro Rosa', style: 'sepia(0.25) saturate(1.3) hue-rotate(320deg) brightness(1.05)' },
+    'dark-moody': { name: 'Moody', style: 'contrast(1.4) brightness(0.82) saturate(0.85)' },
+    'emerald': { name: 'Esmeralda', style: 'hue-rotate(85deg) saturate(1.4) contrast(1.1)' },
+    'chrome': { name: 'Cromo', style: 'contrast(1.5) saturate(1.8) brightness(1.05)' },
+    'vignette': { name: 'Viñeta', style: 'contrast(1.3) brightness(0.9) saturate(1.2)' },
+    'hdr-punch': { name: 'HDR', style: 'contrast(1.45) saturate(1.5) brightness(1.02)' },
+    'soft-glow': { name: 'Brillo Suave', style: 'brightness(1.12) contrast(0.92) saturate(1.15)' },
+    'vintage-70s': { name: 'Retro 70s', style: 'sepia(0.45) contrast(1.1) saturate(1.25) hue-rotate(-8deg)' }
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -461,13 +471,16 @@ function renderCreatePost() {
     const main = document.getElementById('main-content');
     main.innerHTML = `
         <div class="fade-in" style="padding-bottom: 40px;">
-            <div style="padding: 24px 20px 16px 20px;">
-                <h2 style="font-weight: 800; font-size: 1.8rem; letter-spacing: -1px;">Crear Publicación</h2>
-                <p style="color: var(--text-secondary); font-size: 0.9rem; font-weight: 500;">Tu mockup en tiempo real.</p>
+            <div style="padding: 24px 20px 16px 20px; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h2 style="font-weight: 800; font-size: 1.8rem; letter-spacing: -1px; background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Crear Publicación</h2>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 500;">Editor Inteligente de Redes Sociales</p>
+                </div>
+                <span class="ai-badge"><i data-lucide="sparkles" style="width:12px;"></i> IA Activa</span>
             </div>
 
             <!-- Editor Card -->
-            <div class="card" style="margin: 0 20px; padding: 20px; border: none; box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+            <div class="card" style="margin: 0 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 10px 30px rgba(99, 102, 241, 0.08);">
                 <!-- Platform Toggle -->
                 <div style="display: flex; gap: 8px; margin-bottom: 16px; background: #f1f5f9; padding: 6px; border-radius: 18px;">
                     <button class="btn btn-sm" id="plat-ig" onclick="setPlatform('instagram')" style="flex: 1; border-radius: 14px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); font-weight: 700;">Instagram</button>
@@ -484,54 +497,84 @@ function renderCreatePost() {
                     </button>
                 </div>
 
-                <!-- Integrated Preview Mockup (Acts as upload zone + preview) -->
+                <!-- Media Source Picker Toolbar -->
+                <div class="media-source-picker">
+                    <button class="source-btn" onclick="takePhotoFromCamera()" style="background:#f0f7ff; border-color:#bae6fd; color:#0369a1;">
+                        <i data-lucide="camera"></i>
+                        <span>Cámara</span>
+                    </button>
+                    <button class="source-btn" onclick="pickPhotoFromGallery()" style="background:#f5f3ff; border-color:#ddd6fe; color:#6d28d9;">
+                        <i data-lucide="image"></i>
+                        <span>Galería</span>
+                    </button>
+                    <button class="source-btn" onclick="openNativeEditor()" style="background:#fdf2f8; border-color:#fbcfe8; color:#be185d;">
+                        <i data-lucide="sliders"></i>
+                        <span>Editor Pro</span>
+                    </button>
+                </div>
+
+                <!-- Hidden input file -->
                 <input type="file" id="file-input" hidden accept="image/*" onchange="handleFile(event)">
+
+                <!-- Realistic Mockup Preview -->
                 <div id="realistic-preview" style="margin-bottom: 16px;"></div>
 
                 <!-- Image Controls Row -->
-                <div id="image-info-row" style="display:none; justify-content:space-between; align-items:center; background:#f8fafc; padding:12px; border-radius:12px; margin-bottom:20px; border:1px solid #cbd5e1;">
-                    <span style="font-size:0.85rem; font-weight:600; color:var(--text-primary);">Imagen del Flyer</span>
+                <div id="image-info-row" style="display:none; justify-content:space-between; align-items:center; background:#f8fafc; padding:12px; border-radius:14px; margin-bottom:20px; border:1px solid #e2e8f0;">
+                    <span style="font-size:0.82rem; font-weight:700; color:var(--text-primary);">📷 Foto Cargada</span>
                     <div style="display:flex; gap:8px;">
-                        <button class="btn btn-sm" onclick="document.getElementById('filter-section').style.display = document.getElementById('filter-section').style.display === 'none' ? 'block' : 'none'" style="background: #e2e8f0; color: var(--text-primary); width:auto; border-radius:8px; padding:6px 12px;">Filtros</button>
-                        <button class="btn btn-sm" onclick="removeImage()" style="background:#fee2e2; color:#b91c1c; width:auto; border-radius:8px; padding:6px 12px;">Eliminar</button>
+                        <button class="btn btn-sm" onclick="openNativeEditor()" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; width:auto; border-radius:10px; padding:6px 12px;">
+                            <i data-lucide="sliders" style="width:14px;"></i> Editar Foto
+                        </button>
+                        <button class="btn btn-sm" onclick="removeImage()" style="background:#fee2e2; color:#b91c1c; width:auto; border-radius:10px; padding:6px 10px;">
+                            <i data-lucide="trash-2" style="width:14px;"></i>
+                        </button>
                     </div>
-                </div>
-
-                <!-- Filters -->
-                <div id="filter-section" style="display: none; padding: 16px; background: #fafafa; border-radius: 12px; border: 1px solid #eee; margin-bottom: 20px;">
-                    <p style="font-size: 0.85rem; font-weight: 700; margin-bottom: 10px; color: var(--text-secondary);">Filtros</p>
-                    <div id="filter-thumbnails-list" style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; scrollbar-width: none;"></div>
                 </div>
 
                 <!-- Textarea Editor -->
                 <div style="margin-bottom: 20px;">
                     <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:8px;">Texto de la publicación</label>
-                    <textarea id="post-text" oninput="updatePreview()" placeholder="Escribe el texto de tu publicación aquí..." style="width: 100%; min-height: 100px; padding: 14px; border: 1.5px solid var(--border); border-radius: 14px; outline: none; font-family: inherit; font-size: 0.95rem; resize: vertical; line-height: 1.5;"></textarea>
+                    <textarea id="post-text" oninput="updatePreview()" placeholder="Escribe el texto de tu publicación aquí..." style="width: 100%; min-height: 110px; padding: 14px; border: 1.5px solid var(--border); border-radius: 14px; outline: none; font-family: inherit; font-size: 0.95rem; resize: vertical; line-height: 1.5;"></textarea>
                 </div>
 
-                <!-- AI Dynamic Area -->
-                <div style="background: #f8fafc; padding: 12px; border-radius: 16px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
-                    <div style="margin-bottom: 10px;">
-                        <input type="text" id="ai-context" placeholder="💡 Opcional: Dile a la IA sobre qué escribir..." style="width: 100%; border: 1px solid #cbd5e1; padding: 10px 14px; border-radius: 10px; font-size: 0.85rem; outline: none; background: white;">
+                <!-- AI Dynamic Assistant Panel -->
+                <div style="background: linear-gradient(135deg, #f8fafc, #f1f5f9); padding: 16px; border-radius: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
+                        <span style="font-size:0.85rem; font-weight:800; color:#475569; display:flex; align-items:center; gap:6px;">
+                            <i data-lucide="bot" style="width:16px; color:#6366f1;"></i> Asistente de Contenido IA
+                        </span>
+                        <span style="font-size:0.7rem; font-weight:600; color:#10b981;">💡 Horario Sugerido: 18:30 hrs</span>
                     </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn btn-sm" id="btn-ai-suggest" onclick="generateAICaption()" style="background: #f5f3ff; color: var(--primary); font-size: 0.85rem; flex: 1; border-radius: 10px; font-weight: 700; height: 40px;">
-                            <i data-lucide="sparkles" style="width: 14px;"></i> Sugerencia IA
+
+                    <div style="margin-bottom: 12px;">
+                        <input type="text" id="ai-context" placeholder="Dile a la IA sobre qué quieres publicar (ej: Promoción de fin de semana)..." style="width: 100%; border: 1px solid #cbd5e1; padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; outline: none; background: white;">
+                    </div>
+
+                    <div style="display: flex; gap: 8px; margin-bottom:12px;">
+                        <button class="btn btn-sm" id="btn-ai-suggest" onclick="generateAICaption()" style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; font-size: 0.8rem; flex: 1; border-radius: 12px; font-weight: 700; height: 42px;">
+                            <i data-lucide="sparkles" style="width: 14px;"></i> Generar Copy con IA
                         </button>
-                        <button class="btn btn-sm" onclick="generateHashtags()" style="background: #fff1f2; color: var(--secondary); font-size: 0.85rem; border-radius: 10px; font-weight: 700; height: 40px; padding: 0 16px;">
-                            <i data-lucide="hash" style="width: 14px;"></i>
+                        <button class="btn btn-sm" onclick="generateHashtags()" style="background: #ffffff; color: #0284c7; border:1px solid #bae6fd; font-size: 0.8rem; border-radius: 12px; font-weight: 700; height: 42px; padding: 0 16px;">
+                            <i data-lucide="hash" style="width: 14px;"></i> Hashtags
                         </button>
+                    </div>
+
+                    <!-- Instant Tone Quick Actions -->
+                    <div style="display:flex; gap:6px; overflow-x:auto; padding-top:4px;">
+                        <button class="btn btn-sm" onclick="improveTextWithTone('viral')" style="padding:4px 10px; font-size:0.72rem; background:white; border:1px solid #e2e8f0; color:#475569; border-radius:16px;">🚀 Tono Viral</button>
+                        <button class="btn btn-sm" onclick="improveTextWithTone('sales')" style="padding:4px 10px; font-size:0.72rem; background:white; border:1px solid #e2e8f0; color:#475569; border-radius:16px;">🛍️ Modo Ventas</button>
+                        <button class="btn btn-sm" onclick="improveTextWithTone('formal')" style="padding:4px 10px; font-size:0.72rem; background:white; border:1px solid #e2e8f0; color:#475569; border-radius:16px;">💼 Profesional</button>
                     </div>
                 </div>
 
-                <button class="btn btn-primary" id="submit-btn" onclick="submitPost()" style="height: 60px; border-radius: 16px; font-size: 1.05rem; font-weight: 800;">
+                <button class="btn btn-primary" id="submit-btn" onclick="submitPost()" style="height: 60px; border-radius: 18px; font-size: 1.05rem; font-weight: 800;">
                     Publicar ahora <i data-lucide="send" style="width: 18px; margin-left: 8px;"></i>
                 </button>
             </div>
         </div>
     `;
     updatePreview();
-    updateFilterThumbnails();
     lucide.createIcons();
 }
 
@@ -960,21 +1003,98 @@ function handleTextTyping() {
     lucide.createIcons();
 }
 
-async function openNativeEditor() {
-    if (window.Capacitor && window.Capacitor.Plugins.NativeUI && currentPostData.image) {
-        try {
-            const result = await window.Capacitor.Plugins.NativeUI.openPhotoEditor({
-                image: currentPostData.image
+async function takePhotoFromCamera() {
+    try {
+        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Camera) {
+            const image = await window.Capacitor.Plugins.Camera.getPhoto({
+                quality: 90,
+                allowEditing: true,
+                resultType: 'dataUrl',
+                source: 'CAMERA'
             });
-            if (result.image) {
-                currentPostData.image = result.image;
-                document.getElementById('preview-img').src = result.image;
+            if (image && image.dataUrl) {
+                currentPostData.image = image.dataUrl;
+                updatePreview();
+                showImageControls();
             }
-        } catch (e) {
-            console.error("Native editor failed:", e);
+        } else {
+            const fileInput = document.getElementById('file-input');
+            if (fileInput) {
+                fileInput.setAttribute('capture', 'environment');
+                fileInput.click();
+            }
         }
+    } catch (err) {
+        console.log('[Camera] Error taking photo:', err);
+    }
+}
+
+async function pickPhotoFromGallery() {
+    try {
+        if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Camera) {
+            const image = await window.Capacitor.Plugins.Camera.getPhoto({
+                quality: 90,
+                allowEditing: true,
+                resultType: 'dataUrl',
+                source: 'PHOTOS'
+            });
+            if (image && image.dataUrl) {
+                currentPostData.image = image.dataUrl;
+                updatePreview();
+                showImageControls();
+            }
+        } else {
+            const fileInput = document.getElementById('file-input');
+            if (fileInput) {
+                fileInput.removeAttribute('capture');
+                fileInput.click();
+            }
+        }
+    } catch (err) {
+        console.log('[Gallery] Error picking photo:', err);
+    }
+}
+
+function toggleFilterSection() {
+    const sec = document.getElementById('filter-section');
+    if (sec) {
+        sec.style.display = sec.style.display === 'none' ? 'block' : 'none';
+    }
+}
+
+function updateImageAdjustments() {
+    const brightness = document.getElementById('slider-brightness')?.value || 100;
+    const contrast = document.getElementById('slider-contrast')?.value || 100;
+    const saturation = document.getElementById('slider-saturation')?.value || 100;
+
+    if (document.getElementById('val-brightness')) document.getElementById('val-brightness').innerText = `${brightness}%`;
+    if (document.getElementById('val-contrast')) document.getElementById('val-contrast').innerText = `${contrast}%`;
+    if (document.getElementById('val-saturation')) document.getElementById('val-saturation').innerText = `${saturation}%`;
+
+    currentPostData.adjustments = {
+        brightness: parseInt(brightness),
+        contrast: parseInt(contrast),
+        saturation: parseInt(saturation)
+    };
+
+    const img = document.getElementById('pv-image');
+    if (img) {
+        const baseFilter = PHOTO_FILTERS[currentPostData.filter]?.style || 'none';
+        const adjStyle = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+        img.style.filter = baseFilter === 'none' ? adjStyle : `${baseFilter} ${adjStyle}`;
+    }
+}
+
+async function openNativeEditor() {
+    if (currentPostData.image) {
+        PhotoEditor.openEditorModal(currentPostData.image, (editedBase64) => {
+            currentPostData.image = editedBase64;
+            currentPostData.filter = 'none'; // reset filter key since changes are baked into base64
+            updatePreview();
+            showToast('Imagen editada correctamente', 'success');
+        });
     } else {
-        document.getElementById('filter-section').scrollIntoView({ behavior: 'smooth' });
+        showToast('Primero selecciona una imagen', 'warning');
     }
 }
 
@@ -1038,20 +1158,46 @@ async function generateAICaption() {
 
 async function generateHashtags() {
     const text = document.getElementById('post-text').value;
-    const btn = event.currentTarget;
-    const originalText = btn.innerHTML;
-    btn.innerHTML = 'Generando...';
-    btn.disabled = true;
+    const btn = event ? event.currentTarget : null;
+    const originalText = btn ? btn.innerHTML : '';
+    if (btn) {
+        btn.innerHTML = 'Generando...';
+        btn.disabled = true;
+    }
 
     try {
         const res = await API.generateHashtags(text || 'Marketing digital');
         document.getElementById('post-text').value += "\n\n" + res.hashtags;
+        updatePreview();
     } catch (e) {
         showToast("Error de IA: " + e.message, "error");
     } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
+        if (btn) {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
         lucide.createIcons();
+    }
+}
+
+async function improveTextWithTone(tone) {
+    const currentText = document.getElementById('post-text').value;
+    if (!currentText.trim()) {
+        showToast('Escribe un texto o idea previa para adaptar el tono', 'warning');
+        return;
+    }
+
+    showToast(`Optimizando texto en modo ${tone}...`, 'info');
+    try {
+        const promptText = `Reescribe el siguiente texto en tono ${tone.toUpperCase()}: "${currentText}"`;
+        const res = await API.improveText(promptText);
+        if (res && res.improved) {
+            document.getElementById('post-text').value = res.improved;
+            updatePreview();
+            showToast('¡Texto optimizado con éxito!', 'success');
+        }
+    } catch (e) {
+        showToast('Error al adaptar tono: ' + e.message, 'error');
     }
 }
 
@@ -1158,8 +1304,8 @@ async function finalizePostSubmission() {
     try {
         let finalImage = currentPostData.image;
         
-        if (currentPostData.image && currentPostData.filter && currentPostData.filter !== 'none') {
-            finalImage = await PhotoEditor.processImage(currentPostData.image, currentPostData.filter);
+        if (currentPostData.image && (currentPostData.filter !== 'none' || currentPostData.adjustments)) {
+            finalImage = await PhotoEditor.processImage(currentPostData.image, currentPostData.filter || 'none', currentPostData.adjustments || {});
         }
 
         // Si es historia de Instagram, Meta no soporta texto en el caption. Dibujamos el texto en la imagen.

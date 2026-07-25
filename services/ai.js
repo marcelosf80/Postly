@@ -3,7 +3,7 @@ const axios = require('axios');
 
 const GROQ_API_KEY = process.env.GROQ_API_KEY || '';
 const GROQ_URL = 'https://api.groq.com/openai/v1/chat/completions';
-const MODEL = 'meta-llama/llama-4-scout-17b-16e-instruct';
+const MODEL = process.env.GROQ_MODEL || 'qwen/qwen3.6-27b';
 
 async function callAI(systemPrompt, userPrompt, options = {}) {
     const { temperature = 0.8, maxTokens = 600, imageBase64 = null } = options;
@@ -16,7 +16,7 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
     let userMessageContent = userPrompt;
 
     if (imageBase64) {
-        payloadModel = 'meta-llama/llama-4-scout-17b-16e-instruct';
+        payloadModel = process.env.GROQ_MODEL || 'qwen/qwen3.6-27b';
         userMessageContent = [
             { type: "text", text: userPrompt },
             { type: "image_url", image_url: { url: imageBase64 } }
