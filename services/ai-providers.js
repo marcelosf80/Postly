@@ -89,19 +89,9 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
 
     let currentModel = provider.model;
 
-    if (images && images.length > 0) {
-        const content = [{ type: "text", text: userPrompt }];
-        images.forEach(img => {
-            const dataUrl = img.startsWith('data:') ? img : `data:image/jpeg;base64,${img}`;
-            content.push({
-                type: "image_url",
-                image_url: { url: dataUrl }
-            });
-        });
-        messages.push({ role: 'user', content });
-    } else {
-        messages.push({ role: 'user', content: userPrompt });
-    }
+    // Los modelos actuales de Groq (GPT-OSS) no soportan visión/imágenes.
+    // Siempre enviar content como string.
+    messages.push({ role: 'user', content: userPrompt });
 
     const makeRequest = async (modelToUse) => {
         const response = await axios.post(provider.url, {
