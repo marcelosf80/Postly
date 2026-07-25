@@ -4,22 +4,10 @@ const axios = require('axios');
 const PROVIDERS = {
     groq: {
         url: 'https://api.groq.com/openai/v1/chat/completions',
-        model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
-        secondaryModel: 'llama-3.1-8b-instant',
+        model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
+        secondaryModel: 'openai/gpt-oss-20b',
         apiKeyEnv: 'GROQ_API_KEY',
-        name: 'Groq (Llama 3.3)'
-    },
-    huggingface: {
-        url: 'https://router.huggingface.co/hf-inference/v1/chat/completions',
-        model: 'meta-llama/Meta-Llama-3-8B-Instruct',
-        apiKeyEnv: 'HF_API_KEY',
-        name: 'Hugging Face (Llama-3)'
-    },
-    meta: {
-        url: 'https://api.llama-api.com/chat/completions',
-        model: 'llama3.1-70b', 
-        apiKeyEnv: 'META_LLAMA_API_KEY',
-        name: 'Meta Llama'
+        name: 'Groq (GPT-OSS)'
     },
     openai: {
         url: 'https://api.openai.com/v1/chat/completions',
@@ -66,7 +54,7 @@ const IMAGE_PROVIDERS = {
 };
 
 function getAvailableProvider() {
-    const preferenceOrder = ['groq', 'huggingface', 'openai', 'meta'];
+    const preferenceOrder = ['groq', 'openai'];
     for (const key of preferenceOrder) {
         const provider = PROVIDERS[key];
         const apiKey = process.env[provider.apiKeyEnv];
@@ -115,9 +103,9 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
         messages.push({ role: 'user', content: userPrompt });
     }
 
-    try {
+    const makeRequest = async (modelToUse) => {
         const response = await axios.post(provider.url, {
-            model: currentModel,
+            model: modelToUse,
             messages,
             temperature,
             max_tokens: maxTokens
@@ -128,11 +116,26 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
             },
             timeout: 60000
         });
-
         return response.data.choices[0].message.content;
+    };
+
+    try {
+        return await makeRequest(currentModel);
     } catch (error) {
         const msg = error.response?.data?.error?.message || error.message;
-        console.error(`[AI Error] ${provider.name}:`, msg);
+        console.error(`[AI Error] ${provider.name} (${currentModel}):`, msg);
+        
+        // Retry con modelo secundario si existe
+        if (provider.secondaryModel && provider.secondaryModel !== currentModel) {
+            console.log(`[AI] Intentando con modelo secundario: ${provider.secondaryModel}...`);
+            try {
+                return await makeRequest(provider.secondaryModel);
+            } catch (error2) {
+                const msg2 = error2.response?.data?.error?.message || error2.message;
+                console.error(`[AI Error] ${provider.name} (${provider.secondaryModel}):`, msg2);
+                throw new Error(`${provider.name}: ${msg2}`);
+            }
+        }
         throw new Error(`${provider.name}: ${msg}`);
     }
 }
