@@ -1,4 +1,4 @@
-package com.socialpulse.marketing;
+package com.baustisoft.postly;
 
 import android.app.Activity;
 import android.util.Log;

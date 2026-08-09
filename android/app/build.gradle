@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 
 android {
-    namespace = "com.socialpulse.marketing"
+    namespace = "com.baustisoft.postly"
     compileSdk = 35
 
     configurations.all {
@@ -14,7 +14,7 @@ android {
     }
     
     defaultConfig {
-        applicationId "com.socialpulse.marketing"
+        applicationId "com.baustisoft.postly"
         minSdkVersion 24
         targetSdkVersion 35
         versionCode 1

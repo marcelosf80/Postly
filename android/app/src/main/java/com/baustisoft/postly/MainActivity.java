@@ -1,4 +1,4 @@
-package com.socialpulse.marketing;
+package com.baustisoft.postly;
 
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;

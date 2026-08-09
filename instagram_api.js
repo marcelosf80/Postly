@@ -13,10 +13,63 @@ class InstagramAPI {
     /**
      * Sube la imagen local a un servicio público (tmpfiles.org) para obtener una URL pública temporal
      */
-    async uploadLocalImage(filePath) {
+    async uploadLocalImage(filePath, mediaType = 'IMAGE') {
         try {
             const sharp = require('sharp');
-            const normalizedBuffer = await sharp(filePath)
+            
+            // Obtener metadatos de la imagen original
+            const metadata = await sharp(filePath).metadata();
+            let { width, height } = metadata;
+            console.log(`[INSTAGRAM] Imagen original: ${width}x${height}`);
+
+            let sharpInstance = sharp(filePath);
+
+            if (mediaType === 'STORIES') {
+                // Stories: aspecto 9:16 (0.5625), resolución recomendada 1080x1920
+                const targetW = 1080;
+                const targetH = 1920;
+                sharpInstance = sharpInstance
+                    .resize(targetW, targetH, { fit: 'cover', position: 'center' });
+                console.log(`[INSTAGRAM] Redimensionando a Story: ${targetW}x${targetH}`);
+            } else {
+                // Feed: aspecto debe estar entre 4:5 (0.8) y 1.91:1
+                const currentRatio = width / height;
+                const MIN_RATIO = 0.8;   // 4:5 (vertical)
+                const MAX_RATIO = 1.91;   // 1.91:1 (horizontal)
+
+                if (currentRatio < MIN_RATIO || currentRatio > MAX_RATIO) {
+                    // Recortar al ratio válido más cercano
+                    let targetRatio = currentRatio < MIN_RATIO ? MIN_RATIO : MAX_RATIO;
+                    let newW, newH;
+                    if (currentRatio < MIN_RATIO) {
+                        // Imagen demasiado vertical → recortar altura
+                        newW = width;
+                        newH = Math.round(width / targetRatio);
+                    } else {
+                        // Imagen demasiado horizontal → recortar ancho
+                        newH = height;
+                        newW = Math.round(height * targetRatio);
+                    }
+                    sharpInstance = sharpInstance
+                        .resize(newW, newH, { fit: 'cover', position: 'center' });
+                    console.log(`[INSTAGRAM] Ratio ${currentRatio.toFixed(2)} fuera de rango. Recortando a ${newW}x${newH} (ratio ${targetRatio})`);
+                    width = newW;
+                    height = newH;
+                }
+
+                // Asegurar ancho entre 320 y 1440px
+                if (width > 1440) {
+                    const newH = Math.round(1440 * height / width);
+                    sharpInstance = sharpInstance.resize(1440, newH, { fit: 'inside' });
+                    console.log(`[INSTAGRAM] Reduciendo ancho a 1440px`);
+                } else if (width < 320) {
+                    const newH = Math.round(320 * height / width);
+                    sharpInstance = sharpInstance.resize(320, newH, { fit: 'inside' });
+                    console.log(`[INSTAGRAM] Ampliando ancho a 320px`);
+                }
+            }
+
+            const normalizedBuffer = await sharpInstance
                 .jpeg({ quality: 90 })
                 .toBuffer();
 
@@ -138,7 +191,7 @@ class InstagramAPI {
      */
     async processAndPublish(filePath, caption, mediaType = 'IMAGE') {
         console.log(`[INSTAGRAM] 1. Normalizando y subiendo imagen (${mediaType}) a servidor público interino...`);
-        const publicUrl = await this.uploadLocalImage(filePath);
+        const publicUrl = await this.uploadLocalImage(filePath, mediaType);
         
         console.log(`[INSTAGRAM] 1.5. Verificando que la URL sea accesible para Meta...`);
         await this.verifyImageUrlAccessible(publicUrl);

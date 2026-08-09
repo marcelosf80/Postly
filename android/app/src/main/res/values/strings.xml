@@ -2,8 +2,8 @@
 <resources>
     <string name="app_name">Postly</string>
     <string name="title_activity_main">Postly</string>
-    <string name="package_name">com.socialpulse.marketing</string>
-    <string name="custom_url_scheme">com.socialpulse.marketing</string>
+    <string name="package_name">com.baustisoft.postly</string>
+    <string name="custom_url_scheme">com.baustisoft.postly</string>
     <string name="facebook_app_id">2217261002140935</string>
     <string name="fb_login_protocol_scheme">fb2217261002140935</string>
     <string name="facebook_client_token">72f7a528b43e51f27b235e8ac2ad2a39</string>

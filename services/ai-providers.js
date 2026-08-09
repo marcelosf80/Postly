@@ -4,10 +4,16 @@ const axios = require('axios');
 const PROVIDERS = {
     groq: {
         url: 'https://api.groq.com/openai/v1/chat/completions',
-        model: process.env.GROQ_MODEL || 'openai/gpt-oss-120b',
-        secondaryModel: 'openai/gpt-oss-20b',
+        model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+        secondaryModel: 'llama-3.1-8b-instant',
         apiKeyEnv: 'GROQ_API_KEY',
-        name: 'Groq (GPT-OSS)'
+        name: 'Groq'
+    },
+    huggingface_text: {
+        url: 'https://api-inference.huggingface.co/v1/chat/completions',
+        model: 'meta-llama/Llama-3.1-8B-Instruct',
+        apiKeyEnv: 'HF_API_KEY',
+        name: 'HuggingFace (Llama)'
     },
     openai: {
         url: 'https://api.openai.com/v1/chat/completions',
@@ -54,7 +60,7 @@ const IMAGE_PROVIDERS = {
 };
 
 function getAvailableProvider() {
-    const preferenceOrder = ['groq', 'openai'];
+    const preferenceOrder = ['groq', 'huggingface_text', 'openai'];
     for (const key of preferenceOrder) {
         const provider = PROVIDERS[key];
         const apiKey = process.env[provider.apiKeyEnv];
@@ -77,24 +83,43 @@ async function describeImage(imageBase64) {
     }
 
     try {
-        // Extraer solo los bytes base64 sin el prefijo data:image/...
         const rawBase64 = imageBase64.includes('base64,') 
             ? imageBase64.split('base64,')[1] 
             : imageBase64;
         const imageBuffer = Buffer.from(rawBase64, 'base64');
 
-        console.log('[VISION] Analizando imagen con Hugging Face BLIP...');
-        const response = await axios.post(
-            'https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large',
-            imageBuffer,
-            {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/octet-stream'
-                },
-                timeout: 30000
-            }
-        );
+        console.log('[VISION] Analizando imagen con Hugging Face Vision (BLIP-2)...');
+        
+        // Intentar primero con Salesforce/blip2-opt-2.7b para mayor precisión visual
+        let modelUrl = 'https://api-inference.huggingface.co/models/Salesforce/blip2-opt-2.7b';
+        let response;
+        try {
+            response = await axios.post(
+                modelUrl,
+                imageBuffer,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/octet-stream'
+                    },
+                    timeout: 25000
+                }
+            );
+        } catch (e1) {
+            console.warn('[VISION] Falló BLIP-2, usando fallback BLIP-large...', e1.message);
+            modelUrl = 'https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large';
+            response = await axios.post(
+                modelUrl,
+                imageBuffer,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/octet-stream'
+                    },
+                    timeout: 25000
+                }
+            );
+        }
 
         if (response.data && response.data[0] && response.data[0].generated_text) {
             const description = response.data[0].generated_text;
@@ -111,10 +136,10 @@ async function describeImage(imageBase64) {
 async function callAI(systemPrompt, userPrompt, options = {}) {
     let { temperature = 0.7, maxTokens = 1200, images = [], imageBase64 = null, provider: requestedProvider = null } = options;
 
-    // Support single imageBase64 for backward compatibility
     if (imageBase64 && images.length === 0) {
         images = [imageBase64];
     }
+    let provider;
     try {
         if (requestedProvider && PROVIDERS[requestedProvider]) {
             const apiKey = process.env[PROVIDERS[requestedProvider].apiKeyEnv];
@@ -127,14 +152,11 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
     }
 
     let messages = [
-        { role: 'system', content: systemPrompt }
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: userPrompt }
     ];
 
     let currentModel = provider.model;
-
-    // Los modelos actuales de Groq (GPT-OSS) no soportan visión/imágenes.
-    // Siempre enviar content como string.
-    messages.push({ role: 'user', content: userPrompt });
 
     const makeRequest = async (modelToUse) => {
         const response = await axios.post(provider.url, {
@@ -158,7 +180,6 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
         const msg = error.response?.data?.error?.message || error.message;
         console.error(`[AI Error] ${provider.name} (${currentModel}):`, msg);
         
-        // Retry con modelo secundario si existe
         if (provider.secondaryModel && provider.secondaryModel !== currentModel) {
             console.log(`[AI] Intentando con modelo secundario: ${provider.secondaryModel}...`);
             try {
@@ -176,21 +197,25 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
 async function generateCaption(description, options = {}) {
     const { imageBase64 = null } = options;
     
-    // Si hay imagen, primero la analizamos con HF BLIP
     let imageContext = '';
     if (imageBase64) {
         const imageDesc = await describeImage(imageBase64);
         if (imageDesc) {
-            imageContext = `\n\nDESCRIPCIÓN DE LA IMAGEN (generada por IA de visión): "${imageDesc}". Usa esta información para crear un caption que se relacione perfectamente con lo que muestra la imagen.`;
+            imageContext = `\n\nDETALLES VISUALES DE LA IMAGEN ADJUNTA: "${imageDesc}".\nUsa lo que ves en la imagen (personas, objetos, colores, ambiente) para que el texto sea 100% coherente con la foto.`;
         }
     }
 
-    const systemPrompt = `Eres un experto en marketing digital y redes sociales. Tu objetivo es generar captions (textos para publicaciones) altamente atractivos con emojis y hashtags.
-IMPORTANTE: Tu respuesta debe ser ÚNICA Y EXCLUSIVAMENTE el texto del caption listo para publicar. NO uses frases conversacionales como 'Aquí tienes' ni comillas. Solo el texto final.`;
+    const systemPrompt = `Eres un creador de contenido humano, natural y auténtico para redes sociales (Instagram, TikTok, Facebook).
+REGLAS OBLIGATORIAS:
+1. Escribe como una persona real compartiendo con su audiencia. Evita sonar como un anuncio de televisión o un robot de marketing artificial.
+2. Haz referencias específicas y naturales a lo que aparece en la foto.
+3. Incluye una llamada a la acción orgánica (hacer una pregunta a los seguidores o invitarlos a comentar).
+4. Usa emojis expresivos con moderación y 3-5 hashtags relevantes al final.
+5. NO incluyas introducciones ni despedidas conversacionales como "Aquí tienes tu caption:". Devuelve ÚNICAMENTE el texto listo para publicar.`;
     
-    let userPrompt = 'Genera un caption perfecto para una publicación en redes sociales.';
+    let userPrompt = 'Crea una sugerencia de publicación muy humana y cercana.';
     if (description && description.trim() !== '') {
-        userPrompt += ` Contexto del usuario: "${description}"`;
+        userPrompt += ` Idea o contexto deseado: "${description}"`;
     }
     userPrompt += imageContext;
 

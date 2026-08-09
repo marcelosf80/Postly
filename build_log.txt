@@ -1,34 +1,34 @@
 Inciando sincronizacion... 
-√ Copying web assets from Postly_V2_Web to android\app\src\main\assets\public in 147.65ms
-√ Creating capacitor.config.json in android\app\src\main\assets in 9.44ms
-√ copy android in 300.29ms
-√ Updating Android plugins in 28.27ms
+√ Copying web assets from Postly_V2_Web to android\app\src\main\assets\public in 167.41ms
+√ Creating capacitor.config.json in android\app\src\main\assets in 13.54ms
+√ copy android in 350.78ms
+√ Updating Android plugins in 25.29ms
 [info] Found 3 Capacitor plugins for android:
        @capacitor-community/admob@8.0.0
        @capacitor/camera@8.2.1
        @capacitor-community/facebook-login@8.0.0
-√ update android in 633.14ms
-[info] Sync finished in 1.248s
-Starting a Gradle Daemon, 2 busy Daemons could not be reused, use --status for details
+√ update android in 1.17s
+[info] Sync finished in 1.801s
+Starting a Gradle Daemon, 3 busy and 1 incompatible and 1 stopped Daemons could not be reused, use --status for details
 Reusing configuration cache.
 > Task :app:checkKotlinGradlePluginConfigurationErrors SKIPPED
-> Task :capacitor-android:preBuild UP-TO-DATE
-> Task :capacitor-android:preDebugBuild UP-TO-DATE
 > Task :app:preBuild UP-TO-DATE
 > Task :app:preDebugBuild UP-TO-DATE
-> Task :capacitor-android:writeDebugAarMetadata UP-TO-DATE
+> Task :capacitor-android:preBuild UP-TO-DATE
+> Task :capacitor-android:preDebugBuild UP-TO-DATE
 > Task :app:mergeDebugNativeDebugMetadata NO-SOURCE
 > Task :capacitor-camera:preBuild UP-TO-DATE
+> Task :capacitor-android:writeDebugAarMetadata UP-TO-DATE
 > Task :capacitor-camera:preDebugBuild UP-TO-DATE
-> Task :capacitor-camera:writeDebugAarMetadata UP-TO-DATE
 > Task :capacitor-community-admob:preBuild UP-TO-DATE
-> Task :capacitor-community-facebook-login:preBuild UP-TO-DATE
-> Task :capacitor-community-facebook-login:preDebugBuild UP-TO-DATE
 > Task :capacitor-community-admob:preDebugBuild UP-TO-DATE
 > Task :capacitor-community-admob:writeDebugAarMetadata UP-TO-DATE
+> Task :capacitor-community-facebook-login:preBuild UP-TO-DATE
+> Task :capacitor-community-facebook-login:preDebugBuild UP-TO-DATE
+> Task :capacitor-community-facebook-login:writeDebugAarMetadata UP-TO-DATE
+> Task :capacitor-camera:writeDebugAarMetadata UP-TO-DATE
 > Task :capacitor-cordova-android-plugins:preBuild UP-TO-DATE
 > Task :capacitor-cordova-android-plugins:preDebugBuild UP-TO-DATE
-> Task :capacitor-community-facebook-login:writeDebugAarMetadata UP-TO-DATE
 > Task :app:generateDebugResValues UP-TO-DATE
 > Task :capacitor-android:generateDebugResValues UP-TO-DATE
 > Task :capacitor-android:generateDebugResources UP-TO-DATE
@@ -41,28 +41,28 @@ Reusing configuration cache.
 > Task :capacitor-community-admob:packageDebugResources UP-TO-DATE
 > Task :capacitor-community-facebook-login:generateDebugResValues UP-TO-DATE
 > Task :capacitor-community-facebook-login:generateDebugResources UP-TO-DATE
-> Task :capacitor-cordova-android-plugins:writeDebugAarMetadata
 > Task :capacitor-community-facebook-login:packageDebugResources UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:writeDebugAarMetadata
 > Task :capacitor-cordova-android-plugins:generateDebugResValues FROM-CACHE
 > Task :capacitor-cordova-android-plugins:generateDebugResources FROM-CACHE
 > Task :capacitor-cordova-android-plugins:packageDebugResources FROM-CACHE
 > Task :app:checkDebugAarMetadata UP-TO-DATE
-> Task :app:generateDebugResources UP-TO-DATE
 > Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
 > Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
 > Task :app:extractDeepLinksDebug UP-TO-DATE
 > Task :capacitor-android:extractDeepLinksDebug UP-TO-DATE
 > Task :capacitor-android:processDebugManifest UP-TO-DATE
-> Task :app:packageDebugResources UP-TO-DATE
 > Task :capacitor-camera:extractDeepLinksDebug UP-TO-DATE
-> Task :app:parseDebugLocalResources UP-TO-DATE
 > Task :capacitor-camera:processDebugManifest UP-TO-DATE
 > Task :capacitor-community-admob:extractDeepLinksDebug UP-TO-DATE
 > Task :capacitor-community-admob:processDebugManifest UP-TO-DATE
 > Task :capacitor-community-facebook-login:extractDeepLinksDebug UP-TO-DATE
-> Task :app:mergeDebugResources UP-TO-DATE
 > Task :capacitor-community-facebook-login:processDebugManifest UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
 > Task :capacitor-cordova-android-plugins:extractDeepLinksDebug FROM-CACHE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
 > Task :capacitor-android:compileDebugLibraryResources UP-TO-DATE
 > Task :capacitor-android:parseDebugLocalResources UP-TO-DATE
 > Task :capacitor-android:generateDebugRFile UP-TO-DATE
@@ -75,15 +75,15 @@ Reusing configuration cache.
 > Task :capacitor-community-facebook-login:compileDebugLibraryResources UP-TO-DATE
 > Task :capacitor-community-facebook-login:parseDebugLocalResources UP-TO-DATE
 > Task :capacitor-community-facebook-login:generateDebugRFile UP-TO-DATE
-> Task :capacitor-cordova-android-plugins:processDebugManifest FROM-CACHE
 > Task :capacitor-cordova-android-plugins:compileDebugLibraryResources FROM-CACHE
+> Task :capacitor-cordova-android-plugins:processDebugManifest FROM-CACHE
 > Task :capacitor-cordova-android-plugins:parseDebugLocalResources FROM-CACHE
 > Task :capacitor-cordova-android-plugins:generateDebugRFile FROM-CACHE
 > Task :capacitor-android:javaPreCompileDebug UP-TO-DATE
+> Task :app:processDebugMainManifest UP-TO-DATE
 > Task :capacitor-android:compileDebugJavaWithJavac UP-TO-DATE
 > Task :capacitor-android:bundleLibCompileToJarDebug UP-TO-DATE
 > Task :capacitor-camera:checkKotlinGradlePluginConfigurationErrors SKIPPED
-> Task :app:processDebugMainManifest UP-TO-DATE
 > Task :app:processDebugManifest UP-TO-DATE
 > Task :app:processDebugManifestForPackage UP-TO-DATE
 > Task :capacitor-camera:compileDebugKotlin UP-TO-DATE
@@ -109,10 +109,6 @@ Reusing configuration cache.
 > Task :capacitor-android:compileDebugShaders NO-SOURCE
 > Task :capacitor-android:generateDebugAssets UP-TO-DATE
 > Task :capacitor-android:packageDebugAssets UP-TO-DATE
-
-> Task :app:processDebugResources
-Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
-
 > Task :capacitor-camera:mergeDebugShaders UP-TO-DATE
 > Task :capacitor-camera:compileDebugShaders NO-SOURCE
 > Task :capacitor-camera:generateDebugAssets UP-TO-DATE
@@ -125,6 +121,10 @@ Warning: SDK processing. This version only understands SDK XML versions up to 3 
 > Task :capacitor-community-facebook-login:compileDebugShaders NO-SOURCE
 > Task :capacitor-community-facebook-login:generateDebugAssets UP-TO-DATE
 > Task :capacitor-community-facebook-login:packageDebugAssets UP-TO-DATE
+
+> Task :app:processDebugResources
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+
 > Task :capacitor-cordova-android-plugins:mergeDebugShaders
 > Task :capacitor-cordova-android-plugins:compileDebugShaders NO-SOURCE
 > Task :capacitor-cordova-android-plugins:generateDebugAssets UP-TO-DATE
@@ -132,120 +132,117 @@ Warning: SDK processing. This version only understands SDK XML versions up to 3 
 > Task :app:processDebugResources UP-TO-DATE
 > Task :app:mergeDebugAssets
 > Task :app:compressDebugAssets
-> Task :app:compileDebugKotlin FROM-CACHE
 > Task :capacitor-community-facebook-login:bundleLibRuntimeToJarDebug UP-TO-DATE
 > Task :capacitor-community-admob:bundleLibRuntimeToJarDebug UP-TO-DATE
 > Task :capacitor-camera:bundleLibRuntimeToJarDebug UP-TO-DATE
 > Task :capacitor-android:bundleLibRuntimeToJarDebug UP-TO-DATE
 > Task :capacitor-cordova-android-plugins:bundleLibRuntimeToJarDebug
-> Task :app:compileDebugJavaWithJavac FROM-CACHE
 > Task :app:desugarDebugFileDependencies UP-TO-DATE
-> Task :app:processDebugJavaRes
 > Task :capacitor-android:processDebugJavaRes NO-SOURCE
 > Task :capacitor-camera:processDebugJavaRes UP-TO-DATE
+> Task :app:compileDebugKotlin UP-TO-DATE
 > Task :capacitor-community-admob:processDebugJavaRes UP-TO-DATE
+> Task :app:compileDebugJavaWithJavac UP-TO-DATE
+> Task :app:processDebugJavaRes UP-TO-DATE
 > Task :capacitor-community-facebook-login:processDebugJavaRes NO-SOURCE
 > Task :capacitor-cordova-android-plugins:processDebugJavaRes NO-SOURCE
-> Task :app:dexBuilderDebug FROM-CACHE
-> Task :app:mergeDebugJavaResource
-> Task :app:mergeDebugGlobalSynthetics
-> Task :app:checkDebugDuplicateClasses UP-TO-DATE
-> Task :app:mergeExtDexDebug
-> Task :capacitor-community-facebook-login:bundleLibRuntimeToDirDebug
-> Task :capacitor-community-admob:bundleLibRuntimeToDirDebug
-> Task :capacitor-camera:bundleLibRuntimeToDirDebug
+> Task :app:dexBuilderDebug UP-TO-DATE
+> Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:mergeDebugGlobalSynthetics UP-TO-DATE
+> Task :capacitor-community-facebook-login:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :capacitor-community-admob:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :capacitor-camera:bundleLibRuntimeToDirDebug UP-TO-DATE
+> Task :capacitor-android:bundleLibRuntimeToDirDebug UP-TO-DATE
 > Task :capacitor-cordova-android-plugins:bundleLibRuntimeToDirDebug
-> Task :capacitor-android:bundleLibRuntimeToDirDebug
-> Task :app:mergeProjectDexDebug
-> Task :app:mergeDebugJniLibFolders
-> Task :capacitor-android:mergeDebugJniLibFolders
+> Task :app:mergeDebugJniLibFolders UP-TO-DATE
+> Task :capacitor-android:mergeDebugJniLibFolders UP-TO-DATE
 > Task :capacitor-android:mergeDebugNativeLibs NO-SOURCE
-> Task :capacitor-android:copyDebugJniLibsProjectOnly
-> Task :capacitor-camera:mergeDebugJniLibFolders
+> Task :capacitor-android:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :capacitor-camera:mergeDebugJniLibFolders UP-TO-DATE
 > Task :capacitor-camera:mergeDebugNativeLibs NO-SOURCE
-> Task :capacitor-camera:copyDebugJniLibsProjectOnly
-> Task :capacitor-community-admob:mergeDebugJniLibFolders
+> Task :capacitor-camera:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :capacitor-community-admob:mergeDebugJniLibFolders UP-TO-DATE
 > Task :capacitor-community-admob:mergeDebugNativeLibs NO-SOURCE
-> Task :capacitor-community-admob:copyDebugJniLibsProjectOnly
-> Task :capacitor-community-facebook-login:mergeDebugJniLibFolders
+> Task :capacitor-community-admob:copyDebugJniLibsProjectOnly UP-TO-DATE
+> Task :capacitor-community-facebook-login:mergeDebugJniLibFolders UP-TO-DATE
 > Task :capacitor-community-facebook-login:mergeDebugNativeLibs NO-SOURCE
-> Task :capacitor-community-facebook-login:copyDebugJniLibsProjectOnly
+> Task :capacitor-community-facebook-login:copyDebugJniLibsProjectOnly UP-TO-DATE
 > Task :capacitor-cordova-android-plugins:mergeDebugJniLibFolders
 > Task :capacitor-cordova-android-plugins:mergeDebugNativeLibs NO-SOURCE
+> Task :app:checkDebugDuplicateClasses UP-TO-DATE
 > Task :capacitor-cordova-android-plugins:copyDebugJniLibsProjectOnly
-> Task :app:mergeDebugNativeLibs
-> Task :app:mergeLibDexDebug
-> Task :app:validateSigningDebug
-> Task :app:writeDebugAppMetadata
-> Task :app:writeDebugSigningConfigVersions
+> Task :app:mergeLibDexDebug UP-TO-DATE
+> Task :app:mergeProjectDexDebug UP-TO-DATE
+> Task :app:mergeExtDexDebug UP-TO-DATE
+> Task :app:validateSigningDebug UP-TO-DATE
+> Task :app:writeDebugAppMetadata UP-TO-DATE
+> Task :app:writeDebugSigningConfigVersions UP-TO-DATE
 > Task :capacitor-android:stripDebugDebugSymbols NO-SOURCE
-> Task :capacitor-android:copyDebugJniLibsProjectAndLocalJars
-
-> Task :app:stripDebugDebugSymbols
-Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so, libimage_processing_util_jni.so, libsurface_util_jni.so.
-
-> Task :capacitor-android:extractDebugAnnotations
-> Task :capacitor-android:extractDeepLinksForAarDebug
-> Task :capacitor-android:mergeDebugGeneratedProguardFiles
-> Task :capacitor-android:mergeDebugConsumerProguardFiles
-> Task :capacitor-android:prepareDebugArtProfile
-> Task :capacitor-android:prepareLintJarForPublish
-> Task :capacitor-android:mergeDebugJavaResource
-> Task :capacitor-android:syncDebugLibJars
-> Task :capacitor-android:bundleDebugAar
-> Task :capacitor-android:assembleDebug
+> Task :capacitor-android:copyDebugJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :app:mergeDebugNativeLibs UP-TO-DATE
+> Task :app:stripDebugDebugSymbols UP-TO-DATE
+> Task :capacitor-android:extractDebugAnnotations UP-TO-DATE
+> Task :capacitor-android:extractDeepLinksForAarDebug UP-TO-DATE
+> Task :capacitor-android:mergeDebugGeneratedProguardFiles UP-TO-DATE
+> Task :capacitor-android:mergeDebugConsumerProguardFiles UP-TO-DATE
+> Task :capacitor-android:prepareDebugArtProfile UP-TO-DATE
+> Task :capacitor-android:prepareLintJarForPublish UP-TO-DATE
+> Task :capacitor-android:mergeDebugJavaResource UP-TO-DATE
+> Task :capacitor-android:syncDebugLibJars UP-TO-DATE
+> Task :capacitor-android:bundleDebugAar UP-TO-DATE
+> Task :capacitor-android:assembleDebug UP-TO-DATE
 > Task :capacitor-camera:stripDebugDebugSymbols NO-SOURCE
-> Task :capacitor-camera:copyDebugJniLibsProjectAndLocalJars
-> Task :capacitor-camera:extractDebugAnnotations
-> Task :capacitor-camera:extractDeepLinksForAarDebug FROM-CACHE
-> Task :capacitor-camera:mergeDebugGeneratedProguardFiles
-> Task :capacitor-camera:mergeDebugConsumerProguardFiles
-> Task :capacitor-camera:prepareDebugArtProfile
-> Task :capacitor-camera:prepareLintJarForPublish
-> Task :capacitor-camera:mergeDebugJavaResource
-> Task :capacitor-camera:syncDebugLibJars
-> Task :capacitor-camera:bundleDebugAar
-> Task :capacitor-camera:assembleDebug
+> Task :capacitor-camera:copyDebugJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :capacitor-camera:extractDebugAnnotations UP-TO-DATE
+> Task :capacitor-camera:extractDeepLinksForAarDebug UP-TO-DATE
+> Task :capacitor-camera:mergeDebugGeneratedProguardFiles UP-TO-DATE
+> Task :capacitor-camera:mergeDebugConsumerProguardFiles UP-TO-DATE
+> Task :capacitor-camera:prepareDebugArtProfile UP-TO-DATE
+> Task :capacitor-camera:prepareLintJarForPublish UP-TO-DATE
+> Task :capacitor-camera:mergeDebugJavaResource UP-TO-DATE
+> Task :capacitor-camera:syncDebugLibJars UP-TO-DATE
+> Task :capacitor-camera:bundleDebugAar UP-TO-DATE
+> Task :capacitor-camera:assembleDebug UP-TO-DATE
 > Task :capacitor-community-admob:stripDebugDebugSymbols NO-SOURCE
-> Task :capacitor-community-admob:copyDebugJniLibsProjectAndLocalJars
-> Task :capacitor-community-admob:extractDebugAnnotations
-> Task :capacitor-community-admob:extractDeepLinksForAarDebug FROM-CACHE
-> Task :capacitor-community-admob:mergeDebugGeneratedProguardFiles
-> Task :capacitor-community-admob:mergeDebugConsumerProguardFiles
-> Task :capacitor-community-admob:prepareDebugArtProfile
-> Task :capacitor-community-admob:prepareLintJarForPublish
-> Task :capacitor-community-admob:mergeDebugJavaResource
-> Task :capacitor-community-admob:syncDebugLibJars
-> Task :capacitor-community-admob:bundleDebugAar
-> Task :capacitor-community-admob:assembleDebug
+> Task :capacitor-community-admob:copyDebugJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :capacitor-community-admob:extractDebugAnnotations UP-TO-DATE
+> Task :capacitor-community-admob:extractDeepLinksForAarDebug UP-TO-DATE
+> Task :capacitor-community-admob:mergeDebugGeneratedProguardFiles UP-TO-DATE
+> Task :capacitor-community-admob:mergeDebugConsumerProguardFiles UP-TO-DATE
+> Task :capacitor-community-admob:prepareDebugArtProfile UP-TO-DATE
+> Task :capacitor-community-admob:prepareLintJarForPublish UP-TO-DATE
+> Task :capacitor-community-admob:mergeDebugJavaResource UP-TO-DATE
+> Task :capacitor-community-admob:syncDebugLibJars UP-TO-DATE
+> Task :capacitor-community-admob:bundleDebugAar UP-TO-DATE
+> Task :capacitor-community-admob:assembleDebug UP-TO-DATE
 > Task :capacitor-community-facebook-login:stripDebugDebugSymbols NO-SOURCE
-> Task :capacitor-community-facebook-login:copyDebugJniLibsProjectAndLocalJars
-> Task :capacitor-community-facebook-login:extractDebugAnnotations
-> Task :capacitor-community-facebook-login:extractDeepLinksForAarDebug FROM-CACHE
-> Task :capacitor-community-facebook-login:mergeDebugGeneratedProguardFiles
-> Task :capacitor-community-facebook-login:mergeDebugConsumerProguardFiles
-> Task :capacitor-community-facebook-login:prepareDebugArtProfile
-> Task :capacitor-community-facebook-login:prepareLintJarForPublish
-> Task :capacitor-community-facebook-login:mergeDebugJavaResource
-> Task :capacitor-community-facebook-login:syncDebugLibJars
-> Task :capacitor-community-facebook-login:bundleDebugAar
-> Task :capacitor-community-facebook-login:assembleDebug
+> Task :capacitor-community-facebook-login:copyDebugJniLibsProjectAndLocalJars UP-TO-DATE
+> Task :capacitor-community-facebook-login:extractDebugAnnotations UP-TO-DATE
+> Task :capacitor-community-facebook-login:extractDeepLinksForAarDebug UP-TO-DATE
+> Task :capacitor-community-facebook-login:mergeDebugGeneratedProguardFiles UP-TO-DATE
+> Task :capacitor-community-facebook-login:mergeDebugConsumerProguardFiles UP-TO-DATE
+> Task :capacitor-community-facebook-login:prepareDebugArtProfile UP-TO-DATE
+> Task :capacitor-community-facebook-login:prepareLintJarForPublish UP-TO-DATE
+> Task :capacitor-community-facebook-login:mergeDebugJavaResource UP-TO-DATE
+> Task :capacitor-community-facebook-login:syncDebugLibJars UP-TO-DATE
+> Task :capacitor-community-facebook-login:bundleDebugAar UP-TO-DATE
+> Task :capacitor-community-facebook-login:assembleDebug UP-TO-DATE
 > Task :capacitor-cordova-android-plugins:stripDebugDebugSymbols NO-SOURCE
 > Task :capacitor-cordova-android-plugins:copyDebugJniLibsProjectAndLocalJars
-> Task :capacitor-cordova-android-plugins:extractDebugAnnotations
-> Task :capacitor-cordova-android-plugins:extractDeepLinksForAarDebug FROM-CACHE
-> Task :capacitor-cordova-android-plugins:mergeDebugGeneratedProguardFiles
-> Task :capacitor-cordova-android-plugins:mergeDebugConsumerProguardFiles
-> Task :capacitor-cordova-android-plugins:prepareDebugArtProfile
-> Task :capacitor-cordova-android-plugins:prepareLintJarForPublish
+> Task :capacitor-cordova-android-plugins:extractDebugAnnotations FROM-CACHE
+> Task :capacitor-cordova-android-plugins:extractDeepLinksForAarDebug UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:mergeDebugGeneratedProguardFiles UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:mergeDebugConsumerProguardFiles UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:prepareDebugArtProfile UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:prepareLintJarForPublish UP-TO-DATE
 > Task :capacitor-cordova-android-plugins:mergeDebugJavaResource
-> Task :capacitor-cordova-android-plugins:syncDebugLibJars
+> Task :capacitor-cordova-android-plugins:syncDebugLibJars FROM-CACHE
 > Task :capacitor-cordova-android-plugins:bundleDebugAar
 > Task :capacitor-cordova-android-plugins:assembleDebug
 > Task :app:packageDebug
 > Task :app:assembleDebug
-> Task :app:createDebugApkListingFileRedirect
+> Task :app:createDebugApkListingFileRedirect UP-TO-DATE
 
-BUILD SUCCESSFUL in 8m 1s
-179 actionable tasks: 82 executed, 16 from cache, 81 up-to-date
+BUILD SUCCESSFUL in 2m 1s
+179 actionable tasks: 14 executed, 11 from cache, 154 up-to-date
 Configuration cache entry reused.

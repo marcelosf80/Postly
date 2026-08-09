@@ -1,4 +1,4 @@
-package com.socialpulse.marketing.ui.theme
+package com.baustisoft.postly.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

@@ -1,4 +1,4 @@
-package com.socialpulse.marketing
+package com.baustisoft.postly
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.socialpulse.marketing.ui.theme.PostlyTheme
+import com.baustisoft.postly.ui.theme.PostlyTheme
 
 class DashboardActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

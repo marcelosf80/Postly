@@ -1,4 +1,4 @@
-package com.socialpulse.marketing
+package com.baustisoft.postly
 
 import android.content.Intent
 import android.graphics.Bitmap
@@ -32,7 +32,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.socialpulse.marketing.ui.theme.PostlyTheme
+import com.baustisoft.postly.ui.theme.PostlyTheme
 import java.io.ByteArrayOutputStream
 
 class PhotoEditorActivity : ComponentActivity() {

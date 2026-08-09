@@ -52,7 +52,33 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!API.getToken()) {
         renderLogin();
     } else {
-        navigate('dashboard');
+        const savedSection = localStorage.getItem('postly_last_section') || 'dashboard';
+        navigate(savedSection);
+    }
+    
+    // Registrar listeners de ciclo de vida de Capacitor (Android/iOS)
+    if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App) {
+        const { App } = window.Capacitor.Plugins;
+        
+        // Manejo de volver al frente (resume) sin reiniciar la app ni cerrar actividades
+        App.addListener('appStateChange', (state) => {
+            console.log('[LIFECYCLE] Estado de la app cambió:', state.isActive ? 'ACTIVA' : 'SEGUNDO PLANO');
+            if (state.isActive && API.getToken()) {
+                const current = localStorage.getItem('postly_last_section') || currentSection || 'dashboard';
+                // Refrescar vistas si es necesario sin perder el estado actual
+                if (current === 'posts') renderPosts();
+                if (current === 'dashboard') renderDashboard();
+            }
+        });
+
+        // Manejo del botón atrás físico de Android
+        App.addListener('backButton', () => {
+            if (currentSection !== 'dashboard') {
+                navigate('dashboard');
+            } else {
+                App.minimizeApp(); // Minimiza la app en lugar de cerrarla abruptamente
+            }
+        });
     }
 });
 
@@ -76,6 +102,10 @@ function renderLogin() {
 
             <button class="btn" id="btn-connect-facebook" onclick="connectWithFacebook()" style="background: #1877f2; color: white; border-radius: 20px; height: 70px; font-weight:800; font-size: 1.2rem; margin-bottom: 12px; box-shadow: 0 10px 25px rgba(24, 119, 242, 0.3);">
                 <i data-lucide="facebook"></i> Vincular Fanpage de Meta
+            </button>
+            
+            <button class="btn" id="btn-guest-login" onclick="testLoginBypass()" style="background: transparent; color: var(--text-secondary); border: 1px solid var(--border); border-radius: 20px; height: 50px; font-weight:600; font-size: 1rem; margin-top: 10px;">
+                Ingresar como Invitado (Modo Demo)
             </button>
         </div>
     `;
@@ -125,7 +155,7 @@ async function initApp() {
             console.log('[ADMOB] Inicializado correctamente');
             
             const bannerOptions = {
-                adId: 'ca-app-pub-5343221992536229/3520448384',
+                adId: 'ca-app-pub-5343221992536229/5980082384',
                 adSize: 'BANNER',
                 position: 'BOTTOM_CENTER',
                 margin: 0,
@@ -141,6 +171,7 @@ async function initApp() {
 
 function navigate(section) {
     currentSection = section;
+    localStorage.setItem('postly_last_section', section);
     updateNavUI();
     
     // Asegurar que la navegación sea visible al navegar
@@ -1364,7 +1395,7 @@ async function finalizePostSubmission() {
                     resolve();
                 });
 
-                AdMob.prepareRewardVideoAd({ adId: 'ca-app-pub-3940256099942544/5224354917' })
+                AdMob.prepareRewardVideoAd({ adId: 'ca-app-pub-5343221992536229/3520448384' })
                     .catch(e => {
                         console.error('Error preparando ad', e);
                         resolve();
@@ -1407,8 +1438,30 @@ async function finalizePostSubmission() {
         navigate('dashboard');
     } catch (e) {
         console.error("[PUBLISH ERROR]", e);
-        showToast(e.message || "Error al publicar", "error");
-        alert("Error al publicar: " + (e.message || "Problema de conexión"));
+        showToast(e.message || "Error de API Meta", "error");
+        
+        // Ofrecer alternativa de compartir nativamente (Instagram / Facebook Intent)
+        if (confirm("No se pudo publicar directo por API Meta (" + (e.message || "Credenciales no configuradas") + ").\n\n¿Deseas abrir la aplicación nativa para compartir la imagen y el texto directamente?")) {
+            try {
+                if (navigator.share) {
+                    await navigator.share({
+                        title: 'Publicación de Postly',
+                        text: content,
+                    });
+                    showToast('Compartido mediante app nativa', 'success');
+                } else if (window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.Share) {
+                    await window.Capacitor.Plugins.Share.share({
+                        title: 'Postly',
+                        text: content,
+                        dialogTitle: 'Compartir publicación'
+                    });
+                } else {
+                    alert("Copiá el texto: " + content);
+                }
+            } catch (shareErr) {
+                console.log("Compartir cancelado o no soportado", shareErr);
+            }
+        }
     } finally {
         btn.innerHTML = 'Publicar ahora <i data-lucide="send" style="width: 20px; margin-left: 8px;"></i>';
         btn.disabled = false;
