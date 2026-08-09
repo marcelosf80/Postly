@@ -1,6 +1,8 @@
 // services/ai-providers.js — Multi-Provider AI Service
 const axios = require('axios');
 
+const DEFAULT_HF_KEY = process.env.HF_API_KEY || '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';
+
 const PROVIDERS = {
     groq: {
         url: 'https://api.groq.com/openai/v1/chat/completions',
@@ -10,22 +12,17 @@ const PROVIDERS = {
         name: 'Groq'
     },
     huggingface_text: {
-        url: 'https://api-inference.huggingface.co/v1/chat/completions',
-        model: 'meta-llama/Llama-3.1-8B-Instruct',
+        url: 'https://api-inference.huggingface.co/models/Qwen/Qwen2.5-7B-Instruct/v1/chat/completions',
+        model: 'Qwen/Qwen2.5-7B-Instruct',
+        secondaryModel: 'meta-llama/Llama-3.2-3B-Instruct',
         apiKeyEnv: 'HF_API_KEY',
-        name: 'HuggingFace (Llama)'
+        name: 'HuggingFace'
     },
     openai: {
         url: 'https://api.openai.com/v1/chat/completions',
         model: 'gpt-4o-mini', 
         apiKeyEnv: 'OPENAI_API_KEY',
         name: 'OpenAI'
-    },
-    pollinations_text: {
-        url: 'https://text.pollinations.ai/openai',
-        model: 'openai',
-        apiKeyEnv: null,
-        name: 'Pollinations AI (Gratis)'
     }
 };
 
@@ -42,10 +39,10 @@ const IMAGE_PROVIDERS = {
         }
     },
     huggingface: {
-        name: 'Hugging Face (Flux - Requiere Token Gratis)',
-        available: !!(process.env.HF_API_KEY && process.env.HF_API_KEY.length > 5),
+        name: 'Hugging Face (Flux)',
+        available: true,
         generate: async (prompt) => {
-            const token = process.env.HF_API_KEY;
+            const token = DEFAULT_HF_KEY;
             const model = process.env.HF_MODEL || 'black-forest-labs/FLUX.1-schnell';
             const response = await axios.post(
                 `https://api-inference.huggingface.co/models/${model}`,
@@ -67,31 +64,25 @@ const IMAGE_PROVIDERS = {
 
 function getCandidateProviders() {
     const candidates = [];
+    // 1. Groq (si hay key válida en env)
     if (process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.length > 5) {
         candidates.push({ key: 'groq', ...PROVIDERS.groq, apiKey: process.env.GROQ_API_KEY });
     }
-    if (process.env.HF_API_KEY && process.env.HF_API_KEY.length > 5) {
-        candidates.push({ key: 'huggingface_text', ...PROVIDERS.huggingface_text, apiKey: process.env.HF_API_KEY });
-    }
+    // 2. HuggingFace (con clave por defecto si no está en env)
+    candidates.push({ key: 'huggingface_text', ...PROVIDERS.huggingface_text, apiKey: DEFAULT_HF_KEY });
+    // 3. OpenAI (si está en env)
     if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.length > 5) {
         candidates.push({ key: 'openai', ...PROVIDERS.openai, apiKey: process.env.OPENAI_API_KEY });
     }
-    // Siempre agregar Pollinations como respaldo 100% gratuito sin necesidad de API key
-    candidates.push({ key: 'pollinations_text', ...PROVIDERS.pollinations_text, apiKey: null });
     return candidates;
 }
 
 /**
  * Usa Hugging Face BLIP para describir una imagen en texto.
- * Esto permite que modelos sin visión (como GPT-OSS) entiendan la imagen.
+ * Esto permite que modelos sin visión entiendan la imagen.
  */
 async function describeImage(imageBase64) {
-    const token = process.env.HF_API_KEY;
-    if (!token || token.length < 5) {
-        console.warn('[VISION] No hay HF_API_KEY configurada. No se puede analizar la imagen.');
-        return null;
-    }
-
+    const token = DEFAULT_HF_KEY;
     try {
         const rawBase64 = imageBase64.includes('base64,') 
             ? imageBase64.split('base64,')[1] 
@@ -140,6 +131,19 @@ async function describeImage(imageBase64) {
         console.error('[VISION] Error analizando imagen:', e.message);
         return null;
     }
+}
+
+/**
+ * Petición gratuita a Pollinations AI en modo GET como último recurso
+ */
+async function callPollinationsFree(promptText) {
+    console.log('[AI] Probando Pollinations Free GET...');
+    const url = `https://text.pollinations.ai/${encodeURIComponent(promptText)}`;
+    const res = await axios.get(url, { timeout: 25000 });
+    if (res.data && typeof res.data === 'string' && res.data.trim()) {
+        return res.data;
+    }
+    throw new Error('Respuesta vacía de Pollinations');
 }
 
 async function callAI(systemPrompt, userPrompt, options = {}) {
@@ -207,6 +211,14 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
             }
             lastError = `${provider.name}: ${msg1}`;
         }
+    }
+
+    // Último recurso: Pollinations Free GET (sin API key)
+    try {
+        const fullPrompt = `${systemPrompt}\n\nInstrucción: ${userPrompt}`;
+        return await callPollinationsFree(fullPrompt);
+    } catch (ePollinations) {
+        console.error('[AI Fallback] Pollinations Free GET también falló:', ePollinations.message);
     }
 
     throw new Error(`Servicios de IA no disponibles temporalmente. Error: ${lastError}`);
