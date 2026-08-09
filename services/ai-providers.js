@@ -20,6 +20,12 @@ const PROVIDERS = {
         model: 'gpt-4o-mini', 
         apiKeyEnv: 'OPENAI_API_KEY',
         name: 'OpenAI'
+    },
+    pollinations_text: {
+        url: 'https://text.pollinations.ai/openai',
+        model: 'openai',
+        apiKeyEnv: null,
+        name: 'Pollinations AI (Gratis)'
     }
 };
 
@@ -59,16 +65,20 @@ const IMAGE_PROVIDERS = {
     }
 };
 
-function getAvailableProvider() {
-    const preferenceOrder = ['groq', 'huggingface_text', 'openai'];
-    for (const key of preferenceOrder) {
-        const provider = PROVIDERS[key];
-        const apiKey = process.env[provider.apiKeyEnv];
-        if (apiKey && apiKey.length > 5) {
-            return { key, ...provider, apiKey };
-        }
+function getCandidateProviders() {
+    const candidates = [];
+    if (process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.length > 5) {
+        candidates.push({ key: 'groq', ...PROVIDERS.groq, apiKey: process.env.GROQ_API_KEY });
     }
-    throw new Error('No hay ninguna API key de IA configurada en el archivo .env. Por favor, agregá tu GROQ_API_KEY o tu OPENAI_API_KEY.');
+    if (process.env.HF_API_KEY && process.env.HF_API_KEY.length > 5) {
+        candidates.push({ key: 'huggingface_text', ...PROVIDERS.huggingface_text, apiKey: process.env.HF_API_KEY });
+    }
+    if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.length > 5) {
+        candidates.push({ key: 'openai', ...PROVIDERS.openai, apiKey: process.env.OPENAI_API_KEY });
+    }
+    // Siempre agregar Pollinations como respaldo 100% gratuito sin necesidad de API key
+    candidates.push({ key: 'pollinations_text', ...PROVIDERS.pollinations_text, apiKey: null });
+    return candidates;
 }
 
 /**
@@ -90,7 +100,6 @@ async function describeImage(imageBase64) {
 
         console.log('[VISION] Analizando imagen con Hugging Face Vision (BLIP-2)...');
         
-        // Intentar primero con Salesforce/blip2-opt-2.7b para mayor precisión visual
         let modelUrl = 'https://api-inference.huggingface.co/models/Salesforce/blip2-opt-2.7b';
         let response;
         try {
@@ -134,64 +143,73 @@ async function describeImage(imageBase64) {
 }
 
 async function callAI(systemPrompt, userPrompt, options = {}) {
-    let { temperature = 0.7, maxTokens = 1200, images = [], imageBase64 = null, provider: requestedProvider = null } = options;
+    let { temperature = 0.7, maxTokens = 1200, images = [], imageBase64 = null } = options;
 
     if (imageBase64 && images.length === 0) {
         images = [imageBase64];
     }
-    let provider;
-    try {
-        if (requestedProvider && PROVIDERS[requestedProvider]) {
-            const apiKey = process.env[PROVIDERS[requestedProvider].apiKeyEnv];
-            provider = { key: requestedProvider, ...PROVIDERS[requestedProvider], apiKey };
-        } else {
-            provider = getAvailableProvider();
-        }
-    } catch (e) {
-        throw e;
-    }
 
+    const candidates = getCandidateProviders();
     let messages = [
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt }
     ];
 
-    let currentModel = provider.model;
+    let lastError = null;
 
-    const makeRequest = async (modelToUse) => {
-        const response = await axios.post(provider.url, {
-            model: modelToUse,
-            messages,
-            temperature,
-            max_tokens: maxTokens
-        }, {
-            headers: {
-                'Authorization': `Bearer ${provider.apiKey}`,
-                'Content-Type': 'application/json'
-            },
-            timeout: 60000
-        });
-        return response.data.choices[0].message.content;
-    };
-
-    try {
-        return await makeRequest(currentModel);
-    } catch (error) {
-        const msg = error.response?.data?.error?.message || error.message;
-        console.error(`[AI Error] ${provider.name} (${currentModel}):`, msg);
+    for (const provider of candidates) {
+        console.log(`[AI] Intentando proveedor: ${provider.name}...`);
         
-        if (provider.secondaryModel && provider.secondaryModel !== currentModel) {
-            console.log(`[AI] Intentando con modelo secundario: ${provider.secondaryModel}...`);
-            try {
-                return await makeRequest(provider.secondaryModel);
-            } catch (error2) {
-                const msg2 = error2.response?.data?.error?.message || error2.message;
-                console.error(`[AI Error] ${provider.name} (${provider.secondaryModel}):`, msg2);
-                throw new Error(`${provider.name}: ${msg2}`);
-            }
+        const headers = { 'Content-Type': 'application/json' };
+        if (provider.apiKey) {
+            headers['Authorization'] = `Bearer ${provider.apiKey}`;
         }
-        throw new Error(`${provider.name}: ${msg}`);
+
+        const tryModel = async (modelName) => {
+            const body = {
+                model: modelName,
+                messages,
+                temperature,
+                max_tokens: maxTokens
+            };
+            const response = await axios.post(provider.url, body, { headers, timeout: 35000 });
+            
+            if (response.data && response.data.choices && response.data.choices[0] && response.data.choices[0].message) {
+                return response.data.choices[0].message.content;
+            }
+            if (typeof response.data === 'string') {
+                return response.data;
+            }
+            throw new Error('Respuesta no válida');
+        };
+
+        try {
+            const text = await tryModel(provider.model);
+            if (text && text.trim()) {
+                console.log(`[AI] Éxito con proveedor: ${provider.name}`);
+                return text;
+            }
+        } catch (e1) {
+            const msg1 = e1.response?.data?.error?.message || e1.message;
+            console.warn(`[AI Fallback] ${provider.name} (${provider.model}) falló: ${msg1}`);
+            
+            if (provider.secondaryModel) {
+                try {
+                    const text2 = await tryModel(provider.secondaryModel);
+                    if (text2 && text2.trim()) {
+                        console.log(`[AI] Éxito con modelo secundario de ${provider.name}`);
+                        return text2;
+                    }
+                } catch (e2) {
+                    const msg2 = e2.response?.data?.error?.message || e2.message;
+                    console.warn(`[AI Fallback] ${provider.name} (${provider.secondaryModel}) falló: ${msg2}`);
+                }
+            }
+            lastError = `${provider.name}: ${msg1}`;
+        }
     }
+
+    throw new Error(`Servicios de IA no disponibles temporalmente. Error: ${lastError}`);
 }
 
 async function generateCaption(description, options = {}) {
@@ -201,21 +219,24 @@ async function generateCaption(description, options = {}) {
     if (imageBase64) {
         const imageDesc = await describeImage(imageBase64);
         if (imageDesc) {
-            imageContext = `\n\nDETALLES VISUALES DE LA IMAGEN ADJUNTA: "${imageDesc}".\nUsa lo que ves en la imagen (personas, objetos, colores, ambiente) para que el texto sea 100% coherente con la foto.`;
+            imageContext = `\n\nDETALLES VISUALES DETECTADOS EN LA FOTO: "${imageDesc}".\nDebes hacer referencia específica a estos elementos visuales (colores, objetos, personas, ambiente) para que el texto sea 100% natural y coherente con la foto.`;
         }
     }
 
-    const systemPrompt = `Eres un creador de contenido humano, natural y auténtico para redes sociales (Instagram, TikTok, Facebook).
+    const systemPrompt = `Eres un creador de contenido profesional pero 100% HUMANO, cercano, cálido y orgánico para redes sociales (Instagram, Facebook, TikTok).
+
 REGLAS OBLIGATORIAS:
-1. Escribe como una persona real compartiendo con su audiencia. Evita sonar como un anuncio de televisión o un robot de marketing artificial.
-2. Haz referencias específicas y naturales a lo que aparece en la foto.
-3. Incluye una llamada a la acción orgánica (hacer una pregunta a los seguidores o invitarlos a comentar).
-4. Usa emojis expresivos con moderación y 3-5 hashtags relevantes al final.
-5. NO incluyas introducciones ni despedidas conversacionales como "Aquí tienes tu caption:". Devuelve ÚNICAMENTE el texto listo para publicar.`;
+1. Escribe como una persona real compartiendo un pensamiento o momento auténtico.
+2. PROHIBIDO usar clichés de bot o frases de anuncio robótico (como "¡Hola a todos!", "En el mundo acelerado de hoy...", "¡No te lo pierdas!", "¡Atención emprendedores!").
+3. Si hay detalles visuales de la foto, INTEGRA ESOS DETALLES VISUALES DE FORMA NATURAL Y ESPONTÁNEA en el texto.
+4. Incluye una pregunta corta y orgánica al final para interactuar con la audiencia.
+5. Usa entre 2 y 4 emojis con moderación que encajen con la vibra de la foto.
+6. Agrega de 3 a 5 hashtags muy relevantes al final.
+7. Devuelve ÚNICAMENTE el texto de la publicación listo para copiar. Sin introducciones como "Aquí tienes tu publicación:".`;
     
-    let userPrompt = 'Crea una sugerencia de publicación muy humana y cercana.';
+    let userPrompt = 'Genera una publicación muy humana, cercana y atractiva.';
     if (description && description.trim() !== '') {
-        userPrompt += ` Idea o contexto deseado: "${description}"`;
+        userPrompt += ` Idea o contexto del usuario: "${description}"`;
     }
     userPrompt += imageContext;
 
