@@ -95,59 +95,48 @@ function getCandidateProviders() {
 }
 
 /**
- * Usa Hugging Face BLIP para describir una imagen en texto.
- * Esto permite que modelos sin visión entiendan la imagen.
+ * Usa OpenRouter Vision (Nemotron-12B-VL) para describir una imagen en texto nativamente.
  */
 async function describeImage(imageBase64) {
-    const token = DEFAULT_HF_KEY;
+    if (!imageBase64 || imageBase64.length < 50) return null;
+    
     try {
-        const rawBase64 = imageBase64.includes('base64,') 
-            ? imageBase64.split('base64,')[1] 
-            : imageBase64;
-        const imageBuffer = Buffer.from(rawBase64, 'base64');
-
-        console.log('[VISION] Analizando imagen con Hugging Face Vision (BLIP-2)...');
+        console.log('[VISION] Analizando imagen nativamente con OpenRouter Vision (Nemotron-12B-VL)...');
         
-        let modelUrl = 'https://router.huggingface.co/hf-inference/models/Salesforce/blip2-opt-2.7b';
-        let response;
-        try {
-            response = await axios.post(
-                modelUrl,
-                imageBuffer,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/octet-stream'
-                    },
-                    timeout: 25000
-                }
-            );
-        } catch (e1) {
-            console.warn('[VISION] Falló BLIP-2, usando fallback BLIP-large...', e1.message);
-            modelUrl = 'https://router.huggingface.co/hf-inference/models/Salesforce/blip-image-captioning-large';
-            response = await axios.post(
-                modelUrl,
-                imageBuffer,
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/octet-stream'
-                    },
-                    timeout: 25000
-                }
-            );
+        let formattedBase64 = imageBase64;
+        if (!formattedBase64.startsWith('data:image')) {
+            formattedBase64 = `data:image/jpeg;base64,${formattedBase64}`;
         }
+        
+        const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+            model: 'nvidia/nemotron-nano-12b-v2-vl:free',
+            messages: [
+                {
+                    role: 'user',
+                    content: [
+                        { type: 'text', text: 'Describí brevemente en español qué se ve exactamente en esta fotografía (personas, edad aproximada, ropa, objetos, lugar y ambiente).' },
+                        { type: 'image_url', image_url: { url: formattedBase64 } }
+                    ]
+                }
+            ],
+            max_tokens: 250
+        }, {
+            headers: {
+                'Authorization': `Bearer ${OPENROUTER_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            timeout: 25000
+        });
 
-        if (response.data && response.data[0] && response.data[0].generated_text) {
-            const description = response.data[0].generated_text;
-            console.log('[VISION] Imagen descrita:', description);
-            return description;
+        if (response.data && response.data.choices && response.data.choices[0] && response.data.choices[0].message) {
+            const desc = response.data.choices[0].message.content;
+            console.log('[VISION] ✅ Descripción visual obtenida:', desc);
+            return desc;
         }
-        return null;
     } catch (e) {
-        console.warn('[VISION] Error analizando imagen (continuando sin análisis visual):', e.message);
-        return null;
+        console.warn('[VISION] OpenRouter Vision falló:', e.message);
     }
+    return null;
 }
 
 async function callAI(systemPrompt, userPrompt, options = {}) {
