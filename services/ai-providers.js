@@ -14,7 +14,7 @@ const PROVIDERS = {
         name: 'Groq'
     },
     huggingface_text: {
-        url: 'https://api-inference.huggingface.co/models/Qwen/Qwen2.5-7B-Instruct/v1/chat/completions',
+        url: 'https://router.huggingface.co/hf-inference/v1/chat/completions',
         model: 'Qwen/Qwen2.5-7B-Instruct',
         secondaryModel: 'meta-llama/Llama-3.2-3B-Instruct',
         apiKeyEnv: 'HF_API_KEY',
@@ -93,7 +93,7 @@ async function describeImage(imageBase64) {
 
         console.log('[VISION] Analizando imagen con Hugging Face Vision (BLIP-2)...');
         
-        let modelUrl = 'https://api-inference.huggingface.co/models/Salesforce/blip2-opt-2.7b';
+        let modelUrl = 'https://router.huggingface.co/hf-inference/models/Salesforce/blip2-opt-2.7b';
         let response;
         try {
             response = await axios.post(
@@ -109,7 +109,7 @@ async function describeImage(imageBase64) {
             );
         } catch (e1) {
             console.warn('[VISION] Falló BLIP-2, usando fallback BLIP-large...', e1.message);
-            modelUrl = 'https://api-inference.huggingface.co/models/Salesforce/blip-image-captioning-large';
+            modelUrl = 'https://router.huggingface.co/hf-inference/models/Salesforce/blip-image-captioning-large';
             response = await axios.post(
                 modelUrl,
                 imageBuffer,
