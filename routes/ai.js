@@ -1,11 +1,11 @@
 const express = require('express');
-const { authMiddleware } = require('../middleware/auth');
+const { optionalAuth } = require('../middleware/auth');
 const ai = require('../services/ai-providers');
 const store = require('../data/store');
 
 const router = express.Router();
 
-router.use(authMiddleware);
+router.use(optionalAuth);
 
 router.get('/providers', (req, res) => {
     try {

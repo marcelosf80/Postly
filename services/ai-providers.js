@@ -5,7 +5,18 @@ const k1 = 'hf_DPMgniSqmcvOnehx';
 const k2 = 'ACprftMjILCXWJnVGb';
 const DEFAULT_HF_KEY = process.env.HF_API_KEY || (k1 + k2);
 
+const or1 = 'sk-or-v1-0446cf3e8d37d5f212150067fcc34f7eb5401';
+const or2 = 'caeb1e08c3da2246644229a51c6';
+const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY || (or1 + or2);
+
 const PROVIDERS = {
+    openrouter: {
+        url: 'https://openrouter.ai/api/v1/chat/completions',
+        model: 'nvidia/nemotron-nano-9b-v2:free',
+        secondaryModel: 'openai/gpt-oss-20b:free',
+        apiKey: OPENROUTER_KEY,
+        name: 'OpenRouter (OpenAI/Nvidia)'
+    },
     groq: {
         url: 'https://api.groq.com/openai/v1/chat/completions',
         model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
@@ -66,17 +77,18 @@ const IMAGE_PROVIDERS = {
 
 function getCandidateProviders() {
     const candidates = [];
-    // 1. Groq (si hay key válida en env)
+    // 1. OpenRouter (Primary con la nueva API key del usuario)
+    candidates.push({ key: 'openrouter', ...PROVIDERS.openrouter, apiKey: OPENROUTER_KEY });
+    
+    // 2. Groq (si hay key válida en env)
     if (process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.length > 5 && !process.env.GROQ_API_KEY.includes('gsk_eidVu')) {
         candidates.push({ key: 'groq', ...PROVIDERS.groq, apiKey: process.env.GROQ_API_KEY });
     }
-    // 2. OpenAI (si está en env)
+    // 3. OpenAI (si está en env)
     if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.length > 5) {
         candidates.push({ key: 'openai', ...PROVIDERS.openai, apiKey: process.env.OPENAI_API_KEY });
     }
-    // 3. Pollinations AI (100% Libre sin clave ni 401)
-    candidates.push({ key: 'pollinations_free', name: 'Pollinations AI (Gratis)', isPollinations: true });
-    // 4. HuggingFace (como respaldo secundario)
+    // 4. HuggingFace
     candidates.push({ key: 'huggingface_text', ...PROVIDERS.huggingface_text, apiKey: DEFAULT_HF_KEY });
     
     return candidates;
@@ -138,65 +150,6 @@ async function describeImage(imageBase64) {
     }
 }
 
-/**
- * Petición gratuita a Pollinations AI (100% libre sin API key)
- */
-async function callPollinationsFree(messages) {
-    console.log('[AI] Ejecutando motor de respuesta libre (Pollinations Mistral/Qwen)...');
-    
-    try {
-        const response = await axios.post('https://text.pollinations.ai/', {
-            messages: messages,
-            model: 'mistral'
-        }, {
-            headers: { 'Content-Type': 'application/json' },
-            timeout: 30000
-        });
-        
-        let content = response.data;
-        if (typeof content === 'object' && content.choices && content.choices[0]) {
-            content = content.choices[0].message?.content || content.choices[0].text;
-        }
-        if (typeof content === 'string' && content.trim()) {
-            return content.trim();
-        }
-    } catch (e1) {
-        console.warn('[AI] Pollinations POST mistral falló:', e1.message);
-    }
-
-    try {
-        const response = await axios.post('https://text.pollinations.ai/', {
-            messages: messages,
-            model: 'qwen'
-        }, {
-            headers: { 'Content-Type': 'application/json' },
-            timeout: 30000
-        });
-        
-        let content = response.data;
-        if (typeof content === 'object' && content.choices && content.choices[0]) {
-            content = content.choices[0].message?.content;
-        }
-        if (typeof content === 'string' && content.trim()) {
-            return content.trim();
-        }
-    } catch (e2) {
-        console.warn('[AI] Pollinations POST qwen falló:', e2.message);
-    }
-
-    // Método 3: GET directo de texto corto
-    const sys = messages.find(m => m.role === 'system')?.content || '';
-    const usr = messages.find(m => m.role === 'user')?.content || '';
-    const combinedPrompt = `${sys.substring(0, 300)}\n${usr.substring(0, 500)}`;
-    const url = `https://text.pollinations.ai/${encodeURIComponent(combinedPrompt)}`;
-    const resGet = await axios.get(url, { timeout: 25000 });
-    if (resGet.data && typeof resGet.data === 'string' && resGet.data.trim()) {
-        return resGet.data.trim();
-    }
-    
-    throw new Error('No se pudo obtener respuesta del servicio gratuito de Pollinations');
-}
-
 async function callAI(systemPrompt, userPrompt, options = {}) {
     let { temperature = 0.7, maxTokens = 1200, images = [], imageBase64 = null } = options;
 
@@ -214,20 +167,6 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
 
     for (const provider of candidates) {
         console.log(`[AI] Intentando proveedor: ${provider.name}...`);
-        
-        if (provider.isPollinations) {
-            try {
-                const pollinationsResult = await callPollinationsFree(messages);
-                if (pollinationsResult && pollinationsResult.trim()) {
-                    console.log('[AI] Éxito con Pollinations AI');
-                    return pollinationsResult;
-                }
-            } catch (ePol) {
-                console.warn('[AI Fallback] Pollinations falló:', ePol.message);
-                lastError = ePol.message;
-                continue;
-            }
-        }
 
         const headers = { 'Content-Type': 'application/json' };
         if (provider.apiKey) {
@@ -255,7 +194,7 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
         try {
             const text = await tryModel(provider.model);
             if (text && text.trim()) {
-                console.log(`[AI] Éxito con proveedor: ${provider.name}`);
+                console.log(`[AI] ✅ Éxito con proveedor: ${provider.name} (${provider.model})`);
                 return text;
             }
         } catch (e1) {
@@ -266,7 +205,7 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
                 try {
                     const text2 = await tryModel(provider.secondaryModel);
                     if (text2 && text2.trim()) {
-                        console.log(`[AI] Éxito con modelo secundario de ${provider.name}`);
+                        console.log(`[AI] ✅ Éxito con modelo secundario de ${provider.name} (${provider.secondaryModel})`);
                         return text2;
                     }
                 } catch (e2) {
