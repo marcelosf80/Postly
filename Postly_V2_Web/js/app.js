@@ -501,45 +501,53 @@ function useAIImage(base64) {
 function renderCreatePost() {
     const main = document.getElementById('main-content');
     main.innerHTML = `
-        <div class="fade-in" style="padding-bottom: 40px;">
-            <div style="padding: 24px 20px 16px 20px; display:flex; justify-content:space-between; align-items:center;">
+        <div class="fade-in" style="padding: 16px 16px 120px 16px;">
+            <!-- Header section -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 18px; padding: 0 4px;">
                 <div>
-                    <h2 style="font-weight: 800; font-size: 1.8rem; letter-spacing: -1px; background: linear-gradient(135deg, #6366f1, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Crear Publicación</h2>
-                    <p style="color: var(--text-secondary); font-size: 0.85rem; font-weight: 500;">Editor Inteligente de Redes Sociales</p>
+                    <h2 style="font-weight: 800; font-size: 1.5rem; letter-spacing: -0.5px; background: linear-gradient(135deg, #4f46e5, #7c3aed); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Crear Publicación</h2>
+                    <p style="color: var(--text-secondary); font-size: 0.82rem; font-weight: 500;">Editor inteligente para tus redes sociales</p>
                 </div>
-                <span class="ai-badge"><i data-lucide="sparkles" style="width:12px;"></i> IA Activa</span>
+                <span style="background: rgba(99, 102, 241, 0.1); color: #4f46e5; border: 1px solid rgba(99, 102, 241, 0.2); padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.75rem; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 8px rgba(99,102,241,0.1);">
+                    <i data-lucide="sparkles" style="width:14px; height:14px; color:#6366f1;"></i> IA Activa
+                </span>
             </div>
 
             <!-- Editor Card -->
-            <div class="card" style="margin: 0 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.8); box-shadow: 0 10px 30px rgba(99, 102, 241, 0.08);">
-                <!-- Platform Toggle -->
-                <div style="display: flex; gap: 8px; margin-bottom: 16px; background: #f1f5f9; padding: 6px; border-radius: 18px;">
-                    <button class="btn btn-sm" id="plat-ig" onclick="setPlatform('instagram')" style="flex: 1; border-radius: 14px; background: white; box-shadow: 0 4px 10px rgba(0,0,0,0.05); font-weight: 700;">Instagram</button>
-                    <button class="btn btn-sm" id="plat-fb" onclick="setPlatform('facebook')" style="flex: 1; border-radius: 14px; background: transparent; font-weight: 700; color: var(--text-secondary);">Facebook</button>
+            <div class="card" style="margin: 0; padding: 20px; border-radius: 24px; border: 1px solid rgba(226, 232, 240, 0.8); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);">
+                
+                <!-- Platform Toggle (Segmented Control) -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 12px; background: #f1f5f9; padding: 4px; border-radius: 16px;">
+                    <button class="btn btn-sm" id="plat-ig" onclick="setPlatform('instagram')" style="border-radius: 12px; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.06); font-weight: 700; color: #1e293b; height: 38px;">
+                        <i data-lucide="instagram" style="width:15px; color:#e1306c;"></i> Instagram
+                    </button>
+                    <button class="btn btn-sm" id="plat-fb" onclick="setPlatform('facebook')" style="border-radius: 12px; background: transparent; font-weight: 600; color: #64748b; height: 38px;">
+                        <i data-lucide="facebook" style="width:15px; color:#1877f2;"></i> Facebook
+                    </button>
                 </div>
 
                 <!-- Post Type Toggle (Feed vs Stories) -->
-                <div style="display: flex; gap: 8px; margin-bottom: 20px;">
-                    <button class="btn btn-sm" id="type-feed" onclick="setPostType('feed')" style="flex: 1; border-radius: 12px; background: #f1f5f9; font-weight: 700; border: 1.5px solid var(--primary); color: var(--primary);">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin-bottom: 18px; background: #f8fafc; padding: 4px; border-radius: 14px; border: 1px solid #e2e8f0;">
+                    <button class="btn btn-sm" id="type-feed" onclick="setPostType('feed')" style="border-radius: 10px; background: white; font-weight: 700; color: #4f46e5; box-shadow: 0 2px 6px rgba(99,102,241,0.12); height: 34px;">
                         <i data-lucide="layout" style="width: 14px;"></i> Feed
                     </button>
-                    <button class="btn btn-sm" id="type-story" onclick="setPostType('story')" style="flex: 1; border-radius: 12px; background: #f1f5f9; font-weight: 700; border: 1.5px solid transparent; color: var(--text-secondary);">
+                    <button class="btn btn-sm" id="type-story" onclick="setPostType('story')" style="border-radius: 10px; background: transparent; font-weight: 600; color: #64748b; height: 34px;">
                         <i data-lucide="layers" style="width: 14px;"></i> Historia
                     </button>
                 </div>
 
-                <!-- Media Source Picker Toolbar -->
-                <div class="media-source-picker">
-                    <button class="source-btn" onclick="takePhotoFromCamera()" style="background:#f0f7ff; border-color:#bae6fd; color:#0369a1;">
-                        <i data-lucide="camera"></i>
+                <!-- Media Source Picker (3 Clean Cards) -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 18px;">
+                    <button onclick="takePhotoFromCamera()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 16px; color: #0284c7; font-weight: 700; font-size: 0.78rem; cursor: pointer; transition: all 0.2s;">
+                        <i data-lucide="camera" style="width: 20px; height: 20px;"></i>
                         <span>Cámara</span>
                     </button>
-                    <button class="source-btn" onclick="pickPhotoFromGallery()" style="background:#f5f3ff; border-color:#ddd6fe; color:#6d28d9;">
-                        <i data-lucide="image"></i>
+                    <button onclick="pickPhotoFromGallery()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 16px; color: #7e22ce; font-weight: 700; font-size: 0.78rem; cursor: pointer; transition: all 0.2s;">
+                        <i data-lucide="image" style="width: 20px; height: 20px;"></i>
                         <span>Galería</span>
                     </button>
-                    <button class="source-btn" onclick="openNativeEditor()" style="background:#fdf2f8; border-color:#fbcfe8; color:#be185d;">
-                        <i data-lucide="sliders"></i>
+                    <button onclick="openNativeEditor()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 12px 6px; background: #fff1f2; border: 1px solid #fecdd3; border-radius: 16px; color: #e11d48; font-weight: 700; font-size: 0.78rem; cursor: pointer; transition: all 0.2s;">
+                        <i data-lucide="sliders" style="width: 20px; height: 20px;"></i>
                         <span>Editor Pro</span>
                     </button>
                 </div>
@@ -551,55 +559,62 @@ function renderCreatePost() {
                 <div id="realistic-preview" style="margin-bottom: 16px;"></div>
 
                 <!-- Image Controls Row -->
-                <div id="image-info-row" style="display:none; justify-content:space-between; align-items:center; background:#f8fafc; padding:12px; border-radius:14px; margin-bottom:20px; border:1px solid #e2e8f0;">
-                    <span style="font-size:0.82rem; font-weight:700; color:var(--text-primary);">📷 Foto Cargada</span>
+                <div id="image-info-row" style="display:none; justify-content:space-between; align-items:center; background:#f8fafc; padding:12px 14px; border-radius:16px; margin-bottom:18px; border:1px solid #e2e8f0;">
+                    <span style="font-size:0.82rem; font-weight:700; color:#334155; display:flex; align-items:center; gap:6px;">
+                        <i data-lucide="check-circle-2" style="width:16px; color:#10b981;"></i> Foto Lista
+                    </span>
                     <div style="display:flex; gap:8px;">
-                        <button class="btn btn-sm" onclick="openNativeEditor()" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; width:auto; border-radius:10px; padding:6px 12px;">
-                            <i data-lucide="sliders" style="width:14px;"></i> Editar Foto
+                        <button class="btn btn-sm" onclick="openNativeEditor()" style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; width:auto; border-radius:12px; padding:6px 12px; font-weight:700;">
+                            <i data-lucide="sliders" style="width:14px;"></i> Editar
                         </button>
-                        <button class="btn btn-sm" onclick="removeImage()" style="background:#fee2e2; color:#b91c1c; width:auto; border-radius:10px; padding:6px 10px;">
+                        <button class="btn btn-sm" onclick="removeImage()" style="background:#fee2e2; color:#b91c1c; width:auto; border-radius:12px; padding:6px 10px;">
                             <i data-lucide="trash-2" style="width:14px;"></i>
                         </button>
                     </div>
                 </div>
 
                 <!-- Textarea Editor -->
-                <div style="margin-bottom: 20px;">
-                    <label style="font-size:0.8rem; font-weight:700; color:var(--text-secondary); display:block; margin-bottom:8px;">Texto de la publicación</label>
-                    <textarea id="post-text" oninput="updatePreview()" placeholder="Escribe el texto de tu publicación aquí..." style="width: 100%; min-height: 110px; padding: 14px; border: 1.5px solid var(--border); border-radius: 14px; outline: none; font-family: inherit; font-size: 0.95rem; resize: vertical; line-height: 1.5;"></textarea>
+                <div style="margin-bottom: 18px;">
+                    <label style="font-size: 0.82rem; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
+                        <i data-lucide="edit-3" style="width: 14px; color: #6366f1;"></i> Texto de la publicación
+                    </label>
+                    <textarea id="post-text" oninput="updatePreview()" placeholder="Escribe el texto de tu publicación aquí o usa la IA abajo..." style="width: 100%; min-height: 110px; padding: 14px; border: 1.5px solid #cbd5e1; border-radius: 16px; outline: none; font-family: inherit; font-size: 0.92rem; resize: vertical; line-height: 1.5; background: #fdfdff; transition: border-color 0.2s;"></textarea>
                 </div>
 
-                <!-- AI Dynamic Assistant Panel -->
-                <div style="background: linear-gradient(135deg, #f8fafc, #f1f5f9); padding: 16px; border-radius: 20px; margin-bottom: 20px; border: 1px solid #e2e8f0;">
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 10px;">
-                        <span style="font-size:0.85rem; font-weight:800; color:#475569; display:flex; align-items:center; gap:6px;">
-                            <i data-lucide="bot" style="width:16px; color:#6366f1;"></i> Asistente de Contenido IA
+                <!-- AI Copilot Panel -->
+                <div style="background: linear-gradient(135deg, #f8fafc 0%, #edf2f7 100%); padding: 18px; border-radius: 20px; margin-bottom: 22px; border: 1px solid #e2e8f0; box-shadow: inset 0 1px 3px rgba(255,255,255,0.8);">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+                        <span style="font-size:0.85rem; font-weight:800; color:#334155; display:flex; align-items:center; gap:6px;">
+                            <i data-lucide="bot" style="width:18px; height:18px; color:#6366f1;"></i> Copilot de Contenido IA
                         </span>
-                        <span style="font-size:0.7rem; font-weight:600; color:#10b981;">💡 Horario Sugerido: 18:30 hrs</span>
+                        <span style="font-size:0.72rem; font-weight:700; background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; padding:3px 10px; border-radius:12px;">
+                            💡 Mejor hora: 18:30 hrs
+                        </span>
                     </div>
 
                     <div style="margin-bottom: 12px;">
-                        <input type="text" id="ai-context" placeholder="Dile a la IA sobre qué quieres publicar (ej: Promoción de fin de semana)..." style="width: 100%; border: 1px solid #cbd5e1; padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; outline: none; background: white;">
+                        <input type="text" id="ai-context" placeholder="💡 Tema breve (ej: Promo fin de semana)..." style="width: 100%; border: 1.5px solid #cbd5e1; padding: 12px 14px; border-radius: 14px; font-size: 0.88rem; outline: none; background: white; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
                     </div>
 
-                    <div style="display: flex; gap: 8px; margin-bottom:12px;">
-                        <button class="btn btn-sm" id="btn-ai-suggest" onclick="generateAICaption()" style="background: linear-gradient(135deg, #6366f1, #4f46e5); color: white; font-size: 0.8rem; flex: 1; border-radius: 12px; font-weight: 700; height: 42px;">
-                            <i data-lucide="sparkles" style="width: 14px;"></i> Generar Copy con IA
+                    <div style="display: grid; grid-template-columns: 1fr auto; gap: 8px; margin-bottom:12px;">
+                        <button class="btn btn-sm" id="btn-ai-suggest" onclick="generateAICaption()" style="background: linear-gradient(135deg, #4f46e5, #7c3aed); color: white; font-size: 0.82rem; border-radius: 14px; font-weight: 700; height: 44px; box-shadow: 0 4px 12px rgba(79,70,229,0.25);">
+                            <i data-lucide="sparkles" style="width: 15px;"></i> Generar Sugerencia IA
                         </button>
-                        <button class="btn btn-sm" onclick="generateHashtags()" style="background: #ffffff; color: #0284c7; border:1px solid #bae6fd; font-size: 0.8rem; border-radius: 12px; font-weight: 700; height: 42px; padding: 0 16px;">
-                            <i data-lucide="hash" style="width: 14px;"></i> Hashtags
+                        <button class="btn btn-sm" onclick="generateHashtags()" style="background: white; color: #0284c7; border: 1.5px solid #bae6fd; font-size: 0.82rem; border-radius: 14px; font-weight: 700; height: 44px; padding: 0 16px;">
+                            <i data-lucide="hash" style="width: 15px;"></i> Hashtags
                         </button>
                     </div>
 
-                    <!-- Instant Tone Quick Actions -->
-                    <div style="display:flex; gap:6px; overflow-x:auto; padding-top:4px;">
-                        <button class="btn btn-sm" onclick="improveTextWithTone('viral')" style="padding:4px 10px; font-size:0.72rem; background:white; border:1px solid #e2e8f0; color:#475569; border-radius:16px;">🚀 Tono Viral</button>
-                        <button class="btn btn-sm" onclick="improveTextWithTone('sales')" style="padding:4px 10px; font-size:0.72rem; background:white; border:1px solid #e2e8f0; color:#475569; border-radius:16px;">🛍️ Modo Ventas</button>
-                        <button class="btn btn-sm" onclick="improveTextWithTone('formal')" style="padding:4px 10px; font-size:0.72rem; background:white; border:1px solid #e2e8f0; color:#475569; border-radius:16px;">💼 Profesional</button>
+                    <!-- Instant Tone Quick Chips -->
+                    <div style="display:flex; gap:6px; overflow-x:auto; padding-top:2px; scrollbar-width: none;">
+                        <button class="btn btn-sm" onclick="improveTextWithTone('viral')" style="padding:6px 12px; font-size:0.75rem; background:white; border:1px solid #e2e8f0; color:#475569; border-radius:18px; font-weight:600; white-space:nowrap;">🚀 Tono Viral</button>
+                        <button class="btn btn-sm" onclick="improveTextWithTone('sales')" style="padding:6px 12px; font-size:0.75rem; background:white; border:1px solid #e2e8f0; color:#475569; border-radius:18px; font-weight:600; white-space:nowrap;">🛍️ Modo Ventas</button>
+                        <button class="btn btn-sm" onclick="improveTextWithTone('formal')" style="padding:6px 12px; font-size:0.75rem; background:white; border:1px solid #e2e8f0; color:#475569; border-radius:18px; font-weight:600; white-space:nowrap;">💼 Profesional</button>
                     </div>
                 </div>
 
-                <button class="btn btn-primary" id="submit-btn" onclick="submitPost()" style="height: 60px; border-radius: 18px; font-size: 1.05rem; font-weight: 800;">
+                <!-- Submit Button -->
+                <button class="btn btn-primary" id="submit-btn" onclick="submitPost()" style="height: 56px; border-radius: 18px; font-size: 1.02rem; font-weight: 800; background: linear-gradient(135deg, #4f46e5, #7c3aed); box-shadow: 0 8px 25px rgba(79,70,229,0.35);">
                     Publicar ahora <i data-lucide="send" style="width: 18px; margin-left: 8px;"></i>
                 </button>
             </div>
