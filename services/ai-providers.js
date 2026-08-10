@@ -136,16 +136,64 @@ async function describeImage(imageBase64) {
 }
 
 /**
- * Petición gratuita a Pollinations AI en modo GET como último recurso
+ * Petición gratuita a Pollinations AI (100% libre sin API key)
  */
-async function callPollinationsFree(promptText) {
-    console.log('[AI] Probando Pollinations Free GET...');
-    const url = `https://text.pollinations.ai/${encodeURIComponent(promptText)}`;
-    const res = await axios.get(url, { timeout: 25000 });
-    if (res.data && typeof res.data === 'string' && res.data.trim()) {
-        return res.data;
+async function callPollinationsFree(messages) {
+    console.log('[AI] Probando Pollinations Free POST (Mistral/Qwen)...');
+    
+    // Método 1: POST a text.pollinations.ai con modelo mistral (gratis)
+    try {
+        const response = await axios.post('https://text.pollinations.ai/', {
+            messages: messages,
+            model: 'mistral'
+        }, {
+            headers: { 'Content-Type': 'application/json' },
+            timeout: 30000
+        });
+        
+        let content = response.data;
+        if (typeof content === 'object' && content.choices && content.choices[0]) {
+            content = content.choices[0].message?.content || content.choices[0].text;
+        }
+        if (typeof content === 'string' && content.trim()) {
+            return content.trim();
+        }
+    } catch (e1) {
+        console.warn('[AI] Pollinations POST mistral falló:', e1.message);
     }
-    throw new Error('Respuesta vacía de Pollinations');
+
+    // Método 2: POST a text.pollinations.ai con modelo qwen
+    try {
+        const response = await axios.post('https://text.pollinations.ai/', {
+            messages: messages,
+            model: 'qwen'
+        }, {
+            headers: { 'Content-Type': 'application/json' },
+            timeout: 30000
+        });
+        
+        let content = response.data;
+        if (typeof content === 'object' && content.choices && content.choices[0]) {
+            content = content.choices[0].message?.content;
+        }
+        if (typeof content === 'string' && content.trim()) {
+            return content.trim();
+        }
+    } catch (e2) {
+        console.warn('[AI] Pollinations POST qwen falló:', e2.message);
+    }
+
+    // Método 3: GET directo de texto corto
+    const sys = messages.find(m => m.role === 'system')?.content || '';
+    const usr = messages.find(m => m.role === 'user')?.content || '';
+    const combinedPrompt = `${sys.substring(0, 300)}\n${usr.substring(0, 500)}`;
+    const url = `https://text.pollinations.ai/${encodeURIComponent(combinedPrompt)}`;
+    const resGet = await axios.get(url, { timeout: 25000 });
+    if (resGet.data && typeof resGet.data === 'string' && resGet.data.trim()) {
+        return resGet.data.trim();
+    }
+    
+    throw new Error('No se pudo obtener respuesta del servicio gratuito de Pollinations');
 }
 
 async function callAI(systemPrompt, userPrompt, options = {}) {
@@ -215,15 +263,15 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
         }
     }
 
-    // Último recurso: Pollinations Free GET (sin API key)
+    // Si fallan las claves (Groq / HuggingFace 401), usar Pollinations Free POST automáticamente
     try {
-        const fullPrompt = `${systemPrompt}\n\nInstrucción: ${userPrompt}`;
-        return await callPollinationsFree(fullPrompt);
+        console.log('[AI] Activando respaldo Pollinations (Gratuito sin API Key)...');
+        return await callPollinationsFree(messages);
     } catch (ePollinations) {
-        console.error('[AI Fallback] Pollinations Free GET también falló:', ePollinations.message);
+        console.error('[AI Fallback] Respaldo Pollinations también falló:', ePollinations.message);
     }
 
-    throw new Error(`Servicios de IA no disponibles temporalmente. Error: ${lastError}`);
+    throw new Error(`Servicios de IA no disponibles. Error: ${lastError}`);
 }
 
 async function generateCaption(description, options = {}) {
