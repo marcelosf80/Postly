@@ -209,33 +209,93 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
     throw new Error(`Servicios de IA no disponibles. Error: ${lastError}`);
 }
 
-async function generateCaption(description, options = {}) {
-    const { imageBase64 = null } = options;
-    
-    let imageContext = '';
-    if (imageBase64) {
-        const imageDesc = await describeImage(imageBase64);
-        if (imageDesc) {
-            imageContext = `\n\nDETALLES VISUALES DETECTADOS EN LA FOTO: "${imageDesc}".\nDebes hacer referencia específica a estos elementos visuales (colores, objetos, personas, ambiente) para que el texto sea 100% natural y coherente con la foto.`;
-        }
-    }
+const sharp = require('sharp');
 
+/**
+ * Comprime la imagen a máximo 800px y calidad 70 para envío ultrarrápido
+ */
+async function compressImageForVision(imageBase64) {
+    if (!imageBase64 || imageBase64.length < 50) return null;
+    try {
+        const rawBase64 = imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64;
+        const inputBuffer = Buffer.from(rawBase64, 'base64');
+        
+        const compressedBuffer = await sharp(inputBuffer)
+            .resize({ width: 800, height: 800, fit: 'inside', withoutEnlargement: true })
+            .jpeg({ quality: 70 })
+            .toBuffer();
+            
+        return `data:image/jpeg;base64,${compressedBuffer.toString('base64')}`;
+    } catch (e) {
+        console.warn('[VISION] Error comprimiendo imagen:', e.message);
+        return imageBase64;
+    }
+}
+
+async function generateCaption(description, options = {}) {
+    let { imageBase64 = null } = options;
+    
     const systemPrompt = `Eres un creador de contenido profesional pero 100% HUMANO, cercano, cálido y orgánico para redes sociales (Instagram, Facebook, TikTok).
 
 REGLAS OBLIGATORIAS:
 1. Escribe como una persona real compartiendo un pensamiento o momento auténtico.
 2. PROHIBIDO usar clichés de bot o frases de anuncio robótico (como "¡Hola a todos!", "En el mundo acelerado de hoy...", "¡No te lo pierdas!", "¡Atención emprendedores!").
-3. Si hay detalles visuales de la foto, INTEGRA ESOS DETALLES VISUALES DE FORMA NATURAL Y ESPONTÁNEA en el texto.
+3. Si hay una foto, OBSERVA ATENTAMENTE LOS DETALLES VISUALES DE LA FOTO (quién aparece, qué viste, qué objetos hay, lugar, colores, emoción) Y ESTRATÉGICAMENTE INTEGRA ESOS DETALLES EN EL TEXTO.
 4. Incluye una pregunta corta y orgánica al final para interactuar con la audiencia.
 5. Usa entre 2 y 4 emojis con moderación que encajen con la vibra de la foto.
 6. Agrega de 3 a 5 hashtags muy relevantes al final.
 7. Devuelve ÚNICAMENTE el texto de la publicación listo para copiar. Sin introducciones como "Aquí tienes tu publicación:".`;
-    
+
+    // Si hay foto, ejecutamos 1 solo pase directo con visión ultrarrápida (Sub-5 segundos)
+    if (imageBase64 && imageBase64.length > 50) {
+        try {
+            console.log('[AI VISION] Generando caption directo con visión (Single-Pass)...');
+            const fastImage = await compressImageForVision(imageBase64);
+            
+            let promptText = 'Observa detalladamente esta fotografía y escribe una publicación muy humana, cercana y atractiva basada en lo que ves.';
+            if (description && description.trim()) {
+                promptText += ` Idea o tema del usuario: "${description}"`;
+            }
+            
+            const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
+                model: 'nvidia/nemotron-nano-12b-v2-vl:free',
+                messages: [
+                    { role: 'system', content: systemPrompt },
+                    {
+                        role: 'user',
+                        content: [
+                            { type: 'text', text: promptText },
+                            { type: 'image_url', image_url: { url: fastImage } }
+                        ]
+                    }
+                ],
+                max_tokens: 600,
+                temperature: 0.7
+            }, {
+                headers: {
+                    'Authorization': `Bearer ${OPENROUTER_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                timeout: 20000
+            });
+
+            if (response.data && response.data.choices && response.data.choices[0] && response.data.choices[0].message) {
+                const text = response.data.choices[0].message.content.trim();
+                if (text && text.length > 10) {
+                    console.log('[AI VISION] ✅ Éxito en 1 solo pase directo de visión!');
+                    return text;
+                }
+            }
+        } catch (eVision) {
+            console.warn('[AI VISION Fallback] Pase directo falló, intentando flujo estándar...', eVision.message);
+        }
+    }
+
+    // Flujo estándar (sin imagen o si la visión directa falló)
     let userPrompt = 'Genera una publicación muy humana, cercana y atractiva.';
     if (description && description.trim() !== '') {
         userPrompt += ` Idea o contexto del usuario: "${description}"`;
     }
-    userPrompt += imageContext;
 
     return callAI(systemPrompt, userPrompt, options);
 }

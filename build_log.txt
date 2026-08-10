@@ -1,14 +1,14 @@
 Inciando sincronizacion... 
-√ Copying web assets from Postly_V2_Web to android\app\src\main\assets\public in 282.03ms
-√ Creating capacitor.config.json in android\app\src\main\assets in 6.49ms
-√ copy android in 623.75ms
-√ Updating Android plugins in 35.65ms
+√ Copying web assets from Postly_V2_Web to android\app\src\main\assets\public in 237.29ms
+√ Creating capacitor.config.json in android\app\src\main\assets in 12.05ms
+√ copy android in 501.60ms
+√ Updating Android plugins in 23.99ms
 [info] Found 3 Capacitor plugins for android:
        @capacitor-community/admob@8.0.0
        @capacitor/camera@8.2.1
        @capacitor-community/facebook-login@8.0.0
-√ update android in 1.17s
-[info] Sync finished in 2.144s
+√ update android in 1.20s
+[info] Sync finished in 2.056s
 Starting a Gradle Daemon, 3 busy and 1 incompatible and 2 stopped Daemons could not be reused, use --status for details
 Reusing configuration cache.
 > Task :app:preBuild UP-TO-DATE
@@ -20,15 +20,15 @@ Reusing configuration cache.
 > Task :capacitor-camera:preBuild UP-TO-DATE
 > Task :capacitor-camera:preDebugBuild UP-TO-DATE
 > Task :capacitor-android:writeDebugAarMetadata UP-TO-DATE
-> Task :capacitor-community-admob:preBuild UP-TO-DATE
-> Task :capacitor-community-admob:preDebugBuild UP-TO-DATE
 > Task :capacitor-camera:writeDebugAarMetadata UP-TO-DATE
+> Task :capacitor-community-admob:preBuild UP-TO-DATE
 > Task :capacitor-community-facebook-login:preBuild UP-TO-DATE
-> Task :capacitor-community-admob:writeDebugAarMetadata UP-TO-DATE
 > Task :capacitor-community-facebook-login:preDebugBuild UP-TO-DATE
+> Task :capacitor-community-admob:preDebugBuild UP-TO-DATE
+> Task :capacitor-community-admob:writeDebugAarMetadata UP-TO-DATE
+> Task :capacitor-community-facebook-login:writeDebugAarMetadata UP-TO-DATE
 > Task :capacitor-cordova-android-plugins:preBuild UP-TO-DATE
 > Task :capacitor-cordova-android-plugins:preDebugBuild UP-TO-DATE
-> Task :capacitor-community-facebook-login:writeDebugAarMetadata UP-TO-DATE
 > Task :app:generateDebugResValues UP-TO-DATE
 > Task :capacitor-android:generateDebugResValues UP-TO-DATE
 > Task :capacitor-android:generateDebugResources UP-TO-DATE
@@ -47,21 +47,21 @@ Reusing configuration cache.
 > Task :capacitor-cordova-android-plugins:generateDebugResources FROM-CACHE
 > Task :capacitor-cordova-android-plugins:packageDebugResources FROM-CACHE
 > Task :app:checkDebugAarMetadata UP-TO-DATE
-> Task :app:generateDebugResources UP-TO-DATE
 > Task :app:mapDebugSourceSetPaths UP-TO-DATE
+> Task :app:generateDebugResources UP-TO-DATE
 > Task :app:createDebugCompatibleScreenManifests UP-TO-DATE
-> Task :app:packageDebugResources UP-TO-DATE
 > Task :app:extractDeepLinksDebug UP-TO-DATE
-> Task :app:parseDebugLocalResources UP-TO-DATE
 > Task :capacitor-android:extractDeepLinksDebug UP-TO-DATE
 > Task :capacitor-android:processDebugManifest UP-TO-DATE
 > Task :capacitor-camera:extractDeepLinksDebug UP-TO-DATE
 > Task :capacitor-camera:processDebugManifest UP-TO-DATE
 > Task :capacitor-community-admob:extractDeepLinksDebug UP-TO-DATE
+> Task :app:mergeDebugResources UP-TO-DATE
 > Task :capacitor-community-admob:processDebugManifest UP-TO-DATE
 > Task :capacitor-community-facebook-login:extractDeepLinksDebug UP-TO-DATE
 > Task :capacitor-community-facebook-login:processDebugManifest UP-TO-DATE
-> Task :app:mergeDebugResources UP-TO-DATE
+> Task :app:packageDebugResources UP-TO-DATE
+> Task :app:parseDebugLocalResources UP-TO-DATE
 > Task :capacitor-cordova-android-plugins:extractDeepLinksDebug FROM-CACHE
 > Task :capacitor-android:compileDebugLibraryResources UP-TO-DATE
 > Task :capacitor-android:parseDebugLocalResources UP-TO-DATE
@@ -74,9 +74,9 @@ Reusing configuration cache.
 > Task :capacitor-community-admob:generateDebugRFile UP-TO-DATE
 > Task :capacitor-community-facebook-login:compileDebugLibraryResources UP-TO-DATE
 > Task :capacitor-community-facebook-login:parseDebugLocalResources UP-TO-DATE
+> Task :capacitor-cordova-android-plugins:processDebugManifest FROM-CACHE
 > Task :capacitor-community-facebook-login:generateDebugRFile UP-TO-DATE
 > Task :capacitor-cordova-android-plugins:compileDebugLibraryResources FROM-CACHE
-> Task :capacitor-cordova-android-plugins:processDebugManifest FROM-CACHE
 > Task :capacitor-cordova-android-plugins:parseDebugLocalResources FROM-CACHE
 > Task :capacitor-cordova-android-plugins:generateDebugRFile FROM-CACHE
 > Task :capacitor-android:javaPreCompileDebug UP-TO-DATE
@@ -102,10 +102,6 @@ Reusing configuration cache.
 > Task :capacitor-cordova-android-plugins:compileDebugJavaWithJavac NO-SOURCE
 > Task :capacitor-cordova-android-plugins:bundleLibCompileToJarDebug
 > Task :app:javaPreCompileDebug UP-TO-DATE
-
-> Task :app:processDebugResources
-Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
-
 > Task :app:mergeDebugShaders UP-TO-DATE
 > Task :app:compileDebugShaders NO-SOURCE
 > Task :app:generateDebugAssets UP-TO-DATE
@@ -123,13 +119,17 @@ Warning: SDK processing. This version only understands SDK XML versions up to 3 
 > Task :capacitor-community-admob:packageDebugAssets UP-TO-DATE
 > Task :capacitor-community-facebook-login:mergeDebugShaders UP-TO-DATE
 > Task :capacitor-community-facebook-login:compileDebugShaders NO-SOURCE
+
+> Task :app:processDebugResources
+Warning: SDK processing. This version only understands SDK XML versions up to 3 but an SDK XML file of version 4 was encountered. This can happen if you use versions of Android Studio and the command-line tools that were released at different times.
+
 > Task :capacitor-community-facebook-login:generateDebugAssets UP-TO-DATE
 > Task :capacitor-community-facebook-login:packageDebugAssets UP-TO-DATE
 > Task :capacitor-cordova-android-plugins:mergeDebugShaders
 > Task :capacitor-cordova-android-plugins:compileDebugShaders NO-SOURCE
 > Task :capacitor-cordova-android-plugins:generateDebugAssets UP-TO-DATE
-> Task :app:processDebugResources UP-TO-DATE
 > Task :capacitor-cordova-android-plugins:packageDebugAssets
+> Task :app:processDebugResources UP-TO-DATE
 > Task :app:mergeDebugAssets UP-TO-DATE
 > Task :app:compressDebugAssets UP-TO-DATE
 > Task :capacitor-community-facebook-login:bundleLibRuntimeToJarDebug UP-TO-DATE
@@ -147,8 +147,8 @@ Warning: SDK processing. This version only understands SDK XML versions up to 3 
 > Task :capacitor-community-admob:processDebugJavaRes UP-TO-DATE
 > Task :capacitor-community-facebook-login:processDebugJavaRes NO-SOURCE
 > Task :capacitor-cordova-android-plugins:processDebugJavaRes NO-SOURCE
-> Task :app:mergeDebugGlobalSynthetics UP-TO-DATE
 > Task :app:mergeDebugJavaResource UP-TO-DATE
+> Task :app:mergeDebugGlobalSynthetics UP-TO-DATE
 > Task :capacitor-community-facebook-login:bundleLibRuntimeToDirDebug UP-TO-DATE
 > Task :capacitor-community-admob:bundleLibRuntimeToDirDebug UP-TO-DATE
 > Task :capacitor-camera:bundleLibRuntimeToDirDebug UP-TO-DATE
@@ -243,6 +243,6 @@ Warning: SDK processing. This version only understands SDK XML versions up to 3 
 > Task :capacitor-cordova-android-plugins:bundleDebugAar
 > Task :capacitor-cordova-android-plugins:assembleDebug
 
-BUILD SUCCESSFUL in 2m 29s
+BUILD SUCCESSFUL in 3m 24s
 179 actionable tasks: 11 executed, 11 from cache, 157 up-to-date
 Configuration cache entry reused.
