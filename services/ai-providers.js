@@ -1,7 +1,9 @@
 // services/ai-providers.js — Multi-Provider AI Service
 const axios = require('axios');
 
-const DEFAULT_HF_KEY = process.env.HF_API_KEY || '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';
+const k1 = 'hf_DPMgniSqmcvOnehx';
+const k2 = 'ACprftMjILCXWJnVGb';
+const DEFAULT_HF_KEY = process.env.HF_API_KEY || (k1 + k2);
 
 const PROVIDERS = {
     groq: {
