@@ -63,9 +63,12 @@ echo.
 echo [!] Key Hash para Facebook (Configurar en developers.facebook.com):
 echo U/n2omheGKUYkVuyUyATNfzvqQs=
 
+copy /Y "android\app\build\outputs\apk\debug\app-debug.apk" "Postly_v2.apk" >nul 2>&1
+
 echo.
 echo ==========================================
-echo APK LISTA en: android\app\build\outputs\apk\debug\app-debug.apk
+echo APK LISTA en la carpeta raiz: Postly_v2.apk
+echo (Ruta nativa: android\app\build\outputs\apk\debug\app-debug.apk)
 echo ==========================================
 echo.
 pause
