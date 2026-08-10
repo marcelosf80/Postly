@@ -67,15 +67,18 @@ const IMAGE_PROVIDERS = {
 function getCandidateProviders() {
     const candidates = [];
     // 1. Groq (si hay key válida en env)
-    if (process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.length > 5) {
+    if (process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.length > 5 && !process.env.GROQ_API_KEY.includes('gsk_eidVu')) {
         candidates.push({ key: 'groq', ...PROVIDERS.groq, apiKey: process.env.GROQ_API_KEY });
     }
-    // 2. HuggingFace (con clave por defecto si no está en env)
-    candidates.push({ key: 'huggingface_text', ...PROVIDERS.huggingface_text, apiKey: DEFAULT_HF_KEY });
-    // 3. OpenAI (si está en env)
+    // 2. OpenAI (si está en env)
     if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.length > 5) {
         candidates.push({ key: 'openai', ...PROVIDERS.openai, apiKey: process.env.OPENAI_API_KEY });
     }
+    // 3. Pollinations AI (100% Libre sin clave ni 401)
+    candidates.push({ key: 'pollinations_free', name: 'Pollinations AI (Gratis)', isPollinations: true });
+    // 4. HuggingFace (como respaldo secundario)
+    candidates.push({ key: 'huggingface_text', ...PROVIDERS.huggingface_text, apiKey: DEFAULT_HF_KEY });
+    
     return candidates;
 }
 
@@ -130,7 +133,7 @@ async function describeImage(imageBase64) {
         }
         return null;
     } catch (e) {
-        console.error('[VISION] Error analizando imagen:', e.message);
+        console.warn('[VISION] Error analizando imagen (continuando sin análisis visual):', e.message);
         return null;
     }
 }
@@ -139,9 +142,8 @@ async function describeImage(imageBase64) {
  * Petición gratuita a Pollinations AI (100% libre sin API key)
  */
 async function callPollinationsFree(messages) {
-    console.log('[AI] Probando Pollinations Free POST (Mistral/Qwen)...');
+    console.log('[AI] Ejecutando motor de respuesta libre (Pollinations Mistral/Qwen)...');
     
-    // Método 1: POST a text.pollinations.ai con modelo mistral (gratis)
     try {
         const response = await axios.post('https://text.pollinations.ai/', {
             messages: messages,
@@ -162,7 +164,6 @@ async function callPollinationsFree(messages) {
         console.warn('[AI] Pollinations POST mistral falló:', e1.message);
     }
 
-    // Método 2: POST a text.pollinations.ai con modelo qwen
     try {
         const response = await axios.post('https://text.pollinations.ai/', {
             messages: messages,
@@ -214,6 +215,20 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
     for (const provider of candidates) {
         console.log(`[AI] Intentando proveedor: ${provider.name}...`);
         
+        if (provider.isPollinations) {
+            try {
+                const pollinationsResult = await callPollinationsFree(messages);
+                if (pollinationsResult && pollinationsResult.trim()) {
+                    console.log('[AI] Éxito con Pollinations AI');
+                    return pollinationsResult;
+                }
+            } catch (ePol) {
+                console.warn('[AI Fallback] Pollinations falló:', ePol.message);
+                lastError = ePol.message;
+                continue;
+            }
+        }
+
         const headers = { 'Content-Type': 'application/json' };
         if (provider.apiKey) {
             headers['Authorization'] = `Bearer ${provider.apiKey}`;
@@ -261,14 +276,6 @@ async function callAI(systemPrompt, userPrompt, options = {}) {
             }
             lastError = `${provider.name}: ${msg1}`;
         }
-    }
-
-    // Si fallan las claves (Groq / HuggingFace 401), usar Pollinations Free POST automáticamente
-    try {
-        console.log('[AI] Activando respaldo Pollinations (Gratuito sin API Key)...');
-        return await callPollinationsFree(messages);
-    } catch (ePollinations) {
-        console.error('[AI Fallback] Respaldo Pollinations también falló:', ePollinations.message);
     }
 
     throw new Error(`Servicios de IA no disponibles. Error: ${lastError}`);
