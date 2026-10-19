@@ -146,42 +146,50 @@ async function generateVisualPrompt(concept, options = {}) {
 
 async function generateImage(prompt, options = {}) {
     const imageBase64 = options.imageBase64;
-    if (!imageBase64 || typeof imageBase64 !== 'string') {
-        throw new Error('Selecciona una foto de referencia antes de generar la imagen.');
-    }
-
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey || apiKey.trim().length < 12) {
         throw new Error('Configura OPENAI_API_KEY en las variables de entorno del servidor.');
     }
 
-    const match = imageBase64.match(/^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=\s]+)$/i);
-    if (!match) {
-        throw new Error('La foto de referencia debe ser PNG, JPEG o WebP en formato base64.');
-    }
-    const mimeType = match[1].toLowerCase();
-    const imageBuffer = Buffer.from(match[2].replace(/\s/g, ''), 'base64');
-    if (imageBuffer.length > 20 * 1024 * 1024) {
-        throw new Error('La foto de referencia supera el límite de 20 MB.');
-    }
-
-    const extension = mimeType === 'image/jpeg' ? 'jpg' : mimeType.split('/')[1];
-    const form = new FormData();
-    form.append('model', process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2.5-sunburst');
-    form.append('prompt', String(prompt || 'Crea una variación atractiva y natural para una publicación de Instagram.').slice(0, 4000));
-    form.append('image[]', imageBuffer, { filename: `reference.${extension}`, contentType: mimeType });
-    form.append('output_format', 'png');
+    const model = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2.5-sunburst';
+    const imagePrompt = String(prompt || 'Crea una variación atractiva y natural para una publicación de Instagram.').slice(0, 4000);
 
     try {
-        const response = await axios.post('https://api.openai.com/v1/images/edits', form, {
-            headers: {
-                Authorization: `Bearer ${apiKey}`,
-                ...form.getHeaders()
-            },
-            timeout: 180000,
-            maxBodyLength: Infinity,
-            maxContentLength: Infinity
-        });
+        let response;
+        if (imageBase64) {
+            const match = imageBase64.match(/^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=\s]+)$/i);
+            if (!match) {
+                throw new Error('La foto de referencia debe ser PNG, JPEG o WebP en formato base64.');
+            }
+            const mimeType = match[1].toLowerCase();
+            const imageBuffer = Buffer.from(match[2].replace(/\s/g, ''), 'base64');
+            if (imageBuffer.length > 20 * 1024 * 1024) {
+                throw new Error('La foto de referencia supera el límite de 20 MB.');
+            }
+
+            const extension = mimeType === 'image/jpeg' ? 'jpg' : mimeType.split('/')[1];
+            const form = new FormData();
+            form.append('model', model);
+            form.append('prompt', imagePrompt);
+            form.append('image[]', imageBuffer, { filename: `reference.${extension}`, contentType: mimeType });
+            form.append('output_format', 'png');
+            response = await axios.post('https://api.openai.com/v1/images/edits', form, {
+                headers: { Authorization: `Bearer ${apiKey}`, ...form.getHeaders() },
+                timeout: 180000,
+                maxBodyLength: Infinity,
+                maxContentLength: Infinity
+            });
+        } else {
+            response = await axios.post('https://api.openai.com/v1/images/generations', {
+                model,
+                prompt: imagePrompt,
+                output_format: 'png'
+            }, {
+                headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+                timeout: 180000
+            });
+        }
+
         const encoded = response.data?.data?.[0]?.b64_json;
         if (!encoded) throw new Error('OpenAI no devolvió una imagen.');
         return `data:image/png;base64,${encoded}`;
