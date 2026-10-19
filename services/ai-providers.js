@@ -1,5 +1,6 @@
 // services/ai-providers.js — Multi-Provider AI Service
 const axios = require('axios');
+const FormData = require('form-data');
 
 const PROVIDERS = {
     deepseek: {
@@ -7,63 +8,6 @@ const PROVIDERS = {
         model: process.env.DEEPSEEK_MODEL || 'deepseek-flash',
         apiKeyEnv: 'DEEPSEEK_API_KEY',
         name: 'DeepSeek'
-    },
-    groq: {
-        url: 'https://api.groq.com/openai/v1/chat/completions',
-        model: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
-        secondaryModel: 'llama-3.1-8b-instant',
-        apiKeyEnv: 'GROQ_API_KEY',
-        name: 'Groq'
-    },
-    huggingface_text: {
-        url: 'https://router.huggingface.co/hf-inference/v1/chat/completions',
-        model: 'Qwen/Qwen2.5-7B-Instruct',
-        secondaryModel: 'meta-llama/Llama-3.2-3B-Instruct',
-        apiKeyEnv: 'HF_API_KEY',
-        name: 'HuggingFace'
-    },
-    openai: {
-        url: 'https://api.openai.com/v1/chat/completions',
-        model: 'gpt-4o-mini', 
-        apiKeyEnv: 'OPENAI_API_KEY',
-        name: 'OpenAI'
-    }
-};
-
-const IMAGE_PROVIDERS = {
-    pollinations: {
-        name: 'Pollinations AI (Gratis)',
-        available: true,
-        generate: async (prompt) => {
-            const cleanPrompt = prompt.substring(0, 800);
-            const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(cleanPrompt)}?width=1024&height=1024&nologo=true&seed=${Math.floor(Math.random() * 100000)}`;
-            const response = await axios.get(url, { responseType: 'arraybuffer' });
-            const base64Str = Buffer.from(response.data, 'binary').toString('base64');
-            return `data:image/jpeg;base64,${base64Str}`;
-        }
-    },
-    huggingface: {
-        name: 'Hugging Face (Flux)',
-        available: true,
-        generate: async (prompt) => {
-            const token = process.env.HF_API_KEY;
-            if (!token) throw new Error('HF_API_KEY no configurada.');
-            const model = process.env.HF_MODEL || 'black-forest-labs/FLUX.1-schnell';
-            const response = await axios.post(
-                `https://api-inference.huggingface.co/models/${model}`,
-                { inputs: prompt },
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    },
-                    responseType: 'arraybuffer',
-                    timeout: 60000
-                }
-            );
-            const base64Str = Buffer.from(response.data, 'binary').toString('base64');
-            return `data:image/jpeg;base64,${base64Str}`;
-        }
     }
 };
 
@@ -201,50 +145,54 @@ async function generateVisualPrompt(concept, options = {}) {
 }
 
 async function generateImage(prompt, options = {}) {
-    const { imageBase64 = null } = options;
-    if (process.env.HF_API_KEY && process.env.HF_API_KEY.length > 5) {
-        try {
-            if (imageBase64) {
-                console.log("[IMAGE] Generando imagen adaptada con Hugging Face (Stable Diffusion Img2Img)...");
-                const token = process.env.HF_API_KEY;
-                const model = process.env.HF_IMAGE_EDIT_MODEL || 'runwayml/stable-diffusion-v1-5';
-                const formattedBase64 = imageBase64.includes('base64,') ? imageBase64 : `data:image/jpeg;base64,${imageBase64}`;
-                const response = await axios.post(
-                    `https://api-inference.huggingface.co/models/${model}`,
-                    {
-                        inputs: formattedBase64,
-                        parameters: {
-                            prompt: prompt,
-                            strength: 0.4, // Fuerza baja para mantener las facciones de la persona original
-                            negative_prompt: "deformed, bad quality, blurry, different face, different person, extra limbs, ugly"
-                        }
-                    },
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        },
-                        responseType: 'arraybuffer',
-                        timeout: 90000
-                    }
-                );
-                const base64Str = Buffer.from(response.data, 'binary').toString('base64');
-                return `data:image/jpeg;base64,${base64Str}`;
-            } else {
-                console.log("[IMAGE] Generando imagen con Hugging Face (FLUX)...");
-                return await IMAGE_PROVIDERS.huggingface.generate(prompt);
-            }
-        } catch (e) {
-            console.error("[IMAGE] Falló Hugging Face:", e.message);
-            if (imageBase64) {
-                const errMsg = e.response ? Buffer.from(e.response.data).toString('utf8') : e.message;
-                throw new Error(`Hugging Face: ${errMsg}`);
-            }
-        }
+    const imageBase64 = options.imageBase64;
+    if (!imageBase64 || typeof imageBase64 !== 'string') {
+        throw new Error('Selecciona una foto de referencia antes de generar la imagen.');
     }
-    return IMAGE_PROVIDERS.pollinations.generate(prompt);
-}
 
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey || apiKey.trim().length < 12) {
+        throw new Error('Configura OPENAI_API_KEY en las variables de entorno del servidor.');
+    }
+
+    const match = imageBase64.match(/^data:(image\/(?:png|jpeg|webp));base64,([A-Za-z0-9+/=\s]+)$/i);
+    if (!match) {
+        throw new Error('La foto de referencia debe ser PNG, JPEG o WebP en formato base64.');
+    }
+    const mimeType = match[1].toLowerCase();
+    const imageBuffer = Buffer.from(match[2].replace(/\s/g, ''), 'base64');
+    if (imageBuffer.length > 20 * 1024 * 1024) {
+        throw new Error('La foto de referencia supera el límite de 20 MB.');
+    }
+
+    const extension = mimeType === 'image/jpeg' ? 'jpg' : mimeType.split('/')[1];
+    const form = new FormData();
+    form.append('model', process.env.OPENAI_IMAGE_MODEL || 'gpt-image-2.5-sunburst');
+    form.append('prompt', String(prompt || 'Crea una variación atractiva y natural para una publicación de Instagram.').slice(0, 4000));
+    form.append('image[]', imageBuffer, { filename: `reference.${extension}`, contentType: mimeType });
+    form.append('output_format', 'png');
+
+    try {
+        const response = await axios.post('https://api.openai.com/v1/images/edits', form, {
+            headers: {
+                Authorization: `Bearer ${apiKey}`,
+                ...form.getHeaders()
+            },
+            timeout: 180000,
+            maxBodyLength: Infinity,
+            maxContentLength: Infinity
+        });
+        const encoded = response.data?.data?.[0]?.b64_json;
+        if (!encoded) throw new Error('OpenAI no devolvió una imagen.');
+        return `data:image/png;base64,${encoded}`;
+    } catch (error) {
+        const detail = error.response?.data?.error?.message || error.message;
+        console.error('[IMAGE] Error de OpenAI:', detail);
+        if (error.response?.status === 401) throw new Error('API key de OpenAI inválida.');
+        if (error.response?.status === 429) throw new Error('OpenAI alcanzó el límite temporal de solicitudes.');
+        throw new Error(`OpenAI Images: ${detail}`);
+    }
+}
 
 async function analyzeImage(imageBase64, options = {}) {
     const imageDesc = await describeImage(imageBase64);
@@ -255,7 +203,7 @@ async function analyzeImage(imageBase64, options = {}) {
             options
         );
     }
-    return 'No se pudo analizar la imagen. Asegúrate de tener tu HF_API_KEY configurada.';
+    return 'No se pudo analizar la imagen. Revisa DEEPSEEK_API_KEY en la configuración del servidor.';
 }
 
 function getProviderStatus() {
