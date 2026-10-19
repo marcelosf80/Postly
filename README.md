@@ -52,9 +52,9 @@ SocialPulse es una plataforma SaaS diseñada para la automatización de marketin
    FACEBOOK_APP_ID=...
    DEEPSEEK_API_KEY=tu_api_key_de_deepseek
    DEEPSEEK_MODEL=deepseek-flash
-   # Opcional: edición img2img de fotos de referencia
-   HF_API_KEY=tu_api_key_de_huggingface
-   HF_IMAGE_EDIT_MODEL=runwayml/stable-diffusion-v1-5
+   # Edición/generación de imagen desde una foto de referencia (OpenAI Images)
+   OPENAI_API_KEY=tu_api_key_de_openai
+   OPENAI_IMAGE_MODEL=gpt-image-2.5-sunburst
    ```
 
    En Render, agrega estas variables en **Environment** del servicio backend. No pongas las API keys en el código ni en el frontend.
