@@ -4,7 +4,7 @@ SocialPulse es una plataforma SaaS diseñada para la automatización de marketin
 
 ## 🚀 Características Principales
 
-- **Generación de Contenido con IA**: Integración con múltiples proveedores de IA para crear captions y contenido optimizado.
+- **Generación de Contenido con IA**: DeepSeek analiza imágenes de referencia y redacta captions; OpenAI crea o edita imágenes para las publicaciones.
 - **Gestión Multi-Plataforma**: Publicación directa y programación en Instagram y Facebook.
 - **Programación de Posts**: Calendario de publicaciones inteligente con estados de borrador, programado y publicado.
 - **Autenticación Segura**: Sistema de login local y soporte para Google OAuth.
@@ -20,7 +20,7 @@ SocialPulse es una plataforma SaaS diseñada para la automatización de marketin
     - Meta Graph API (Instagram & Facebook).
     - Google OAuth 2.0.
     - MercadoPago Checkout Pro.
-    - AI Providers (Groq, Gemini, Ollama).
+    - DeepSeek API (texto y visión) y OpenAI Images (generación y edición).
 
 ## 📋 Requisitos Previos
 
@@ -50,7 +50,14 @@ SocialPulse es una plataforma SaaS diseñada para la automatización de marketin
    JWT_SECRET=tu_secreto_aqui
    GOOGLE_CLIENT_ID=...
    FACEBOOK_APP_ID=...
+   DEEPSEEK_API_KEY=tu_api_key_de_deepseek
+   DEEPSEEK_MODEL=deepseek-flash
+   # Edición/generación de imagen desde una foto de referencia (OpenAI Images)
+   OPENAI_API_KEY=tu_api_key_de_openai
+   OPENAI_IMAGE_MODEL=gpt-image-2.5-sunburst
    ```
+
+   En Render, agrega estas variables en **Environment** del servicio backend. No pongas las API keys en el código ni en el frontend.
 
 4. Inicia el servidor:
    ```bash
