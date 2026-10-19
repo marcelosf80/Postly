@@ -1,21 +1,12 @@
 // services/ai-providers.js — Multi-Provider AI Service
 const axios = require('axios');
 
-const k1 = 'hf_DPMgniSqmcvOnehx';
-const k2 = 'ACprftMjILCXWJnVGb';
-const DEFAULT_HF_KEY = process.env.HF_API_KEY || (k1 + k2);
-
-const or1 = 'sk-or-v1-0446cf3e8d37d5f212150067fcc34f7eb5401';
-const or2 = 'caeb1e08c3da2246644229a51c6';
-const OPENROUTER_KEY = process.env.OPENROUTER_API_KEY || (or1 + or2);
-
 const PROVIDERS = {
-    openrouter: {
-        url: 'https://openrouter.ai/api/v1/chat/completions',
-        model: 'nvidia/nemotron-nano-9b-v2:free',
-        secondaryModel: 'openai/gpt-oss-20b:free',
-        apiKey: OPENROUTER_KEY,
-        name: 'OpenRouter (OpenAI/Nvidia)'
+    deepseek: {
+        url: 'https://api.deepseek.com/chat/completions',
+        model: process.env.DEEPSEEK_MODEL || 'deepseek-flash',
+        apiKeyEnv: 'DEEPSEEK_API_KEY',
+        name: 'DeepSeek'
     },
     groq: {
         url: 'https://api.groq.com/openai/v1/chat/completions',
@@ -55,7 +46,8 @@ const IMAGE_PROVIDERS = {
         name: 'Hugging Face (Flux)',
         available: true,
         generate: async (prompt) => {
-            const token = DEFAULT_HF_KEY;
+            const token = process.env.HF_API_KEY;
+            if (!token) throw new Error('HF_API_KEY no configurada.');
             const model = process.env.HF_MODEL || 'black-forest-labs/FLUX.1-schnell';
             const response = await axios.post(
                 `https://api-inference.huggingface.co/models/${model}`,
@@ -76,228 +68,80 @@ const IMAGE_PROVIDERS = {
 };
 
 function getCandidateProviders() {
-    const candidates = [];
-    // 1. OpenRouter (Primary con la nueva API key del usuario)
-    candidates.push({ key: 'openrouter', ...PROVIDERS.openrouter, apiKey: OPENROUTER_KEY });
-    
-    // 2. Groq (si hay key válida en env)
-    if (process.env.GROQ_API_KEY && process.env.GROQ_API_KEY.length > 5 && !process.env.GROQ_API_KEY.includes('gsk_eidVu')) {
-        candidates.push({ key: 'groq', ...PROVIDERS.groq, apiKey: process.env.GROQ_API_KEY });
+    const apiKey = process.env.DEEPSEEK_API_KEY;
+    if (!apiKey || apiKey.trim().length < 12) {
+        throw new Error('Configura DEEPSEEK_API_KEY en las variables de entorno del servidor.');
     }
-    // 3. OpenAI (si está en env)
-    if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY.length > 5) {
-        candidates.push({ key: 'openai', ...PROVIDERS.openai, apiKey: process.env.OPENAI_API_KEY });
-    }
-    // 4. HuggingFace
-    candidates.push({ key: 'huggingface_text', ...PROVIDERS.huggingface_text, apiKey: DEFAULT_HF_KEY });
-    
-    return candidates;
+    const provider = PROVIDERS.deepseek;
+    return [{ key: 'deepseek', ...provider, apiKey }];
 }
 
-/**
- * Usa OpenRouter Vision (Nemotron-12B-VL) para describir una imagen en texto nativamente.
- */
-async function describeImage(imageBase64) {
+async function describeImage(imageBase64, options = {}) {
     if (!imageBase64 || imageBase64.length < 50) return null;
-    
     try {
-        console.log('[VISION] Analizando imagen nativamente con OpenRouter Vision (Nemotron-12B-VL)...');
-        
-        let formattedBase64 = imageBase64;
-        if (!formattedBase64.startsWith('data:image')) {
-            formattedBase64 = `data:image/jpeg;base64,${formattedBase64}`;
-        }
-        
-        const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-            model: 'nvidia/nemotron-nano-12b-v2-vl:free',
-            messages: [
-                {
-                    role: 'user',
-                    content: [
-                        { type: 'text', text: 'Describí brevemente en español qué se ve exactamente en esta fotografía (personas, edad aproximada, ropa, objetos, lugar y ambiente).' },
-                        { type: 'image_url', image_url: { url: formattedBase64 } }
-                    ]
-                }
-            ],
-            max_tokens: 250
-        }, {
-            headers: {
-                'Authorization': `Bearer ${OPENROUTER_KEY}`,
-                'Content-Type': 'application/json'
-            },
-            timeout: 25000
-        });
-
-        if (response.data && response.data.choices && response.data.choices[0] && response.data.choices[0].message) {
-            const desc = response.data.choices[0].message.content;
-            console.log('[VISION] ✅ Descripción visual obtenida:', desc);
-            return desc;
-        }
+        return await callAI(
+            'Describe imágenes en español con precisión. No inventes detalles ni identifiques personas.',
+            'Describe brevemente los elementos visibles, colores, composición y ambiente de esta fotografía.',
+            { ...options, imageBase64, maxTokens: 300 }
+        );
     } catch (e) {
-        console.warn('[VISION] OpenRouter Vision falló:', e.message);
+        console.warn('[VISION] DeepSeek no pudo analizar la imagen:', e.message);
+        return null;
     }
-    return null;
 }
 
 async function callAI(systemPrompt, userPrompt, options = {}) {
-    let { temperature = 0.7, maxTokens = 1200, images = [], imageBase64 = null } = options;
+    const { temperature = 0.7, maxTokens = 1200, imageBase64 = null } = options;
+    const provider = getCandidateProviders()[0];
+    const imageUrl = imageBase64
+        ? (imageBase64.startsWith('data:image/') ? imageBase64 : `data:image/jpeg;base64,${imageBase64}`)
+        : null;
+    const userContent = imageUrl
+        ? [
+            { type: 'text', text: userPrompt },
+            { type: 'image_url', image_url: { url: imageUrl } }
+        ]
+        : userPrompt;
 
-    if (imageBase64 && images.length === 0) {
-        images = [imageBase64];
-    }
-
-    const candidates = getCandidateProviders();
-    let messages = [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-    ];
-
-    let lastError = null;
-
-    for (const provider of candidates) {
-        console.log(`[AI] Intentando proveedor: ${provider.name}...`);
-
-        const headers = { 'Content-Type': 'application/json' };
-        if (provider.apiKey) {
-            headers['Authorization'] = `Bearer ${provider.apiKey}`;
-        }
-
-        const tryModel = async (modelName) => {
-            const body = {
-                model: modelName,
-                messages,
-                temperature,
-                max_tokens: maxTokens
-            };
-            const response = await axios.post(provider.url, body, { headers, timeout: 35000 });
-            
-            if (response.data && response.data.choices && response.data.choices[0] && response.data.choices[0].message) {
-                return response.data.choices[0].message.content;
-            }
-            if (typeof response.data === 'string') {
-                return response.data;
-            }
-            throw new Error('Respuesta no válida');
-        };
-
-        try {
-            const text = await tryModel(provider.model);
-            if (text && text.trim()) {
-                console.log(`[AI] ✅ Éxito con proveedor: ${provider.name} (${provider.model})`);
-                return text;
-            }
-        } catch (e1) {
-            const msg1 = e1.response?.data?.error?.message || e1.message;
-            console.warn(`[AI Fallback] ${provider.name} (${provider.model}) falló: ${msg1}`);
-            
-            if (provider.secondaryModel) {
-                try {
-                    const text2 = await tryModel(provider.secondaryModel);
-                    if (text2 && text2.trim()) {
-                        console.log(`[AI] ✅ Éxito con modelo secundario de ${provider.name} (${provider.secondaryModel})`);
-                        return text2;
-                    }
-                } catch (e2) {
-                    const msg2 = e2.response?.data?.error?.message || e2.message;
-                    console.warn(`[AI Fallback] ${provider.name} (${provider.secondaryModel}) falló: ${msg2}`);
-                }
-            }
-            lastError = `${provider.name}: ${msg1}`;
-        }
-    }
-
-    throw new Error(`Servicios de IA no disponibles. Error: ${lastError}`);
-}
-
-const sharp = require('sharp');
-
-/**
- * Comprime la imagen a máximo 800px y calidad 70 para envío ultrarrápido
- */
-async function compressImageForVision(imageBase64) {
-    if (!imageBase64 || imageBase64.length < 50) return null;
     try {
-        const rawBase64 = imageBase64.includes('base64,') ? imageBase64.split('base64,')[1] : imageBase64;
-        const inputBuffer = Buffer.from(rawBase64, 'base64');
-        
-        const compressedBuffer = await sharp(inputBuffer)
-            .resize({ width: 800, height: 800, fit: 'inside', withoutEnlargement: true })
-            .jpeg({ quality: 70 })
-            .toBuffer();
-            
-        return `data:image/jpeg;base64,${compressedBuffer.toString('base64')}`;
-    } catch (e) {
-        console.warn('[VISION] Error comprimiendo imagen:', e.message);
-        return imageBase64;
+        const response = await axios.post(provider.url, {
+            model: provider.model,
+            messages: [
+                { role: 'system', content: systemPrompt },
+                { role: 'user', content: userContent }
+            ],
+            temperature,
+            max_tokens: maxTokens
+        }, {
+            headers: {
+                Authorization: `Bearer ${provider.apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            timeout: 60000
+        });
+        const text = response.data?.choices?.[0]?.message?.content;
+        if (typeof text !== 'string' || !text.trim()) throw new Error('Respuesta vacía de DeepSeek.');
+        return text.trim();
+    } catch (error) {
+        const detail = error.response?.data?.error?.message || error.response?.data?.message || error.message;
+        console.error('[AI] Error de DeepSeek:', detail);
+        if (error.response?.status === 401) throw new Error('API key de DeepSeek inválida.');
+        if (error.response?.status === 402) throw new Error('La cuenta de DeepSeek no tiene saldo disponible.');
+        if (error.response?.status === 429) throw new Error('DeepSeek alcanzó el límite temporal de solicitudes.');
+        throw new Error(`DeepSeek: ${detail}`);
     }
 }
 
 async function generateCaption(description, options = {}) {
-    let { imageBase64 = null } = options;
-    
-    const systemPrompt = `Eres un creador de contenido profesional pero 100% HUMANO, cercano, cálido y orgánico para redes sociales (Instagram, Facebook, TikTok).
-
-REGLAS OBLIGATORIAS:
-1. Escribe como una persona real compartiendo un pensamiento o momento auténtico.
-2. PROHIBIDO usar clichés de bot o frases de anuncio robótico (como "¡Hola a todos!", "En el mundo acelerado de hoy...", "¡No te lo pierdas!", "¡Atención emprendedores!").
-3. Si hay una foto, OBSERVA ATENTAMENTE LOS DETALLES VISUALES DE LA FOTO (quién aparece, qué viste, qué objetos hay, lugar, colores, emoción) Y ESTRATÉGICAMENTE INTEGRA ESOS DETALLES EN EL TEXTO.
-4. Incluye una pregunta corta y orgánica al final para interactuar con la audiencia.
-5. Usa entre 2 y 4 emojis con moderación que encajen con la vibra de la foto.
-6. Agrega de 3 a 5 hashtags muy relevantes al final.
-7. Devuelve ÚNICAMENTE el texto de la publicación listo para copiar. Sin introducciones como "Aquí tienes tu publicación:".`;
-
-    // Si hay foto, ejecutamos 1 solo pase directo con visión ultrarrápida (Sub-5 segundos)
-    if (imageBase64 && imageBase64.length > 50) {
-        try {
-            console.log('[AI VISION] Generando caption directo con visión (Single-Pass)...');
-            const fastImage = await compressImageForVision(imageBase64);
-            
-            let promptText = 'Observa detalladamente esta fotografía y escribe una publicación muy humana, cercana y atractiva basada en lo que ves.';
-            if (description && description.trim()) {
-                promptText += ` Idea o tema del usuario: "${description}"`;
-            }
-            
-            const response = await axios.post('https://openrouter.ai/api/v1/chat/completions', {
-                model: 'nvidia/nemotron-nano-12b-v2-vl:free',
-                messages: [
-                    { role: 'system', content: systemPrompt },
-                    {
-                        role: 'user',
-                        content: [
-                            { type: 'text', text: promptText },
-                            { type: 'image_url', image_url: { url: fastImage } }
-                        ]
-                    }
-                ],
-                max_tokens: 600,
-                temperature: 0.7
-            }, {
-                headers: {
-                    'Authorization': `Bearer ${OPENROUTER_KEY}`,
-                    'Content-Type': 'application/json'
-                },
-                timeout: 20000
-            });
-
-            if (response.data && response.data.choices && response.data.choices[0] && response.data.choices[0].message) {
-                const text = response.data.choices[0].message.content.trim();
-                if (text && text.length > 10) {
-                    console.log('[AI VISION] ✅ Éxito en 1 solo pase directo de visión!');
-                    return text;
-                }
-            }
-        } catch (eVision) {
-            console.warn('[AI VISION Fallback] Pase directo falló, intentando flujo estándar...', eVision.message);
-        }
-    }
-
-    // Flujo estándar (sin imagen o si la visión directa falló)
-    let userPrompt = 'Genera una publicación muy humana, cercana y atractiva.';
-    if (description && description.trim() !== '') {
-        userPrompt += ` Idea o contexto del usuario: "${description}"`;
-    }
-
-    return callAI(systemPrompt, userPrompt, options);
+    const { imageBase64 = null } = options;
+    const systemPrompt = `Eres un creador de contenido humano y cercano para Instagram, Facebook y TikTok.
+Escribe en español natural, evita clichés y no inventes datos que no estén en la foto o en la indicación.
+Si hay una foto, úsala como contexto visual. Incluye una pregunta orgánica, de 2 a 4 emojis y entre 3 y 5 hashtags.
+Devuelve únicamente el texto final listo para publicar.`;
+    const userPrompt = description && description.trim()
+        ? `Crea una publicación atractiva basada en la foto y esta indicación: "${description.trim()}".`
+        : 'Crea una publicación atractiva basada en esta foto.';
+    return callAI(systemPrompt, userPrompt, { ...options, imageBase64, maxTokens: 600 });
 }
 
 async function generateFlyer(data, options = {}) {
