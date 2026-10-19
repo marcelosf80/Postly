@@ -50,7 +50,14 @@ SocialPulse es una plataforma SaaS diseñada para la automatización de marketin
    JWT_SECRET=tu_secreto_aqui
    GOOGLE_CLIENT_ID=...
    FACEBOOK_APP_ID=...
+   DEEPSEEK_API_KEY=tu_api_key_de_deepseek
+   DEEPSEEK_MODEL=deepseek-flash
+   # Opcional: edición img2img de fotos de referencia
+   HF_API_KEY=tu_api_key_de_huggingface
+   HF_IMAGE_EDIT_MODEL=runwayml/stable-diffusion-v1-5
    ```
+
+   En Render, agrega estas variables en **Environment** del servicio backend. No pongas las API keys en el código ni en el frontend.
 
 4. Inicia el servidor:
    ```bash
