@@ -5,6 +5,7 @@ let cachedPosts = [];
 let currentPostData = {
     content: '',
     image: null,
+    referenceImage: null,
     platform: 'instagram',
     aspect_ratio: 'feed',
     filter: 'none'
@@ -573,6 +574,18 @@ function renderCreatePost() {
                     </div>
                 </div>
 
+                <!-- Generate an Instagram image from the selected reference -->
+                <div class="card" style="padding:16px; border-radius:18px; margin-bottom:18px; background:#fafaff; border:1px solid #e0e7ff;">
+                    <label for="ai-image-prompt" style="font-size:0.84rem; font-weight:800; display:block; margin-bottom:8px; color:#334155;">
+                        <i data-lucide="sparkles" style="width:15px; color:#6366f1; vertical-align:middle;"></i> Crear imagen nueva con tu foto
+                    </label>
+                    <textarea id="ai-image-prompt" placeholder="Ej: Mantén mi apariencia y crea una foto de viaje en una cafetería de París, estilo natural..." style="width:100%; min-height:72px; padding:11px 12px; border:1px solid #cbd5e1; border-radius:12px; font:inherit; font-size:0.84rem; resize:vertical; background:white;"></textarea>
+                    <button class="btn btn-primary" id="btn-generate-reference-image" onclick="generateImageFromReference()" disabled style="width:100%; margin-top:10px; border-radius:12px; min-height:44px;">
+                        <i data-lucide="image-plus" style="width:16px;"></i> Crear imagen con OpenAI
+                    </button>
+                    <p id="ai-image-reference-hint" style="font-size:0.72rem; color:#64748b; margin:8px 0 0;">Primero selecciona una foto tuya. La foto se enviará a OpenAI para crear la nueva imagen.</p>
+                </div>
+
                 <!-- Textarea Editor -->
                 <div style="margin-bottom: 18px;">
                     <label style="font-size: 0.82rem; font-weight: 700; color: #475569; display: flex; align-items: center; gap: 6px; margin-bottom: 8px;">
@@ -640,6 +653,13 @@ function updatePreview() {
     const imgInfoRow = document.getElementById('image-info-row');
     if (imgInfoRow) {
         imgInfoRow.style.display = image ? 'flex' : 'none';
+    }
+
+    const imageButton = document.getElementById('btn-generate-reference-image');
+    if (imageButton) imageButton.disabled = !(currentPostData.referenceImage || image);
+    const imageHint = document.getElementById('ai-image-reference-hint');
+    if (imageHint && (currentPostData.referenceImage || image)) {
+        imageHint.textContent = 'Tu foto está lista como referencia. Al crearla, se enviará a OpenAI para generar una nueva imagen.';
     }
 
     const avatarUrl = user.avatar_url;
@@ -1016,6 +1036,7 @@ function handleFile(event) {
             const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
             
             currentPostData.image = compressedBase64;
+            currentPostData.referenceImage = compressedBase64;
             updatePreview();
             updateFilterThumbnails();
             generateAICaption();
@@ -1027,6 +1048,7 @@ function handleFile(event) {
 
 function removeImage() {
     currentPostData.image = null;
+    currentPostData.referenceImage = null;
     currentPostData.filter = 'none';
     
     updatePreview();
@@ -1060,8 +1082,10 @@ async function takePhotoFromCamera() {
             });
             if (image && image.dataUrl) {
                 currentPostData.image = image.dataUrl;
+                currentPostData.referenceImage = image.dataUrl;
                 updatePreview();
                 showImageControls();
+                generateAICaption();
             }
         } else {
             const fileInput = document.getElementById('file-input');
@@ -1086,8 +1110,10 @@ async function pickPhotoFromGallery() {
             });
             if (image && image.dataUrl) {
                 currentPostData.image = image.dataUrl;
+                currentPostData.referenceImage = image.dataUrl;
                 updatePreview();
                 showImageControls();
+                generateAICaption();
             }
         } else {
             const fileInput = document.getElementById('file-input');
@@ -1169,6 +1195,44 @@ function applyFilter(filter) {
     if (img) img.style.filter = filterStyleVal;
     
     updateFilterThumbnails();
+}
+
+async function generateImageFromReference() {
+    const referenceImage = currentPostData.referenceImage || currentPostData.image;
+    const promptField = document.getElementById('ai-image-prompt');
+    const button = document.getElementById('btn-generate-reference-image');
+    const prompt = promptField?.value.trim();
+
+    if (!referenceImage) {
+        showToast('Selecciona una foto de referencia primero.', 'warning');
+        return;
+    }
+    if (!prompt) {
+        showToast('Describe cómo quieres que sea la nueva imagen.', 'warning');
+        return;
+    }
+
+    const original = button.innerHTML;
+    button.disabled = true;
+    button.innerHTML = '<i data-lucide="loader-circle" class="spin" style="width:16px;"></i> Creando imagen...';
+    lucide.createIcons();
+    try {
+        const result = await API.generateImage(prompt, referenceImage);
+        if (!result?.imageBase64) throw new Error('OpenAI no devolvió una imagen.');
+        currentPostData.image = result.imageBase64;
+        updatePreview();
+        updateFilterThumbnails();
+        showToast('Imagen creada. Generando el texto con DeepSeek...', 'success');
+        await generateAICaption();
+    } catch (error) {
+        showToast('No se pudo crear la imagen: ' + error.message, 'error');
+    } finally {
+        if (button) {
+            button.innerHTML = original;
+            button.disabled = !(currentPostData.referenceImage || currentPostData.image);
+            lucide.createIcons();
+        }
+    }
 }
 
 async function generateAICaption() {
@@ -1627,6 +1691,7 @@ async function processAIPhotoEdit() {
 }
 
 window.useEditedPhoto = function(base64) {
+    currentPostData.referenceImage = editorImageBase64;
     currentPostData.image = base64;
     navigate('create');
     setTimeout(() => {
